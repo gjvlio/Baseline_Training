@@ -16,8 +16,10 @@ import numpy as np
 import pandas as pd
 
 from preprocessing.config import (
-    CREMAD_DIR, MELD_DIR, SAVEE_DIR,
-    CREMAD_OUT, MELD_OUT, SAVEE_OUT,
+    CREMAD_DIR, CREMAD_DEEPFAKE_DIR,
+    MELD_DIR, SAVEE_DIR,
+    CREMAD_OUT, CREMAD_DEEPFAKE_OUT,
+    MELD_OUT, SAVEE_OUT,
 )
 
 VIDEO_EXTS = {".flv", ".mp4", ".avi"}
@@ -244,6 +246,119 @@ def validate_cremad(strict):
     return passed
 
 
+def validate_cremad_deepfake(strict):
+    print("\n" + "=" * 60)
+    print("  CREMA-D Deepfake (Paradigm 2)")
+    print("=" * 60)
+
+    passed = True
+
+    if not os.path.isdir(CREMAD_DEEPFAKE_DIR):
+        print(f"  {_tag('FAIL')} input dir not found: {CREMAD_DEEPFAKE_DIR}")
+        print(f"         Place deepfake videos in that directory and re-run.")
+        return False
+
+    all_ids = sorted(
+        os.path.splitext(f)[0]
+        for f in os.listdir(CREMAD_DEEPFAKE_DIR)
+        if os.path.splitext(f)[1].lower() in VIDEO_EXTS
+    )
+    total = len(all_ids)
+    print(f"  input files  : {total}")
+
+    if total == 0:
+        print(f"  {_tag('FAIL')} no video files found in {CREMAD_DEEPFAKE_DIR}")
+        return False
+
+    # ── progress ─────────────────────────────────────────────────────────
+    progress = _load_progress_union(os.path.join(CREMAD_DEEPFAKE_OUT, "progress.json"))
+    pct = 100 * len(progress) / total if total else 0
+    status = "PASS" if len(progress) == total else "FAIL"
+    passed = passed and (status == "PASS")
+    print(f"  {_tag(status)} progress   : {len(progress)}/{total} ({pct:.1f}%)")
+    _report_missing([i for i in all_ids if i not in progress], "from progress.json")
+
+    # ── audio ────────────────────────────────────────────────────────────
+    audio_missing = []
+    for fid in all_ids:
+        path = os.path.join(CREMAD_DEEPFAKE_OUT, "audio", f"{fid}_melspec.npy")
+        ok, err = _check_npy(path, (80, None), strict, is_melspec=True)
+        if not ok:
+            audio_missing.append(f"{fid} ({err})" if err else fid)
+    status = "PASS" if not audio_missing else "FAIL"
+    passed = passed and (status == "PASS")
+    print(f"  {_tag(status)} audio      : {total - len(audio_missing)}/{total}" +
+          (" [shape+NaN checked]" if strict else ""))
+    _report_missing(audio_missing, "audio melspec.npy")
+
+    # ── text ─────────────────────────────────────────────────────────────
+    text_missing = []
+    for fid in all_ids:
+        p_ids  = os.path.join(CREMAD_DEEPFAKE_OUT, "text", f"{fid}_input_ids.npy")
+        p_mask = os.path.join(CREMAD_DEEPFAKE_OUT, "text", f"{fid}_attention_mask.npy")
+        ok1, e1 = _check_npy(p_ids,  (1, 128), strict)
+        ok2, e2 = _check_npy(p_mask, (1, 128), strict)
+        if not (ok1 and ok2):
+            err = e1 or e2
+            text_missing.append(f"{fid} ({err})" if err else fid)
+    status = "PASS" if not text_missing else "FAIL"
+    passed = passed and (status == "PASS")
+    print(f"  {_tag(status)} text       : {total - len(text_missing)}/{total}" +
+          (" [shape+NaN checked]" if strict else ""))
+    _report_missing(text_missing, "text token .npy pair")
+
+    # ── visual + eq. 12 weights (required for deepfake, same as Paradigm 1) ──
+    visual_missing, weights_missing = [], []
+    for fid in all_ids:
+        if fid not in progress:
+            continue
+        vdir = os.path.join(CREMAD_DEEPFAKE_OUT, "visual", fid)
+        if _visual_frame_count(vdir) == 0:
+            visual_missing.append(fid)
+        elif not _has_weights(vdir):
+            weights_missing.append(fid)
+    vis_done = len(progress) - len(visual_missing)
+    status = "PASS" if not visual_missing else "FAIL"
+    passed = passed and (status == "PASS")
+    print(f"  {_tag(status)} visual     : {vis_done}/{len(progress)} done files have keyframes")
+    _report_missing(visual_missing, "visual keyframe dir")
+    if weights_missing:
+        w_status = "WARN"
+        print(f"  {_tag(w_status)} eq.12 wts  : {len(weights_missing)} visual dir(s) missing keyframe_weights.npy")
+        _report_missing(weights_missing, "keyframe_weights.npy (re-run save_visual)")
+
+    # ── paradigm column check ─────────────────────────────────────────────
+    df = _load_manifests(
+        os.path.join(CREMAD_DEEPFAKE_OUT, "cremad_deepfake_manifest_shard*.csv")
+    )
+    if df.empty:
+        print(f"  {_tag('FAIL')} manifest   : no shard CSVs found")
+        passed = False
+    else:
+        n_shards = len(glob.glob(
+            os.path.join(CREMAD_DEEPFAKE_OUT, "cremad_deepfake_manifest_shard*.csv")
+        ))
+        dupes = int(df["file_id"].duplicated().sum())
+        m_status = "PASS" if dupes == 0 else "FAIL"
+        passed = passed and (m_status == "PASS")
+        print(f"  {_tag(m_status)} manifest   : {len(df)} records, {n_shards} shard(s), {dupes} duplicates")
+
+        # Verify all records are tagged paradigm=2
+        if "paradigm" in df.columns:
+            wrong_paradigm = int((df["paradigm"] != 2).sum())
+            p_status = "PASS" if wrong_paradigm == 0 else "FAIL"
+            passed = passed and (p_status == "PASS")
+            print(f"  {_tag(p_status)} paradigm=2 : {len(df) - wrong_paradigm}/{len(df)} records correctly tagged")
+        else:
+            print(f"  {_tag('WARN')} paradigm   : column missing from manifest (old run?)")
+
+        cov_ok = _check_manifest_coverage(df, progress, all_ids, "CREMA-D Deepfake", strict_coverage=True)
+        passed = passed and cov_ok
+        _check_empty_transcripts(df, "CREMA-D Deepfake")
+
+    return passed
+
+
 def validate_meld(strict):
     print("\n" + "=" * 60)
     print("  MELD")
@@ -438,8 +553,8 @@ def parse_args():
     p.add_argument(
         "--only",
         nargs="+",
-        choices=["cremad", "meld", "savee"],
-        default=["cremad", "meld", "savee"],
+        choices=["cremad", "cremad_deepfake", "meld", "savee"],
+        default=["cremad", "cremad_deepfake", "meld", "savee"],
         help="Datasets to validate (default: all)",
     )
     p.add_argument(
@@ -456,9 +571,10 @@ def main():
     print(f"Validation mode: {mode}")
 
     validators = {
-        "cremad": validate_cremad,
-        "meld":   validate_meld,
-        "savee":  validate_savee,
+        "cremad":          validate_cremad,
+        "cremad_deepfake": validate_cremad_deepfake,
+        "meld":            validate_meld,
+        "savee":           validate_savee,
     }
 
     results = {name: validators[name](args.strict) for name in args.only}

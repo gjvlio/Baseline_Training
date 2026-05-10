@@ -34,7 +34,7 @@ if shutil.which("ffmpeg") is None:
 
 from preprocessing.utils.text import load_asr, load_tokenizer
 from preprocessing.utils.visual import load_mtcnn
-from preprocessing.datasets import cremad, meld, savee
+from preprocessing.datasets import cremad, cremad_deepfake, meld, savee
 
 
 def parse_args():
@@ -42,8 +42,8 @@ def parse_args():
     parser.add_argument(
         "--only",
         nargs="+",
-        choices=["cremad", "meld", "savee"],
-        default=["cremad", "meld", "savee"],
+        choices=["cremad", "cremad_deepfake", "meld", "savee"],
+        default=["cremad", "cremad_deepfake", "meld", "savee"],
     )
     parser.add_argument(
         "--shard",
@@ -89,9 +89,10 @@ def main():
     models = load_models()
 
     runners = {
-        "cremad": cremad.process,
-        "meld":   meld.process,
-        "savee":  savee.process,
+        "cremad":          cremad.process,
+        "cremad_deepfake": cremad_deepfake.process,
+        "meld":            meld.process,
+        "savee":           savee.process,
     }
 
     for name in args.only:

@@ -6,13 +6,15 @@ _REPO_ROOT  = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_ROOT   = os.path.join(_REPO_ROOT, "preprocessing", "datasets")
 OUTPUT_ROOT = os.path.join(_REPO_ROOT, "outputs")
 
-CREMAD_DIR  = os.path.join(DATA_ROOT, "cremad")
-MELD_DIR    = os.path.join(DATA_ROOT, "MELD", "MELD-RAW", "MELD.Raw")
-SAVEE_DIR   = os.path.join(DATA_ROOT, "savee", "ALL")
+CREMAD_DIR          = os.path.join(DATA_ROOT, "cremad")
+CREMAD_DEEPFAKE_DIR = os.path.join(DATA_ROOT, "cremad_deepfake")
+MELD_DIR            = os.path.join(DATA_ROOT, "MELD", "MELD-RAW", "MELD.Raw")
+SAVEE_DIR           = os.path.join(DATA_ROOT, "savee", "ALL")
 
-CREMAD_OUT  = os.path.join(OUTPUT_ROOT, "cremad")
-MELD_OUT    = os.path.join(OUTPUT_ROOT, "meld")
-SAVEE_OUT   = os.path.join(OUTPUT_ROOT, "savee")
+CREMAD_OUT          = os.path.join(OUTPUT_ROOT, "cremad")
+CREMAD_DEEPFAKE_OUT = os.path.join(OUTPUT_ROOT, "cremad_deepfake")
+MELD_OUT            = os.path.join(OUTPUT_ROOT, "meld")
+SAVEE_OUT           = os.path.join(OUTPUT_ROOT, "savee")
 
 # ── Audio ─────────────────────────────────────────────────────────────────────
 SAMPLE_RATE = 16_000
