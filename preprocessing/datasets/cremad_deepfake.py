@@ -33,7 +33,7 @@ EMOTION_MAP = {
     "SAD": "sadness",
 }
 
-VIDEO_EXTS = {".flv", ".mp4", ".avi", ".mkv"}
+VIDEO_EXTS = {".flv", ".mp4", ".avi"}
 
 
 def parse_emotion(file_id: str) -> str:

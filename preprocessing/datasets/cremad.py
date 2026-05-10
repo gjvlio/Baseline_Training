@@ -44,11 +44,13 @@ def process(
     out_dir: str = CREMAD_OUT,
     shard: int = 0,
     num_shards: int = 1,
+    limit: int = None,
 ) -> list:
     """
     Process CREMA-D samples (all three modalities).
     models: dict with keys 'asr', 'tokenizer', 'mtcnn', 'device'.
     shard / num_shards: split the file list for parallel execution.
+    limit: cap files per shard (None = no cap; use for test runs).
     """
     _make_dirs(out_dir)
     progress_file = os.path.join(out_dir, "progress.json")
@@ -59,6 +61,8 @@ def process(
         if os.path.splitext(f)[1].lower() in VIDEO_EXTS
     ])
     shard_files = all_files[shard::num_shards]
+    if limit is not None:
+        shard_files = shard_files[:limit]
 
     print(
         f"\n[CREMA-D] {len(all_files)} total | shard {shard + 1}/{num_shards} "
