@@ -1,0 +1,82 @@
+# ── Python ────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+*.whl
+pip-wheel-metadata/
+
+# ── Virtual environments ───────────────────────────────────────────────────
+.venv/
+.venv310/
+venv/
+env/
+ENV/
+
+# ── PyTorch / model weights ───────────────────────────────────────────────
+*.pth
+*.ckpt
+*.bin
+*.safetensors
+*.pt
+
+# ── Pretrained / downloaded models ────────────────────────────────────────
+pretrained_models/
+huggingface_cache/
+.cache/
+
+# ── RVC models (large binary files) ──────────────────────────────────────
+rvc_models/
+
+# ── Dataset videos (CREMA-D) ──────────────────────────────────────────────
+VideoFlash/
+*.flv
+*.mp4
+*.avi
+*.mov
+*.mkv
+
+# ── Audio files ───────────────────────────────────────────────────────────
+*.wav
+*.mp3
+*.flac
+*.ogg
+
+# ── Output / temp directories ─────────────────────────────────────────────
+temp/
+batch_output/
+test_output/
+
+# ── Logs ──────────────────────────────────────────────────────────────────
+*.log
+*.csv
+logs/
+
+# ── Jupyter ───────────────────────────────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb
+
+# ── IDE / OS ──────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Environment variables ─────────────────────────────────────────────────
+.env
+.env.*
+
+# ── Leftover folders ────────────────────────────────────────────────
+AudioWAV/
+fairseq/
+RVC/
+temp/
+test_output/
