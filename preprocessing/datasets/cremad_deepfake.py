@@ -105,8 +105,11 @@ def process(
         )
 
     _make_dirs(out_dir)
-    progress_file = os.path.join(out_dir, "progress.json")
-    done_set = load_done(progress_file)
+    # per-shard progress file — prevents race condition when 2 shards run simultaneously
+    progress_file = os.path.join(out_dir, f"progress_shard{shard}.json")
+    # also load health-check checkpoint so verified-healthy files are never reprocessed
+    healthy_file  = os.path.join(out_dir, "progress_healthy.json")
+    done_set = load_done(progress_file) | load_done(healthy_file)
 
     all_files = sorted([
         f for f in os.listdir(CREMAD_DEEPFAKE_DIR)
