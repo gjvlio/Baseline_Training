@@ -26,12 +26,35 @@ EMOTION_MAP = {
 
 VIDEO_EXTS = {".flv", ".mp4", ".avi"}
 
+SENTENCE_MAP = {
+    "IEO": "It's eleven o'clock",
+    "TIE": "That is exactly what happened",
+    "IOM": "I'm on my way to the meeting",
+    "IWW": "I wonder what this is about",
+    "TAI": "The airplane is almost full",
+    "MTI": "Maybe tomorrow it will be cold",
+    "IWL": "I would like a new alarm clock",
+    "ITH": "I think I have a doctor's appointment",
+    "DFA": "Don't forget a jacket",
+    "ITS": "I think I've seen this before",
+    "TSI": "The surface is slippery",
+    "WSI": "We'll stop in a bit",
+}
+
 
 def parse_emotion(file_id: str) -> str:
     parts = file_id.split("_")
     if len(parts) >= 3:
         return EMOTION_MAP.get(parts[2].upper(), "unknown")
     return "unknown"
+
+
+def _sentence_fallback(file_id: str) -> str:
+    """Return known sentence text from SentenceCode when Whisper returns empty."""
+    parts = file_id.split("_")
+    if len(parts) >= 2:
+        return SENTENCE_MAP.get(parts[1].upper(), "")
+    return ""
 
 
 def _make_dirs(out_dir: str) -> None:
@@ -78,42 +101,53 @@ def process(
 
         video_path = os.path.join(CREMAD_DIR, fname)
         tmp_wav = None
+        record = {
+            "file_id":    file_id,
+            "emotion":    parse_emotion(file_id),
+            "transcript": "",
+            "n_faces":    0,
+            "visual_ok":  False,
+        }
 
         try:
             with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
                 tmp_wav = tmp.name
 
+            # ── audio (required — skip clip if fails) ────────────────────────
             if not extract_audio(video_path, tmp_wav):
                 raise RuntimeError("audio extraction failed")
-
             log_mel = compute_log_mel(tmp_wav)
             save_audio(log_mel, out_dir, file_id)
 
+            # ── text ─────────────────────────────────────────────────────────
             transcript = transcribe(tmp_wav, models["asr"])
+            if not transcript.strip():
+                transcript = _sentence_fallback(file_id)
             tokens = tokenize(transcript, models["tokenizer"])
             save_text(tokens, out_dir, file_id)
+            record["transcript"] = transcript
 
+            # ── visual (best-effort — failure logged, not fatal) ─────────────
             frames, fps = read_frames(video_path)
-            crops, det_scores = crop_all_frames(frames, models["mtcnn"])
+            crops, det_scores, real_idx = crop_all_frames(frames, models["mtcnn"])
             if crops is None:
-                raise RuntimeError("too many failed face detections (>10%)")
-            keyframes = select_keyframes(crops, det_scores, fps)
-            n_faces = save_visual(crops, keyframes, out_dir, file_id)
-
-            records.append({
-                "file_id":    file_id,
-                "emotion":    parse_emotion(file_id),
-                "transcript": transcript,
-                "n_faces":    n_faces,
-            })
-
-            mark_done(file_id, done_set, progress_file)
+                tqdm.write(f"  [CREMA-D] {fname}: visual skipped (>50% face fail)")
+            else:
+                keyframes = select_keyframes(crops, det_scores, fps, real_indices=real_idx, fer_model=models.get("fer"))
+                record["n_faces"] = save_visual(crops, keyframes, out_dir, file_id)
+                record["visual_ok"] = True
 
         except Exception as e:
             tqdm.write(f"  [CREMA-D] error on {fname}: {e}")
+            if record["transcript"]:
+                mark_done(file_id, done_set, progress_file)
+            continue
         finally:
             if tmp_wav and os.path.exists(tmp_wav):
                 os.remove(tmp_wav)
+
+        records.append(record)
+        mark_done(file_id, done_set, progress_file)
 
     save_manifest(records, os.path.join(out_dir, f"cremad_manifest_shard{shard}.csv"))
     return records

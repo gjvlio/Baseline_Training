@@ -42,10 +42,12 @@ def process(
     out_dir: str = SAVEE_OUT,
     shard: int = 0,
     num_shards: int = 1,
+    limit: int = None,
 ) -> list:
     """
     Process all SAVEE samples (audio + text only).
     models: dict with keys 'asr', 'tokenizer'.
+    limit: cap files per shard (None = no cap; use for test runs).
     """
     _make_dirs(out_dir)
     progress_file = os.path.join(out_dir, "progress.json")
@@ -53,6 +55,8 @@ def process(
 
     all_files = sorted([f for f in os.listdir(SAVEE_DIR) if f.lower().endswith(".wav")])
     shard_files = all_files[shard::num_shards]
+    if limit is not None:
+        shard_files = shard_files[:limit]
 
     print(
         f"\n[SAVEE] {len(all_files)} total | shard {shard + 1}/{num_shards} "

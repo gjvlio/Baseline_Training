@@ -33,7 +33,7 @@ if shutil.which("ffmpeg") is None:
     )
 
 from preprocessing.utils.text import load_asr, load_tokenizer
-from preprocessing.utils.visual import load_mtcnn
+from preprocessing.utils.visual import load_mtcnn, load_fer
 from preprocessing.datasets import cremad, cremad_deepfake, meld, savee
 
 
@@ -75,7 +75,9 @@ def load_models() -> dict:
     tokenizer = load_tokenizer()
     print("loading MTCNN...")
     mtcnn = load_mtcnn(device)
-    return {"asr": asr, "tokenizer": tokenizer, "mtcnn": mtcnn, "device": device}
+    print("loading FER model (emotional intensity scorer)...")
+    fer = load_fer(device)
+    return {"asr": asr, "tokenizer": tokenizer, "mtcnn": mtcnn, "fer": fer, "device": device}
 
 
 def main():

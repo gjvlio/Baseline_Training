@@ -126,11 +126,11 @@ def process(
 
                 # ── visual (best-effort — failure logged, not fatal) ─────────
                 frames, fps = read_frames(video_path)
-                crops, det_scores = crop_all_frames(frames, models["mtcnn"])
+                crops, det_scores, real_idx = crop_all_frames(frames, models["mtcnn"])
                 if crops is None:
-                    tqdm.write(f"  [MELD/{split}] {fname}: visual skipped (>10% face fail)")
+                    tqdm.write(f"  [MELD/{split}] {fname}: visual skipped (>50% face fail)")
                 else:
-                    keyframes = select_keyframes(crops, det_scores, fps)
+                    keyframes = select_keyframes(crops, det_scores, fps, real_indices=real_idx, fer_model=models.get("fer"))
                     record["n_faces"] = save_visual(crops, keyframes, split_out, file_id)
                     record["visual_ok"] = True
 

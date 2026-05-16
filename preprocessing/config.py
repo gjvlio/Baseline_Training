@@ -7,7 +7,10 @@ DATA_ROOT   = os.path.join(_REPO_ROOT, "preprocessing", "datasets")
 OUTPUT_ROOT = os.path.join(_REPO_ROOT, "outputs")
 
 CREMAD_DIR          = os.path.join(DATA_ROOT, "cremad")
-CREMAD_DEEPFAKE_DIR = os.path.join(DATA_ROOT, "cremad_deepfake")
+CREMAD_DEEPFAKE_DIR = os.environ.get(
+    "CREMAD_DEEPFAKE_DIR",
+    os.path.join(DATA_ROOT, "cremad_deepfake"),
+)
 MELD_DIR            = os.path.join(DATA_ROOT, "MELD", "MELD-RAW", "MELD.Raw")
 SAVEE_DIR           = os.path.join(DATA_ROOT, "savee", "ALL")
 
