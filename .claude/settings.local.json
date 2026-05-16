@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls \"d:\\\\Documents\\\\GitHub\\\\Baseline\" && ls \"d:\\\\Baseline\" 2>/dev/null || echo \"no d:\\\\Baseline\")",
+      "Read(//d//**)",
+      "Read(//c/Users/Gel/anaconda3/**)",
+      "Bash(conda env *)",
+      "Bash(pip show *)",
+      "Bash(python -c \"import sys; print\\(sys.executable\\)\")",
+      "Bash(ls /c/Python*)",
+      "Read(//c/Users/Gel/AppData/Local/Programs/**)",
+      "Bash(where python *)",
+      "Read(//c/Users/Gel/**)",
+      "Bash(python -c \"import facenet_pytorch; import transformers; print\\('facenet ok, transformers ok'\\)\")",
+      "Bash(python -c \"import transformers; import librosa; import cv2; import torch; print\\('ok'\\)\")",
+      "Bash(pip install *)"
+    ]
+  }
+}
