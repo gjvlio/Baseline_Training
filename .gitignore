@@ -1,0 +1,84 @@
+# ─── Python ───────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+.Python
+
+# ─── Virtual Environment ──────────────────────────────────────────────────────
+.venv/
+venv/
+env/
+ENV/
+
+# ─── Data — never commit raw clips or preprocessed outputs ───────────────────
+cremad_forged/
+cremad_outputs/
+data/
+outputs/
+
+# specific file types to always exclude
+*.mp4
+*.flv
+*.wav
+*.avi
+*.mov
+
+# preprocessed numpy arrays
+*.npy
+
+# face crop images
+*.jpg
+*.jpeg
+*.png
+
+# ─── Progress & Manifests ─────────────────────────────────────────────────────
+# these are machine-specific, do not commit
+progress.json
+*_manifest.csv
+genuine_selection.csv
+
+# ─── Temporary Files ──────────────────────────────────────────────────────────
+_tmp_audio.wav
+*.tmp
+*.temp
+tmp/
+temp/
+
+# ─── Model Weights & Cache ────────────────────────────────────────────────────
+# whisper, BERT, torch model caches
+*.pt
+*.pth
+*.bin
+*.ckpt
+*.safetensors
+.cache/
+~/.cache/
+
+# huggingface cache
+huggingface/
+transformers_cache/
+
+# ─── IDE & OS ─────────────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.code-workspace
+
+# Windows
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Mac
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# ─── Jupyter Notebooks ────────────────────────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb
+
+# ─── Logs ─────────────────────────────────────────────────────────────────────
+*.log
+logs/
