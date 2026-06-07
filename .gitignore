@@ -1,0 +1,7 @@
+/data
+/.venv
+/.claude
+/docs
+/checkpoints
+__pycache__/
+*.pyc
