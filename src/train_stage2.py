@@ -111,6 +111,8 @@ def main():
     ap = argparse.ArgumentParser(description="ACE-Net Stage-2 consistency discrimination")
     ap.add_argument("--batch-size", type=int, default=None)
     ap.add_argument("--epochs", type=int, default=None)
+    ap.add_argument("--early-stop", type=int, default=None,
+                    help="override early-stop patience (paper default 25)")
     ap.add_argument("--lr", type=float, default=None)
     ap.add_argument("--num-workers", type=int, default=None)
     ap.add_argument("--st-ckpt", default=None)
@@ -122,6 +124,7 @@ def main():
     cfg = TrainConfig()
     if args.batch_size: cfg.batch_size = args.batch_size
     if args.epochs:      cfg.max_epochs = args.epochs
+    if args.early_stop is not None: cfg.early_stop_patience = args.early_stop
     if args.lr:          cfg.lr = args.lr
     if args.num_workers is not None: cfg.num_workers = args.num_workers
     set_seed(cfg.seed)

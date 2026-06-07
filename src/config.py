@@ -80,7 +80,8 @@ MELD_EMO2IDX = {e: i for i, e in enumerate(MELD_EMOTIONS)}
 EMOTION_DATASETS = {
     "crema": {
         "emotions": CREMA_EMOTIONS,
-        "split_keys": ("crema_genuine_lasthalf",),
+        # FirstHalf auto-joins once delivered (loader returns [] until then).
+        "split_keys": ("crema_genuine_lasthalf", "crema_genuine_firsthalf"),
     },
     "meld": {
         "emotions": MELD_EMOTIONS,
@@ -128,6 +129,15 @@ SPLITS = {
     "crema_genuine_lasthalf": SplitSpec(
         name="crema_genuine_lasthalf",
         root=DATA_ROOT / "CREMA-D" / "GENUINE_LastHalf",
+        manifest="cremad_forged_manifest.csv",
+        id_col="file_id",
+    ),
+    # Pending teammate delivery. Assumed same layout/manifest as LastHalf.
+    # Loaders guard on existence -> absent folder is silently skipped, so this
+    # is safe to register before the data lands.
+    "crema_genuine_firsthalf": SplitSpec(
+        name="crema_genuine_firsthalf",
+        root=DATA_ROOT / "CREMA-D" / "GENUINE_FirstHalf",
         manifest="cremad_forged_manifest.csv",
         id_col="file_id",
     ),

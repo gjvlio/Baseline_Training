@@ -108,6 +108,10 @@ def meld_emotion_idx(emotion_str: str):
 # ---------------------------------------------------------------------------
 def load_manifest_rows(spec: config.SplitSpec):
     path = spec.root / spec.manifest
+    # Guard: a registered-but-not-yet-delivered split (e.g. CREMA FirstHalf)
+    # has no manifest on disk. Skip it silently instead of crashing.
+    if not path.exists():
+        return []
     with open(path, newline="", encoding="utf-8") as f:
         return list(csv.DictReader(f))
 
@@ -122,10 +126,14 @@ def build_emotion_samples(dataset: str):
         raise ValueError(f"unknown emotion dataset '{dataset}'")
     split_keys = config.EMOTION_DATASETS[dataset]["split_keys"]
     samples = []
+    seen = set()  # dedup: CREMA manifests list each genuine clip twice
     for key in split_keys:
         spec = config.SPLITS[key]
         for row in load_manifest_rows(spec):
             fid = row[spec.id_col]
+            if (key, fid) in seen:
+                continue
+            seen.add((key, fid))
             if dataset == "crema":
                 if row.get("forgery_type", "genuine") != "genuine":
                     continue
@@ -142,19 +150,28 @@ def build_emotion_samples(dataset: str):
     return samples
 
 
-def build_stage2_samples(genuine_keys=("crema_genuine_lasthalf",),
+def build_stage2_samples(genuine_keys=("crema_genuine_lasthalf",
+                                       "crema_genuine_firsthalf"),
                          fake_keys=("crema_fake_p1", "crema_fake_p2")):
     """Stage-2 samples with forgery labels. Genuine=0, fake=1.
 
     For CREMA fake splits only the forged rows have local files; genuine rows
-    in those manifests are skipped (they live in the genuine split)."""
+    in those manifests are skipped (they live in the genuine split).
+
+    FirstHalf is included by default but its loader returns [] until the data
+    is delivered, so this is correct whether or not FirstHalf exists yet."""
     genuine, fake = [], []
+    seen = set()  # dedup: CREMA manifests list each clip twice
     for key in genuine_keys:
         spec = config.SPLITS[key]
         for row in load_manifest_rows(spec):
             if row.get("forgery_type", "genuine") != "genuine":
                 continue
-            s = resolve_sample(spec, row[spec.id_col])
+            fid = row[spec.id_col]
+            if (key, fid) in seen:
+                continue
+            seen.add((key, fid))
+            s = resolve_sample(spec, fid)
             if s:
                 s.label = 0
                 genuine.append(s)
@@ -165,7 +182,11 @@ def build_stage2_samples(genuine_keys=("crema_genuine_lasthalf",),
             ftype = row.get("forgery_type")
             if ftype is not None and ftype == "genuine":
                 continue
-            s = resolve_sample(spec, row[spec.id_col])
+            fid = row[spec.id_col]
+            if (key, fid) in seen:
+                continue
+            seen.add((key, fid))
+            s = resolve_sample(spec, fid)
             if s:
                 s.label = 1
                 s.emotion = key  # tag source paradigm for stratification
