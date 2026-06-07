@@ -113,6 +113,8 @@ def main():
     ap.add_argument("--epochs", type=int, default=None)
     ap.add_argument("--early-stop", type=int, default=None,
                     help="override early-stop patience (paper default 25)")
+    ap.add_argument("--max-minutes", type=float, default=None,
+                    help="hard wall-clock cap; stop after this many minutes")
     ap.add_argument("--lr", type=float, default=None)
     ap.add_argument("--num-workers", type=int, default=None)
     ap.add_argument("--st-ckpt", default=None)
@@ -228,6 +230,12 @@ def main():
         stop = stopper.step(va["loss"], model.discriminator)
         if stopper.counter == 0:
             torch.save(model.state_dict(), ckpt_path)
+        if args.max_minutes is not None:
+            elapsed_min = (datetime.now() - run_t0).total_seconds() / 60
+            if elapsed_min + (avg / 60) > args.max_minutes:
+                logger.log(L.red(f"time cap: {elapsed_min:.1f}/{args.max_minutes} min "
+                                 f"used -> stopping @ epoch {epoch}"))
+                break
         if stop:
             logger.log(L.red(f"early stop @ epoch {epoch} "
                              f"(best val loss {stopper.best:.4f})"))

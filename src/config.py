@@ -138,7 +138,7 @@ SPLITS = {
     "crema_genuine_firsthalf": SplitSpec(
         name="crema_genuine_firsthalf",
         root=DATA_ROOT / "CREMA-D" / "GENUINE_FirstHalf",
-        manifest="cremad_forged_manifest.csv",
+        manifest="cremad_genuine_manifest.csv",
         id_col="file_id",
     ),
     "crema_fake_p1": SplitSpec(
