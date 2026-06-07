@@ -485,16 +485,16 @@ for ftype in FORGERY_TYPES:
         try:
             # 1. extract audio track from the video file
             #    for forged clips this IS already the replaced/forged audio
-            # extract_audio_wav(video_path, tmp_wav)
-            # if not os.path.exists(tmp_wav):
-               # raise RuntimeError("ffmpeg audio extraction failed")
+            extract_audio_wav(video_path, tmp_wav)
+            if not os.path.exists(tmp_wav):
+               raise RuntimeError("ffmpeg audio extraction failed")
 
             # 2. audio stream → log-Mel spectrogram
-            # process_audio(tmp_wav, out_dir, file_id, augment=augment)
+            process_audio(tmp_wav, out_dir, file_id, augment=augment)
 
             # 3. text stream → BERT tokens  (transcribed from forged audio)
-            # transcript = process_text(tmp_wav, out_dir, file_id)
-            transcript = "skipped"   
+            transcript = process_text(tmp_wav, out_dir, file_id)
+            # transcript = "skipped"   
 
             # 4. visual stream → keyframe crops  (always from video track)
             n_saved = process_visual(video_path, out_dir, file_id, augment=augment)
@@ -542,9 +542,9 @@ for ftype in FORGERY_TYPES:
         except Exception as exc:
             tqdm.write(f"  [ERROR] {fname}: {exc}")
 
-        # finally:
-        #     if os.path.exists(tmp_wav):
-        #         os.remove(tmp_wav)
+        finally:
+            if os.path.exists(tmp_wav):
+                os.remove(tmp_wav)
 
 # ─── SAVE MANIFEST ────────────────────────────────────────────────────────────
 manifest_path = os.path.join(OUTPUT_DIR, "cremad_forged_manifest.csv")
