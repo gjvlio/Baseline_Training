@@ -174,8 +174,7 @@ def main():
         eta_full = avg * (cfg.max_epochs - epoch)
 
         improved = va_acc > best_acc
-        best_acc = max(best_acc, va_acc)
-        mark = L.green("  * best-acc") if improved else ""
+        mark = L.green("  * best-acc -> saved") if improved else ""
         va_loss_s = L.yellow(f"{va_loss:.4f}")
         va_acc_s = L.yellow(f"{va_acc:.3f}")
         logger.log(
@@ -184,9 +183,14 @@ def main():
             f"val[loss {va_loss_s} acc {va_acc_s}]  "
             f"{tr_dur:.0f}s/ep  ETA {timedelta(seconds=int(eta_full))}{mark}")
 
-        stop = stopper.step(va_loss, model)
-        if stopper.counter == 0:  # this epoch was best val loss -> save
+        # Save the best-ACCURACY checkpoint (what Table 2/3 reports). Val loss
+        # and val acc diverge under overfitting, so saving on best-loss can keep
+        # a lower-accuracy epoch. Early-stop still tracks loss for a stable
+        # stopping signal.
+        if improved:
+            best_acc = va_acc
             torch.save(model.state_dict(), ckpt_path)
+        stop = stopper.step(va_loss, model)
         # hard wall-clock cap: stop if the next epoch would blow the budget
         if args.max_minutes is not None:
             elapsed_min = (datetime.now() - run_t0).total_seconds() / 60
@@ -200,8 +204,8 @@ def main():
             break
 
     logger.raw("")
-    logger.log("restoring best-val-loss weights for final test ...")
-    stopper.restore(model)
+    logger.log(f"loading best-val-ACC checkpoint for final test (val acc {best_acc:.3f}) ...")
+    model.load_state_dict(torch.load(ckpt_path, map_location=device))
     with torch.no_grad():
         te_loss, te_acc, te_conf, _ = run_epoch(
             model, test_dl, args.branch, device, 0, cfg.max_epochs,
@@ -211,7 +215,7 @@ def main():
         f"TEST  loss {te_loss:.4f}  acc {te_acc:.3f}")))
     L.per_class_report(logger, te_conf, class_names)
 
-    torch.save(model.state_dict(), ckpt_path)
+    # ckpt on disk is already the best-acc one; do not overwrite.
     total_time = datetime.now() - run_t0
     logger.raw("")
     logger.log(f"checkpoint saved -> {L.cyan(str(ckpt_path))}")
