@@ -23,25 +23,56 @@ _IMAGENET_MEAN = np.array([0.485, 0.456, 0.406], dtype=np.float32)
 _IMAGENET_STD = np.array([0.229, 0.224, 0.225], dtype=np.float32)
 
 
-def _load_image(path):
+def _load_image(path, aug=None):
     img = Image.open(path).convert("RGB").resize((config.IMG_SIZE, config.IMG_SIZE))
     arr = np.asarray(img, dtype=np.float32) / 255.0
+    if aug is not None:
+        # photometric jitter (consistent factors across a clip's frames)
+        arr = arr * aug["bright"]                         # brightness
+        mean = arr.mean()
+        arr = (arr - mean) * aug["contrast"] + mean       # contrast
+        arr = np.clip(arr, 0.0, 1.0)
+        if aug["flip"]:
+            arr = arr[:, ::-1, :].copy()                  # horizontal flip
     arr = (arr - _IMAGENET_MEAN) / _IMAGENET_STD
-    return torch.from_numpy(arr.transpose(2, 0, 1))   # [3,H,W]
+    return torch.from_numpy(arr.transpose(2, 0, 1))       # [3,H,W]
 
 
-def _load_sample_tensors(sample: manifests.Sample):
+def _spec_augment(mel):
+    """Light SpecAugment: 1 freq mask + 1 time mask (in-place on a copy)."""
+    mel = mel.copy()
+    F, T = mel.shape
+    floor = -80.0
+    fw = np.random.randint(0, max(1, F // 8))             # up to ~10 bands
+    f0 = np.random.randint(0, max(1, F - fw))
+    mel[f0:f0 + fw, :] = floor
+    tw = np.random.randint(0, max(1, T // 8))
+    t0 = np.random.randint(0, max(1, T - tw))
+    mel[:, t0:t0 + tw] = floor
+    return mel
+
+
+def _load_sample_tensors(sample: manifests.Sample, augment=False):
     mel = manifests.load_melspec(sample.audio)        # [80, T]
+    if augment:
+        mel = _spec_augment(mel)
     mel_t = torch.from_numpy(mel)                     # [80, T]
 
     ids, mask = manifests.load_text(sample.input_ids, sample.attention_mask)
     ids_t = torch.from_numpy(ids)                     # [128]
     mask_t = torch.from_numpy(mask)
 
+    aug = None
+    if augment:
+        aug = {
+            "bright": float(np.random.uniform(0.85, 1.15)),
+            "contrast": float(np.random.uniform(0.85, 1.15)),
+            "flip": bool(np.random.rand() < 0.5),
+        }
     fw = manifests.load_frame_weights(sample)[: config.N_KEYFRAMES]
     frames, alphas = [], []
     for fname, alpha in fw:
-        frames.append(_load_image(sample.visual_dir / fname))
+        frames.append(_load_image(sample.visual_dir / fname, aug))
         alphas.append(alpha)
     frames_t = torch.stack(frames) if frames else torch.zeros(
         1, 3, config.IMG_SIZE, config.IMG_SIZE)
@@ -50,17 +81,22 @@ def _load_sample_tensors(sample: manifests.Sample):
 
 
 class EmotionDataset(Dataset):
-    """Stage-1: returns a modality dict + emotion label."""
+    """Stage-1: returns a modality dict + emotion label.
 
-    def __init__(self, samples):
+    augment=True applies train-time data augmentation (visual flip + photometric
+    jitter, audio SpecAugment) to reduce overfitting. Use False for val/test.
+    """
+
+    def __init__(self, samples, augment=False):
         self.samples = samples
+        self.augment = augment
 
     def __len__(self):
         return len(self.samples)
 
     def __getitem__(self, i):
         s = self.samples[i]
-        mel, ids, mask, frames, alpha = _load_sample_tensors(s)
+        mel, ids, mask, frames, alpha = _load_sample_tensors(s, augment=self.augment)
         return {
             "melspec": mel, "input_ids": ids, "attention_mask": mask,
             "frames": frames, "alpha": alpha, "emotion": s.emotion,

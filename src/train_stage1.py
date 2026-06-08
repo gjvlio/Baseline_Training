@@ -81,6 +81,8 @@ def main():
                     help="override early-stop patience (paper default 25)")
     ap.add_argument("--max-minutes", type=float, default=None,
                     help="hard wall-clock cap; stop after this many minutes")
+    ap.add_argument("--no-augment", action="store_true",
+                    help="disable train-time data augmentation")
     ap.add_argument("--lr", type=float, default=None)
     ap.add_argument("--num-workers", type=int, default=None)
     ap.add_argument("--limit", type=int, default=None,
@@ -135,11 +137,15 @@ def main():
     logger.log(f"split -> train {L.bold(str(len(train_s)))}  "
                f"val {L.bold(str(len(val_s)))}  test {L.bold(str(len(test_s)))}")
 
-    def make_dl(s, sh):
-        return DataLoader(EmotionDataset(s), batch_size=cfg.batch_size, shuffle=sh,
-                          num_workers=cfg.num_workers, collate_fn=collate_emotion,
-                          drop_last=sh, pin_memory=(device == "cuda"))
-    train_dl, val_dl, test_dl = make_dl(train_s, True), make_dl(val_s, False), make_dl(test_s, False)
+    def make_dl(s, sh, aug=False):
+        return DataLoader(EmotionDataset(s, augment=aug), batch_size=cfg.batch_size,
+                          shuffle=sh, num_workers=cfg.num_workers,
+                          collate_fn=collate_emotion, drop_last=sh,
+                          pin_memory=(device == "cuda"))
+    # train uses augmentation (anti-overfit); val/test do not
+    train_dl = make_dl(train_s, True, aug=not args.no_augment)
+    val_dl, test_dl = make_dl(val_s, False), make_dl(test_s, False)
+    logger.log(f"augmentation: {'ON' if not args.no_augment else 'OFF'} (train only)")
 
     if args.branch == "speech_text":
         model = SpeechTextModule(n_classes=n_classes).to(device)
@@ -152,6 +158,9 @@ def main():
     optimizer = torch.optim.Adam(
         [p for p in model.parameters() if p.requires_grad],
         lr=cfg.lr, weight_decay=cfg.weight_decay)
+    # cosine LR decay over the epoch budget (smoother convergence, less overfit)
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+        optimizer, T_max=cfg.max_epochs, eta_min=cfg.lr * 0.05)
     stopper = EarlyStopper(cfg.early_stop_patience)
     ckpt_path = config.CKPT_ROOT / f"stage1_{tag}.pt"
 
@@ -169,6 +178,7 @@ def main():
             va_loss, va_acc, va_conf, _ = run_epoch(
                 model, val_dl, args.branch, device, epoch, cfg.max_epochs,
                 n_classes, None, logger)
+        scheduler.step()
         epoch_durs.append(tr_dur)
         avg = sum(epoch_durs) / len(epoch_durs)
         eta_full = avg * (cfg.max_epochs - epoch)
