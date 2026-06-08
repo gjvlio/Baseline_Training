@@ -27,7 +27,7 @@ from .config import TrainConfig
 from .data import manifests
 from .data.dataset import PairDataset, collate_pair
 from .models.acenet import ACENet
-from .train_utils import set_seed, stratified_split, EarlyStopper
+from .train_utils import set_seed, group_aware_split, EarlyStopper
 from . import logging_utils as L
 
 
@@ -173,11 +173,14 @@ def main():
     if args.limit:
         samples = samples[:args.limit]
         logger.log(L.red(f"[debug] limited to {len(samples)} samples"))
-    train_s, val_s, test_s = stratified_split(
-        samples, key_fn=lambda s: s.label,
+    # group-aware split by source actor: prevents component/speaker leakage
+    # (a P2 fake reuses a genuine visual clip; both must stay on one side).
+    train_s, val_s, test_s = group_aware_split(
+        samples, group_fn=lambda s: s.group_key,
         ratios=(cfg.train_ratio, cfg.val_ratio, cfg.test_ratio), seed=cfg.seed)
     logger.log(f"split    : train {L.bold(str(len(train_s)))}  "
-               f"val {L.bold(str(len(val_s)))}  test {L.bold(str(len(test_s)))}")
+               f"val {L.bold(str(len(val_s)))}  test {L.bold(str(len(test_s)))} "
+               f"(group-aware, no actor/clip leakage)")
 
     def make_dl(s, sh):
         return DataLoader(PairDataset(s), batch_size=cfg.batch_size, shuffle=sh,

@@ -29,7 +29,7 @@ from .config import TrainConfig
 from .data import manifests
 from .data.dataset import PairDataset, collate_pair
 from .models.acenet import ACENet
-from .train_utils import set_seed, stratified_split
+from .train_utils import set_seed, group_aware_split
 from . import logging_utils as L
 
 
@@ -122,9 +122,10 @@ def main():
                   "threshold": 0.5})
 
     samples = build_balanced_tagged(cfg.seed)
-    # IDENTICAL split to training (key=label, same seed) -> same held-out test
-    _, _, test_s = stratified_split(
-        samples, key_fn=lambda s: s.label,
+    # IDENTICAL group-aware split to training (same seed) -> same held-out
+    # test, with no actor/clip-component leakage across partitions.
+    _, _, test_s = group_aware_split(
+        samples, group_fn=lambda s: s.group_key,
         ratios=(cfg.train_ratio, cfg.val_ratio, cfg.test_ratio), seed=cfg.seed)
     logger.log(f"held-out test samples: {L.bold(str(len(test_s)))}")
 

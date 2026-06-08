@@ -31,6 +31,7 @@ class Sample:
     weights_kind: str            # "npy" | "json"
     label: Optional[int] = None  # 0 genuine / 1 fake (Stage 2)
     emotion: Optional[int] = None  # unified emotion idx (Stage 1)
+    group_key: Optional[str] = None  # source actor for leakage-free split
 
 
 def _first(*paths):
@@ -174,6 +175,7 @@ def build_stage2_samples(genuine_keys=("crema_genuine_lasthalf",
             s = resolve_sample(spec, fid)
             if s:
                 s.label = 0
+                s.group_key = source_actor(fid)
                 genuine.append(s)
     for key in fake_keys:
         spec = config.SPLITS[key]
@@ -190,8 +192,23 @@ def build_stage2_samples(genuine_keys=("crema_genuine_lasthalf",
             if s:
                 s.label = 1
                 s.emotion = key  # tag source paradigm for stratification
+                s.group_key = source_actor(fid)
                 fake.append(s)
     return genuine, fake
+
+
+def source_actor(fid: str):
+    """Group key for leakage-free splitting: the actor of the GENUINE/visual
+    source clip. Prevents a clip's genuine version and any forgery derived
+    from it (P2 cross-identity reuses a genuine visual clip) from straddling
+    the train/test boundary.
+
+    file_id forms:
+      genuine / P1 : '1001_DFA_ANG_XX'           -> actor '1001'
+      P2 splice    : '1012_..._XX___1003_..._XX' -> visual-source actor '1012'
+    """
+    visual_part = fid.split("___")[0]   # for P2, the A (video) component
+    return visual_part.split("_")[0]    # leading actor id
 
 
 # ---------------------------------------------------------------------------

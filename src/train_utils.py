@@ -33,6 +33,40 @@ def stratified_split(samples, key_fn, ratios=(0.8, 0.1, 0.1), seed=42):
     return train, val, test
 
 
+def group_aware_split(samples, group_fn, ratios=(0.8, 0.1, 0.1), seed=42):
+    """Split so that all samples sharing a group_fn(sample) key land in the
+    SAME partition. Prevents component/speaker leakage: a genuine clip and any
+    forgery derived from it (or from the same actor) cannot straddle
+    train/test. Groups are assigned to partitions by cumulative count to keep
+    the sample-level ratios close to the targets.
+    """
+    rng = random.Random(seed)
+    groups = defaultdict(list)
+    for s in samples:
+        groups[group_fn(s)].append(s)
+
+    keys = list(groups.keys())
+    rng.shuffle(keys)
+
+    total = len(samples)
+    n_tr = int(total * ratios[0])
+    n_va = int(total * ratios[1])
+
+    train, val, test = [], [], []
+    count = 0
+    for k in keys:
+        items = groups[k]
+        if count < n_tr:
+            train += items
+        elif count < n_tr + n_va:
+            val += items
+        else:
+            test += items
+        count += len(items)
+    rng.shuffle(train)
+    return train, val, test
+
+
 class EarlyStopper:
     """Tracks best val loss; restores best state; signals stop after patience."""
 
