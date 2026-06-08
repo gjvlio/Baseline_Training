@@ -83,6 +83,28 @@ def confusion(y, p, n_classes):
     return cm
 
 
+def per_class_prf(y, p, names):
+    """Per-class precision / recall / F1 + support (paper 'Per-class F1')."""
+    rows = []
+    for c, name in enumerate(names):
+        tp = int(((p == c) & (y == c)).sum())
+        fp = int(((p == c) & (y != c)).sum())
+        fn = int(((p != c) & (y == c)).sum())
+        prec = tp / max(tp + fp, 1)
+        rec = tp / max(tp + fn, 1)
+        f1 = 2 * prec * rec / max(prec + rec, 1e-8)
+        rows.append((name, prec, rec, f1, int((y == c).sum())))
+    return rows
+
+
+def print_per_class(logger, rows):
+    logger.raw(L.dim("    per-class  Precision  Recall   F1   (support):"))
+    for name, prec, rec, f1, n in rows:
+        logger.raw(f"      {name:<10} {prec:6.3f}   {rec:6.3f}  {f1:6.3f}  (n={n})")
+    macro_f1 = sum(r[3] for r in rows) / max(len(rows), 1)
+    logger.raw(f"      {'macro-F1':<10} {'':6}   {'':6}  {macro_f1:6.3f}")
+
+
 def print_confusion(logger, cm, names):
     logger.raw(L.dim("    confusion (rows=true, cols=pred):"))
     head = "            " + " ".join(f"{n[:4]:>5}" for n in names)
@@ -140,6 +162,7 @@ def main():
     logger.log(L.bold(L.green(
         f"  [{args.dataset.upper()}]  ACC {acc*100:.2f}%   "
         f"Weighted-F1 {wf1:.3f}   (n={len(y)})")))
+    print_per_class(logger, per_class_prf(y, p, class_names))
     cm = confusion(y, p, nc)
     print_confusion(logger, cm, class_names)
     logger.close()
