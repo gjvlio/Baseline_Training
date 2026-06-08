@@ -52,10 +52,21 @@ def _spec_augment(mel):
     return mel
 
 
+def _normalize_mel(mel):
+    """Per-sample z-score on the log-Mel. Removes absolute-loudness and global
+    energy differences that otherwise let a discriminator separate genuine vs
+    synthesized/spliced audio by a trivial level fingerprint instead of by
+    emotional content."""
+    m = mel.mean()
+    s = mel.std()
+    return (mel - m) / (s + 1e-6)
+
+
 def _load_sample_tensors(sample: manifests.Sample, augment=False):
     mel = manifests.load_melspec(sample.audio)        # [80, T]
     if augment:
         mel = _spec_augment(mel)
+    mel = _normalize_mel(mel)                         # kill loudness fingerprint
     mel_t = torch.from_numpy(mel)                     # [80, T]
 
     ids, mask = manifests.load_text(sample.input_ids, sample.attention_mask)
@@ -127,7 +138,8 @@ class PairDataset(Dataset):
 def _pad_melspec(mels):
     """mels: list of [80, T_i] -> [B,1,80,T_max], lengths."""
     t_max = min(max(m.shape[1] for m in mels), config.MAX_MEL_FRAMES)
-    out = torch.full((len(mels), config.N_MELS, t_max), -80.0)  # dB floor pad
+    # mels are per-sample z-scored (mean 0), so pad with 0.0, not the dB floor.
+    out = torch.zeros((len(mels), config.N_MELS, t_max))
     lengths = []
     for i, m in enumerate(mels):
         t = min(m.shape[1], t_max)
