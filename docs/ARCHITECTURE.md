@@ -1,10 +1,9 @@
 # ACE-Net Architecture
 
-Visual walkthrough of the ACE-Net baseline (Yu et al., *Electronics* 2025, 14, 4420),
-mapped to this repository's implementation. The paper's Figure 1 shows the
-**inference / forward** architecture; it does **not** depict the **training
-procedure**, so this document adds that part (Section 4) since it is what the
-`src/train_*.py` scripts implement.
+Architecture of the ACE-Net baseline (Yu et al., *Electronics* 2025, 14, 4420),
+mapped to this repository's implementation. Figure 1 presents the forward
+architecture. Section 4 documents the two-stage training procedure implemented
+in `src/train_*.py`.
 
 ---
 
@@ -12,7 +11,7 @@ procedure**, so this document adds that part (Section 4) since it is what the
 
 ![ACE-Net architecture](figures/acenet_architecture.png)
 
-The forward pipeline has three stages, left to right:
+The forward pipeline comprises three stages, left to right:
 
 | Block (in figure) | Role | Output |
 |---|---|---|
@@ -80,10 +79,9 @@ Full forward assembly: `src/models/acenet.py`.
 
 ---
 
-## 4. Training procedure  *(not in the paper's figure — added here)*
+## 4. Training procedure
 
-The figure stops at the forward pass. ACE-Net is trained in **two decoupled
-stages** (paper §3.5), which is what this repo's training scripts implement.
+ACE-Net is trained in **two decoupled stages** (paper §3.5).
 
 ```
 ┌─────────────────────────── STAGE 1 ───────────────────────────┐
