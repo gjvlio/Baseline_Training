@@ -22,6 +22,7 @@ from . import config
 from .config import TrainConfig
 from .data import manifests
 from .data.dataset import EmotionDataset, collate_emotion
+from .data.splits import partition_by_actor
 from .models.speech_text import SpeechTextModule
 from .models.fv_litenet import FVLiteNet
 from .train_utils import set_seed, stratified_split, EarlyStopper
@@ -131,11 +132,22 @@ def main():
     logger.raw("    label distribution: " +
                "  ".join(f"{k}={v}" for k, v in sorted(dist.items())))
 
-    train_s, val_s, test_s = stratified_split(
-        samples, key_fn=lambda s: s.emotion,
-        ratios=(cfg.train_ratio, cfg.val_ratio, cfg.test_ratio), seed=cfg.seed)
+    if args.dataset == "crema":
+        # speaker-independent actor partition, SHARED with Stage-2 so held-out
+        # test actors are never seen by the extractor (no cross-stage leak).
+        train_s, val_s, test_s = partition_by_actor(
+            samples, actor_fn=lambda s: s.group_key,
+            ratios=(cfg.train_ratio, cfg.val_ratio, cfg.test_ratio), seed=cfg.seed)
+        split_note = "actor-disjoint (speaker-independent, shared with Stage-2)"
+    else:
+        # MELD: no speaker labels / no forgery stage -> stratified random
+        # (matches the paper's emotion-recognition protocol).
+        train_s, val_s, test_s = stratified_split(
+            samples, key_fn=lambda s: s.emotion,
+            ratios=(cfg.train_ratio, cfg.val_ratio, cfg.test_ratio), seed=cfg.seed)
+        split_note = "stratified-by-emotion (paper protocol)"
     logger.log(f"split -> train {L.bold(str(len(train_s)))}  "
-               f"val {L.bold(str(len(val_s)))}  test {L.bold(str(len(test_s)))}")
+               f"val {L.bold(str(len(val_s)))}  test {L.bold(str(len(test_s)))}  [{split_note}]")
 
     def make_dl(s, sh, aug=False):
         return DataLoader(EmotionDataset(s, augment=aug), batch_size=cfg.batch_size,

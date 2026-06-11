@@ -27,7 +27,8 @@ from .config import TrainConfig
 from .data import manifests
 from .data.dataset import PairDataset, collate_pair
 from .models.acenet import ACENet
-from .train_utils import set_seed, group_aware_split, EarlyStopper
+from .train_utils import set_seed, EarlyStopper
+from .data.splits import partition_by_actor
 from . import logging_utils as L
 
 
@@ -173,14 +174,15 @@ def main():
     if args.limit:
         samples = samples[:args.limit]
         logger.log(L.red(f"[debug] limited to {len(samples)} samples"))
-    # group-aware split by source actor: prevents component/speaker leakage
-    # (a P2 fake reuses a genuine visual clip; both must stay on one side).
-    train_s, val_s, test_s = group_aware_split(
-        samples, group_fn=lambda s: s.group_key,
+    # SAME actor partition as Stage-1 (shared seed): held-out test actors were
+    # never seen by the frozen extractor -> no component/speaker leakage AND no
+    # cross-stage in-distribution 'familiarity' shortcut.
+    train_s, val_s, test_s = partition_by_actor(
+        samples, actor_fn=lambda s: s.group_key,
         ratios=(cfg.train_ratio, cfg.val_ratio, cfg.test_ratio), seed=cfg.seed)
     logger.log(f"split    : train {L.bold(str(len(train_s)))}  "
                f"val {L.bold(str(len(val_s)))}  test {L.bold(str(len(test_s)))} "
-               f"(group-aware, no actor/clip leakage)")
+               f"(actor-disjoint, shared with Stage-1)")
 
     def make_dl(s, sh):
         return DataLoader(PairDataset(s), batch_size=cfg.batch_size, shuffle=sh,

@@ -29,7 +29,8 @@ from .config import TrainConfig
 from .data import manifests
 from .data.dataset import PairDataset, collate_pair
 from .models.acenet import ACENet
-from .train_utils import set_seed, group_aware_split
+from .train_utils import set_seed
+from .data.splits import partition_by_actor
 from . import logging_utils as L
 
 
@@ -122,10 +123,10 @@ def main():
                   "threshold": 0.5})
 
     samples = build_balanced_tagged(cfg.seed)
-    # IDENTICAL group-aware split to training (same seed) -> same held-out
-    # test, with no actor/clip-component leakage across partitions.
-    _, _, test_s = group_aware_split(
-        samples, group_fn=lambda s: s.group_key,
+    # IDENTICAL actor partition to training (same seed) -> same held-out test,
+    # actor-disjoint and never seen by the frozen extractor.
+    _, _, test_s = partition_by_actor(
+        samples, actor_fn=lambda s: s.group_key,
         ratios=(cfg.train_ratio, cfg.val_ratio, cfg.test_ratio), seed=cfg.seed)
     logger.log(f"held-out test samples: {L.bold(str(len(test_s)))}")
 

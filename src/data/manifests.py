@@ -147,6 +147,7 @@ def build_emotion_samples(dataset: str):
             if s is None:
                 continue
             s.emotion = emo
+            s.group_key = source_actor(fid)   # actor id, for actor-level split
             samples.append(s)
     return samples
 

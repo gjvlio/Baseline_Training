@@ -20,8 +20,16 @@ D_MODEL = 256
 # Audio / log-Mel (Section 3.2; preprocessing 16 kHz, 80-band, 25ms/10ms)
 # ---------------------------------------------------------------------------
 N_MELS = 80
-# melspecs are stored as (80, T) with variable T; we pad/crop to MAX_MEL_FRAMES
-MAX_MEL_FRAMES = 256
+# melspecs are stored as (80, T) with variable T. We crop every clip to exactly
+# FIXED_MEL_LEN frames (random window in train, centre in eval). All clips are
+# >= ~134 frames, so this never pads -> sequence length carries NO class signal
+# (removes the P1-short / P2-long duration leak). 128 frames = 1.28 s.
+FIXED_MEL_LEN = 128
+MAX_MEL_FRAMES = 256  # legacy fallback cap (unused when fixed-length crop is on)
+# Use uniform keyframe weights for all samples: the preprocessed alpha is
+# exactly uniform for P2 but slightly peaked for genuine/P1, which would let the
+# pooling pattern tag the class. Uniform-for-all removes that signal.
+UNIFORM_ALPHA = True
 
 # ---------------------------------------------------------------------------
 # Text (BERT tokenizer, stored as (1,128))

@@ -3,6 +3,24 @@
 Status of this implementation vs the source paper (Yu et al., *Electronics* 2025,
 14, 4420). See [docs/ACE-Net.md](docs/ACE-Net.md) for the spec.
 
+## Leakage & bias controls
+
+A dedicated audit (`scripts/bias_audit.py`) checks every shortcut a discriminator
+could exploit instead of genuine emotional inconsistency. Findings and the
+controls applied:
+
+| Leak / bias | Symptom | Control |
+|---|---|---|
+| Duplicate manifest rows | each clip listed twice → same clip in train & test | dedup by `(split, file_id)` in the sample builders |
+| **Forgery component leakage** | a P2 splice `A___B` reuses genuine visual clip `A`; 283/360 P2 test fakes had `A` in train as genuine | **actor-disjoint split** keyed on the source/visual actor |
+| **Cross-stage familiarity** | frozen extractor trained (Stage-1) on the same genuine clips later in Stage-2 *test* → genuine = in-distribution, fake-audio = out-of-distribution; 593/737 test clips were seen, AUC ≈ 0.99 | **single shared actor partition** across both stages — the same held-out actors are excluded from Stage-1 training and used as the Stage-2 test set (verified 0 clip / 0 actor overlap) |
+| Loudness fingerprint | genuine −51 dB, P1 −54, P2 −48 → class separable by level | **per-sample mel z-score** (verified all classes → mean 0, std 1) |
+| Duration tell | mean T: genuine 250, P1 223, P2 259 → length tags class | **fixed-length crop** to 128 frames (all clips ≥134 ⇒ no padding ⇒ no length signal) |
+| α-weight signature | P2 α exactly uniform, genuine/P1 slightly peaked → pooling pattern tags P2 | **uniform α for all** samples (verified α std = 0 for every class) |
+
+All controls are verified by `scripts/bias_audit.py`; rerun it after any data or
+split change.
+
 ## Faithful (matches paper spec)
 
 | Component | Detail | Paper ref |
@@ -38,9 +56,12 @@ Status of this implementation vs the source paper (Yu et al., *Electronics* 2025
 
 ## Known gaps (data / environment, not architecture)
 
-1. **Genuine = LastHalf only (7542).** `GENUINE_FirstHalf` still preprocessing
-   by teammate. Stage-2 genuine class is currently half-size; rerun Stage-2
-   once FirstHalf lands for full-scale numbers.
+1. **CREMA split is speaker-independent (deliberate deviation).** The paper uses
+   a random 80/10/10 split for emotion recognition (speaker-dependent). We use an
+   actor-disjoint partition for CREMA — more rigorous, and required to share a
+   leakage-free holdout with Stage-2. Emotion accuracy is therefore expected to
+   be lower than a speaker-dependent split would report. MELD keeps the paper's
+   stratified random split (no speaker labels exposed, no forgery stage).
 
 2. **No SAVEE.** Paper Tables 2/3 include SAVEE; not in our data. CREMA-D + MELD
    only.
@@ -49,10 +70,11 @@ Status of this implementation vs the source paper (Yu et al., *Electronics* 2025
    would need the full preprocessing pipeline (face/keyframe/melspec/ASR/BERT)
    before it can enter the vector pipeline for a cross-dataset AUC.
 
-4. **P2 keyframe weights are uniform (0.125 each).** The cross-identity
-   preprocessing did not compute expressiveness scores for P2, so alpha is
-   uniform there. Genuine/P1 use the real beta=5 softmax weights. This reflects
-   the preprocessing as delivered, not a modelling choice.
+4. **Uniform keyframe weights (deliberate deviation from Eq. 13).** The
+   preprocessing produced exactly-uniform α for P2 but slightly-peaked α for
+   genuine/P1, which leaks the class through the visual pooling pattern. We
+   therefore use uniform α for ALL samples (mean-pooling of keyframes), trading
+   the paper's expressiveness weighting for a leakage-free visual branch.
 
 5. **Hardware.** Paper used RTX 3090 (24GB, batch=32). Local GPU is RTX 4050
    (6GB). batch=32 may OOM for the speech_text branch (BERT). Use `--batch-size`

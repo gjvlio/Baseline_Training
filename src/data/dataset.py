@@ -62,12 +62,27 @@ def _normalize_mel(mel):
     return (mel - m) / (s + 1e-6)
 
 
+def _fixed_len(mel, augment):
+    """Crop the mel to exactly FIXED_MEL_LEN frames so sequence length carries
+    no class signal. Random window in train, centre in eval. Pads only if a
+    clip is unexpectedly shorter than the target (rare; all clips >= ~134)."""
+    L = config.FIXED_MEL_LEN
+    T = mel.shape[1]
+    if T >= L:
+        start = np.random.randint(0, T - L + 1) if augment else (T - L) // 2
+        return mel[:, start:start + L]
+    out = np.zeros((mel.shape[0], L), dtype=mel.dtype)
+    out[:, :T] = mel
+    return out
+
+
 def _load_sample_tensors(sample: manifests.Sample, augment=False):
     mel = manifests.load_melspec(sample.audio)        # [80, T]
     if augment:
         mel = _spec_augment(mel)
-    mel = _normalize_mel(mel)                         # kill loudness fingerprint
-    mel_t = torch.from_numpy(mel)                     # [80, T]
+    mel = _normalize_mel(mel)                          # kill loudness fingerprint
+    mel = _fixed_len(mel, augment)                     # kill duration tell
+    mel_t = torch.from_numpy(mel)                      # [80, FIXED_MEL_LEN]
 
     ids, mask = manifests.load_text(sample.input_ids, sample.attention_mask)
     ids_t = torch.from_numpy(ids)                     # [128]
@@ -84,7 +99,10 @@ def _load_sample_tensors(sample: manifests.Sample, augment=False):
     frames, alphas = [], []
     for fname, alpha in fw:
         frames.append(_load_image(sample.visual_dir / fname, aug))
-        alphas.append(alpha)
+        # uniform alpha for all: the stored alpha is exactly uniform for P2 but
+        # slightly peaked for genuine/P1, which would leak the class via the
+        # pooling pattern. Uniform-for-all removes that tell.
+        alphas.append(1.0 if config.UNIFORM_ALPHA else alpha)
     frames_t = torch.stack(frames) if frames else torch.zeros(
         1, 3, config.IMG_SIZE, config.IMG_SIZE)
     alpha_t = torch.tensor(alphas if alphas else [1.0], dtype=torch.float32)

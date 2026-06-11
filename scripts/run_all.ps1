@@ -38,19 +38,21 @@ function Run($name, $argline) {
 $overall = [Diagnostics.Stopwatch]::StartNew()
 
 # FULL DATA (CREMA genuine 7438 incl. FirstHalf, MELD 10907).
-# Two-layer 8h guarantee: epoch caps sized to estimate + a hard per-run
-# --max-minutes wall-clock cap that stops mid-run if the estimate is wrong.
-# Per-run budget sums to ~430 min (<480 = 8h), leaving buffer for eval.
-# 1. CREMA visual (feeds Stage-2)
-Run "CREMA visual"      "src.train_stage1 --branch visual      --dataset crema --batch-size 16 --epochs 12 --early-stop 5 --max-minutes 80  --num-workers 0"
-# 2. CREMA speech (BERT heavy, small batch)
-Run "CREMA speech_text" "src.train_stage1 --branch speech_text --dataset crema --batch-size 8  --epochs 6  --early-stop 3 --max-minutes 95  --num-workers 0"
-# 3. MELD visual
-Run "MELD visual"       "src.train_stage1 --branch visual      --dataset meld  --batch-size 16 --epochs 8  --early-stop 4 --max-minutes 75  --num-workers 0"
-# 4. MELD speech
-Run "MELD speech_text"  "src.train_stage1 --branch speech_text --dataset meld  --batch-size 8  --epochs 4  --early-stop 2 --max-minutes 90  --num-workers 0"
+# 8h HARD CEILING: per-run --max-minutes sums to 430 min (<480 = 8h),
+# leaving buffer for eval. Each run also has an epoch cap; whichever hits
+# first wins. Visual runs are RAM-safe; speech_text (BERT, ~3-4GB host RAM)
+# is the OOM risk on a 7.7GB box -- if it crashes the chain logs FAILED and
+# continues to the next run.
+# 1. CREMA visual (feeds Stage-2, RAM-safe)
+Run "CREMA visual"      "src.train_stage1 --branch visual      --dataset crema --batch-size 16 --epochs 12 --early-stop 5 --max-minutes 80 --num-workers 0"
+# 2. CREMA speech (BERT, OOM risk)
+Run "CREMA speech_text" "src.train_stage1 --branch speech_text --dataset crema --batch-size 8  --epochs 6  --early-stop 3 --max-minutes 95 --num-workers 0"
+# 3. MELD visual (RAM-safe)
+Run "MELD visual"       "src.train_stage1 --branch visual      --dataset meld  --batch-size 16 --epochs 8  --early-stop 4 --max-minutes 75 --num-workers 0"
+# 4. MELD speech (BERT, OOM risk)
+Run "MELD speech_text"  "src.train_stage1 --branch speech_text --dataset meld  --batch-size 8  --epochs 4  --early-stop 2 --max-minutes 90 --num-workers 0"
 # 5. Stage-2 (needs CREMA stage-1 above; full genuine now)
-Run "Stage-2 ACE-Net"   "src.train_stage2 --batch-size 8 --epochs 8  --early-stop 4 --max-minutes 90  --num-workers 0"
+Run "Stage-2 ACE-Net"   "src.train_stage2 --batch-size 8 --epochs 8  --early-stop 4 --max-minutes 90 --num-workers 0"
 
 $overall.Stop()
 Write-Output "ALL RUNS COMPLETE in $([int]$overall.Elapsed.TotalMinutes) min"
