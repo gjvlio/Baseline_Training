@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ACE-Net Detector</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <span class="logo-dot"></span>
+      ACE-Net
+    </div>
+    <span class="badge-proto">Research prototype</span>
+  </header>
+
+  <main>
+
+    <!-- ── STATE: idle (drop zone) ── -->
+    <div id="state-idle" class="card drop-zone" data-state>
+      <input type="file" id="file-input" accept="video/*" hidden />
+      <div class="upload-icon">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="16 16 12 12 8 16"/>
+          <line x1="12" y1="12" x2="12" y2="21"/>
+          <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
+        </svg>
+      </div>
+      <p class="drop-title">Drop your video here</p>
+      <p class="drop-sub">or click to browse files</p>
+      <p class="drop-hint">MP4, MOV, WEBM · up to 500 MB</p>
+    </div>
+
+    <!-- ── STATE: file selected ── -->
+    <div id="state-selected" class="card drop-zone" data-state hidden>
+      <div class="file-thumb">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="2" width="20" height="20" rx="3"/>
+          <polygon points="10 8 16 12 10 16 10 8"/>
+        </svg>
+      </div>
+      <p id="file-info" class="file-info-text">—</p>
+      <button id="run-btn" class="btn-run">Run Analysis</button>
+      <p class="drop-hint mt-8">Click anywhere to change file</p>
+    </div>
+
+    <!-- ── STATE: analyzing ── -->
+    <div id="state-analyzing" class="card text-center" data-state hidden>
+      <div class="spinner"></div>
+      <h2 id="analyzing-title">Analyzing video</h2>
+      <p id="analyzing-sub" class="sub-text"></p>
+      <ul class="steps-list" id="steps-list"></ul>
+    </div>
+
+    <!-- ── STATE: results ── -->
+    <div id="state-results" data-state hidden>
+
+      <!-- verdict -->
+      <div id="verdict-card" class="verdict-card">
+        <span id="verdict-badge" class="verdict-badge">—</span>
+        <div id="fake-pct"     class="fake-pct">—%</div>
+        <div id="verdict-label" class="verdict-label">—</div>
+        <div id="verdict-desc"  class="verdict-desc">—</div>
+        <div class="verdict-metrics" id="verdict-metrics"></div>
+      </div>
+
+      <!-- dominant mismatch -->
+      <div class="info-card">
+        <div class="info-card-header">
+          <span id="dom-label" class="info-card-title">Dominant mismatch · —</span>
+          <span id="dom-delta" class="tag-delta">Δ = —</span>
+        </div>
+        <div class="bar-track"><div id="dom-bar" class="bar-fill bar-neutral" style="width:0%"></div></div>
+        <p id="dom-hint" class="bar-hint">—</p>
+      </div>
+
+      <!-- emotion heads -->
+      <div class="heads-row">
+        <div class="head-card">
+          <div class="head-title">Head A — audio</div>
+          <div class="head-sub">what the voice expresses</div>
+          <div id="audio-bars" class="emo-bars"></div>
+        </div>
+        <div class="head-card">
+          <div class="head-title">Head B — visual</div>
+          <div class="head-sub">what the face shows</div>
+          <div id="visual-bars" class="emo-bars"></div>
+        </div>
+      </div>
+
+      <!-- per-class delta -->
+      <div class="info-card">
+        <div class="delta-section-title">Δ per emotion class</div>
+        <div id="delta-bars"></div>
+      </div>
+
+      <!-- transcript (collapsible) -->
+      <details class="transcript-card">
+        <summary>Transcript</summary>
+        <p id="transcript-text" class="transcript-body">—</p>
+      </details>
+
+      <button id="reset-btn" class="btn-reset">Analyze another video</button>
+    </div>
+
+    <!-- ── STATE: error ── -->
+    <div id="state-error" class="card text-center" data-state hidden>
+      <div class="error-icon">⚠</div>
+      <h2>Analysis failed</h2>
+      <p id="error-msg" class="sub-text"></p>
+      <button id="retry-btn" class="btn-reset mt-16">Try again</button>
+    </div>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
