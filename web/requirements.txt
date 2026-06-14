@@ -1,0 +1,7 @@
+# Web-specific deps — install on top of the existing .venv
+# (.venv already has torch, torchvision, transformers, librosa, numpy)
+fastapi>=0.110.0
+uvicorn[standard]>=0.29.0
+python-multipart>=0.0.9
+openai-whisper>=20231117
+opencv-python>=4.9.0
