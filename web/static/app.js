@@ -1,13 +1,13 @@
 "use strict";
 
-// Processing steps — match exact backend sequence in preprocess.py + inference.py
+// Processing steps — faithful to ACE-Net paper sections 3.2 / 3.3 / 3.4
 const STEPS = [
-  "Extracting audio waveform",
-  "Running MDCNN + BERT encoder → Z_at",
-  "Extracting video keyframes (Top-8)",
-  "Running FVLiteNet encoder → Z_v",
-  "Computing consistency discriminator",
-  "Bilinear fusion → P(fake)",
+  "Log-Mel spectrogram extraction (80 bands, 16 kHz)",   // §3.2 MDCNN input
+  "MDCNN acoustic encoding → acoustic features",          // §3.2.1
+  "BERT textual encoding + cross-attention → Z_at",       // §3.2.2, Eq.5-9
+  "Facial keyframe selection (Top-K = 8)",                // §3.3.1
+  "FVLiteNet visual encoding → Z_v",                      // §3.3.2, Eq.12-13
+  "Multi-aspect fusion + MLP discriminator → P(fake)",    // §3.4, Eq.14-17
 ];
 
 // ── State machine ──
@@ -122,19 +122,23 @@ function renderScanning() {
   currentStep = 0;
   if (stepTimer) clearInterval(stepTimer);
 
-  // Advance one step every ~1.8 s until all done OR result arrives
+  // Mark step 0 immediately so user sees instant response
+  markStep(0); currentStep = 1;
+
+  // Advance one step every 1.5 s until result arrives or all done
   stepTimer = setInterval(() => {
     if (currentStep < STEPS.length) {
       markStep(currentStep);
       currentStep++;
     } else {
       clearInterval(stepTimer);
+      stepTimer = null;
     }
-  }, 1800);
+  }, 1500);
 
-  // Wait for the fetch that was started in startAnalysis()
+  // Wait for the fetch started in startAnalysis()
   const p = window._aceNetFetch;
-  if (!p) { nav("/"); return; }   // navigated here directly — go back to upload
+  if (!p) { nav("/"); return; }   // user landed here directly via URL — go home
 
   p.then(async resp => {
     if (!resp.ok) {
@@ -144,31 +148,25 @@ function renderScanning() {
     return resp.json();
   })
   .then(data => {
-    // Complete remaining steps quickly then go to results
-    clearInterval(stepTimer);
-    const remaining = STEPS.length - currentStep;
-    let i = 0;
-    const snap = setInterval(() => {
-      if (currentStep < STEPS.length) { markStep(currentStep); currentStep++; }
-      if (++i >= remaining) {
-        clearInterval(snap);
+    // Snap remaining steps quickly (200 ms each), then navigate
+    clearInterval(stepTimer); stepTimer = null;
+    const snapRemaining = () => {
+      if (currentStep < STEPS.length) {
+        markStep(currentStep); currentStep++;
+        setTimeout(snapRemaining, 200);
+      } else {
         sessionStorage.setItem("acenet_result", JSON.stringify(data));
-        setTimeout(() => nav("/results"), 400);
+        setTimeout(() => nav("/results"), 350);
       }
-    }, remaining > 0 ? 250 : 0);
-    if (remaining === 0) {
-      sessionStorage.setItem("acenet_result", JSON.stringify(data));
-      setTimeout(() => nav("/results"), 400);
-    }
+    };
+    snapRemaining();
   })
   .catch(err => {
-    clearInterval(stepTimer);
-    sessionStorage.setItem("acenet_error", String(err).replace(/^Error:\s*/, ""));
-    nav("/error");
+    clearInterval(stepTimer); stepTimer = null;
     show("state-error");
+    history.replaceState({}, "", "/");
     const em = get("error-msg");
-    if (em) em.textContent = sessionStorage.getItem("acenet_error");
-    history.pushState({}, "", "/");
+    if (em) em.textContent = String(err).replace(/^Error:\s*/, "");
   });
 }
 
