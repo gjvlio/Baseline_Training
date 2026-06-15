@@ -1,223 +1,159 @@
 "use strict";
 
-// ── Processing steps (labels match the real backend pipeline) ──
 const STEPS = [
-  { id: "audio",        label: "Extracting audio waveform" },
-  { id: "speech_text",  label: "Running MDCNN + BERT encoder → Z_at" },
-  { id: "keyframes",    label: "Extracting video keyframes (Top-8)" },
-  { id: "fvlitenet",    label: "Running FVLiteNet encoder → Z_v" },
-  { id: "emotion",      label: "Computing emotion heads A + B" },
-  { id: "discrepancy",  label: "Computing discrepancy score Δ" },
-  { id: "classifier",   label: "Bilinear fusion + classifier → P(fake)" },
+  { label: "Extracting audio waveform" },
+  { label: "Running MDCNN + BERT encoder → Z_at" },
+  { label: "Extracting video keyframes (Top-8)" },
+  { label: "Running FVLiteNet encoder → Z_v" },
+  { label: "Computing consistency discriminator" },
+  { label: "Bilinear fusion → P(fake)" },
 ];
+const STEP_MS = [900, 3500, 5200, 7000, 8800, 10200];
 
-// Approx wall-clock offset (ms) when each step *appears* to finish during animation.
-// Real inference drives the final reveal; these just keep the UI alive while waiting.
-const STEP_MS = [900, 3800, 5500, 7200, 9000, 10200, 11500];
-
-// ── State ──
 let selectedFile = null;
 let stepTimers   = [];
-let allStepsDone = false;
-let pendingData  = null;   // inference result arrives before animation ends
+let allDone      = false;
+let pending      = null;
 
-// ── DOM refs ──
-const $idle      = id("state-idle");
-const $selected  = id("state-selected");
-const $analyzing = id("state-analyzing");
-const $results   = id("state-results");
-const $error     = id("state-error");
-const $fileInput = id("file-input");
+// DOM
+const $idle  = get("state-idle");
+const $sel   = get("state-selected");
+const $ana   = get("state-analyzing");
+const $res   = get("state-results");
+const $err   = get("state-error");
+const $fi    = get("file-input");
 
-function id(x) { return document.getElementById(x); }
+function get(id) { return document.getElementById(id); }
 
-function showState(stateId) {
-  [$idle, $selected, $analyzing, $results, $error].forEach(el => {
-    el.hidden = el.id !== stateId;
-  });
+function show(stateId) {
+  [$idle, $sel, $ana, $res, $err].forEach(el => { el.hidden = el.id !== stateId; });
 }
 
 // ── File selection ──
-$idle.addEventListener("click",     () => $fileInput.click());
-$selected.addEventListener("click", e => { if (e.target.id !== "run-btn") $fileInput.click(); });
-
-$idle.addEventListener("dragover", e => { e.preventDefault(); $idle.classList.add("drag-over"); });
-$idle.addEventListener("dragleave",  () => $idle.classList.remove("drag-over"));
+$idle.addEventListener("click",     () => $fi.click());
+$sel.addEventListener("click",  e => { if (e.target.id !== "run-btn") $fi.click(); });
+$idle.addEventListener("dragover",  e => { e.preventDefault(); $idle.classList.add("drag-over"); });
+$idle.addEventListener("dragleave",     () => $idle.classList.remove("drag-over"));
 $idle.addEventListener("drop", e => {
-  e.preventDefault();
-  $idle.classList.remove("drag-over");
-  const f = e.dataTransfer.files[0];
-  if (f) setFile(f);
+  e.preventDefault(); $idle.classList.remove("drag-over");
+  const f = e.dataTransfer.files[0]; if (f) pick(f);
 });
+$fi.addEventListener("change", () => { if ($fi.files[0]) pick($fi.files[0]); });
 
-$fileInput.addEventListener("change", () => {
-  if ($fileInput.files[0]) setFile($fileInput.files[0]);
-});
-
-function setFile(f) {
+function pick(f) {
   selectedFile = f;
-  id("file-info").textContent = `${f.name} · ${(f.size / 1e6).toFixed(1)} MB`;
-  showState("state-selected");
+  get("file-info").textContent = `${f.name}  ·  ${(f.size / 1e6).toFixed(1)} MB`;
+  show("state-selected");
 }
 
-id("run-btn").addEventListener("click",  e => { e.stopPropagation(); startAnalysis(); });
-id("reset-btn").addEventListener("click",  reset);
-id("retry-btn").addEventListener("click",  reset);
+get("run-btn").addEventListener("click",  e => { e.stopPropagation(); start(); });
+get("reset-btn").addEventListener("click",  reset);
+get("retry-btn").addEventListener("click",  reset);
 
 function reset() {
-  selectedFile = null;
-  $fileInput.value = "";
-  stepTimers.forEach(clearTimeout);
-  stepTimers = [];
-  allStepsDone = false;
-  pendingData  = null;
-  showState("state-idle");
+  selectedFile = null; $fi.value = "";
+  stepTimers.forEach(clearTimeout); stepTimers = [];
+  allDone = false; pending = null;
+  show("state-idle");
 }
 
 // ── Analysis ──
 function buildSteps() {
-  id("steps-list").innerHTML = STEPS.map((s, i) => `
-    <li id="step-${i}">
-      <span class="step-icon" id="icon-${i}"></span>${s.label}
-    </li>`).join("");
+  get("steps-list").innerHTML = STEPS.map((s, i) =>
+    `<li id="s${i}"><span class="step-icon" id="si${i}"></span>${s.label}</li>`
+  ).join("");
 }
 
-function markStep(i) {
-  const li = id(`step-${i}`);
-  if (!li || li.classList.contains("done")) return;
-  li.classList.add("done");
-  id(`icon-${i}`).textContent = "✓";
+function mark(i) {
+  const li = get(`s${i}`); if (!li || li.classList.contains("done")) return;
+  li.classList.add("done"); get(`si${i}`).textContent = "✓";
 }
+function markAll() { STEPS.forEach((_, i) => mark(i)); }
 
-function markAllSteps() {
-  STEPS.forEach((_, i) => markStep(i));
-}
-
-async function startAnalysis() {
+async function start() {
   if (!selectedFile) return;
-
-  id("analyzing-sub").textContent = selectedFile.name;
+  get("analyzing-sub").textContent = selectedFile.name;
   buildSteps();
-  showState("state-analyzing");
-  allStepsDone = false;
-  pendingData  = null;
+  show("state-analyzing");
+  allDone = false; pending = null;
 
-  // Animate steps with approximate timings
   stepTimers = STEP_MS.map((ms, i) =>
     setTimeout(() => {
-      markStep(i);
+      mark(i);
       if (i === STEPS.length - 1) {
-        allStepsDone = true;
-        if (pendingData) setTimeout(() => renderResults(pendingData), 350);
+        allDone = true;
+        if (pending) setTimeout(() => render(pending), 350);
       }
     }, ms)
   );
 
-  // Fire the real POST request
   const fd = new FormData();
   fd.append("file", selectedFile);
 
   try {
     const resp = await fetch("/analyze", { method: "POST", body: fd });
     if (!resp.ok) {
-      const err = await resp.json().catch(() => ({ detail: resp.statusText }));
-      throw new Error(err.detail || `Server error ${resp.status}`);
+      const e = await resp.json().catch(() => ({ detail: resp.statusText }));
+      throw new Error(e.detail || `Server error ${resp.status}`);
     }
     const data = await resp.json();
-
-    markAllSteps();               // complete remaining steps immediately
-    if (allStepsDone) {
-      setTimeout(() => renderResults(data), 350);
-    } else {
-      pendingData = data;         // wait for last step timer
-    }
-  } catch (err) {
+    markAll();
+    if (allDone) setTimeout(() => render(data), 350);
+    else pending = data;
+  } catch (e) {
     stepTimers.forEach(clearTimeout);
-    id("error-msg").textContent = String(err).replace(/^Error:\s*/, "");
-    showState("state-error");
+    get("error-msg").textContent = String(e).replace(/^Error:\s*/, "");
+    show("state-error");
   }
 }
 
-// ── Results rendering ──
-function renderResults(data) {
+// ── Results ──
+function render(data) {
   const isGenuine = data.verdict === "GENUINE";
   const pct       = Math.round(data.fake_prob * 100);
-  const vc        = id("verdict-card");
 
-  vc.className = `verdict-card ${isGenuine ? "genuine" : "fake"}`;
-  id("verdict-badge").textContent  = isGenuine ? "Real" : "Fake";
-  id("fake-pct").textContent       = `${pct}%`;
-  id("verdict-label").textContent  = isGenuine ? "Likely authentic" : "Likely deepfake";
-  id("verdict-desc").textContent   = isGenuine
-    ? "Emotions are consistent across audio and visual modalities."
-    : "Significant audio-visual emotion discrepancy detected.";
+  // verdict card
+  const vc = get("verdict-card");
+  vc.className = `verdict ${isGenuine ? "genuine" : "fake"}`;
+  get("verdict-badge").textContent  = isGenuine ? "Genuine" : "Fake";
+  get("fake-pct").textContent       = `${pct}%`;
+  get("verdict-label").textContent  = isGenuine ? "Likely authentic" : "Likely deepfake";
+  get("verdict-desc").textContent   = isGenuine
+    ? "The model found no significant inconsistency between the audio-text and visual emotion embeddings."
+    : "The model detected a significant mismatch between audio-text and visual emotion embeddings.";
 
-  // Model stats chips
-  const ms = data.model_stats || {};
-  id("verdict-metrics").innerHTML = [
+  // score bar — fill position maps 0→green end, 100→red end
+  get("score-fill").style.width            = `${pct}%`;
+  get("score-fill").style.backgroundPosition = `${pct}% 0`;
+  get("score-pct-label").textContent = `${pct}%`;
+  const tag = get("score-tag");
+  tag.textContent = isGenuine ? "Genuine" : "Fake";
+  tag.className   = `score-tag ${isGenuine ? "genuine" : "fake"}`;
+
+  // discrepancy L2
+  const l2 = data.discrepancy_l2;
+  get("disc-value").textContent = l2 != null ? l2.toFixed(3) : "—";
+
+  // model stats
+  const ms  = data.model_stats || {};
+  const rows = [
     ["AUC",  fmt(ms.auc)],
+    ["F1",   fmt(ms.f1)],
     ["ACC",  pctFmt(ms.accuracy)],
     ["Prec", fmt(ms.precision)],
     ["Rec",  fmt(ms.recall)],
-    ["F1",   fmt(ms.f1)],
-    ["L2 Δ", data.discrepancy_l2 != null ? data.discrepancy_l2.toFixed(3) : "—"],
-  ].map(([k, v]) =>
-    `<span class="metric-chip"><strong>${k}</strong> ${v}</span>`
-  ).join("");
-
-  // Dominant mismatch
-  const dm = data.dominant_mismatch;
-  id("dom-label").textContent = `Dominant mismatch · ${dm.emotion}`;
-  id("dom-delta").textContent = `Δ = ${dm.delta.toFixed(2)}`;
-  const audioVal  = (data.audio_emotion  || {})[dm.emotion] || 0;
-  const visualVal = (data.visual_emotion || {})[dm.emotion] || 0;
-  id("dom-bar").style.width = `${Math.max(audioVal, visualVal) * 100}%`;
-  const sig = dm.delta < 0.05 ? "low" : dm.delta < 0.15 ? "moderate" : "high";
-  id("dom-hint").textContent =
-    `audio says ${(dm.audio_dominant  || dm.emotion).toLowerCase()} · ` +
-    `face says ${(dm.visual_dominant || dm.emotion).toLowerCase()} · ` +
-    `${sig} mismatch signal`;
-
-  // Emotion bars
-  renderEmoBars("audio-bars",  data.audio_emotion  || {}, "bar-purple");
-  renderEmoBars("visual-bars", data.visual_emotion || {}, "bar-green");
-
-  // Per-class delta
-  const deltaDiv = id("delta-bars");
-  deltaDiv.innerHTML = Object.entries(data.per_class_delta || {})
-    .sort((a, b) => b[1] - a[1])
-    .map(([emo, d]) => {
-      const tier  = d < 0.05 ? "low" : d < 0.15 ? "med" : "high";
-      const label = tier === "low" ? "Low" : tier === "med" ? "Med" : "High";
-      return `
-        <div class="delta-row">
-          <span class="delta-label">${emo}</span>
-          <div class="delta-track">
-            <div class="delta-fill bar-neutral" style="width:${Math.min(d * 200, 100)}%"></div>
-          </div>
-          <span class="delta-val">${d.toFixed(2)}</span>
-          <span class="tag-sm tag-${tier}">${label}</span>
-        </div>`;
-    }).join("");
-
-  // Transcript
-  id("transcript-text").textContent = data.transcript || "[not available]";
-
-  showState("state-results");
-}
-
-function renderEmoBars(containerId, emoData, barClass) {
-  const container = id(containerId);
-  const sorted    = Object.entries(emoData).sort((a, b) => b[1] - a[1]);
-  container.innerHTML = sorted.map(([emo, val]) =>
-    `<div class="emo-row">
-       <span class="emo-label">${emo}</span>
-       <div class="emo-track">
-         <div class="emo-fill ${barClass}" style="width:${(val * 100).toFixed(1)}%"></div>
-       </div>
-       <span class="emo-value">${val.toFixed(2)}</span>
+  ];
+  get("stat-grid").innerHTML = rows.map(([k, v]) =>
+    `<div class="stat-item">
+       <span class="stat-val">${v}</span>
+       <span class="stat-key">${k}</span>
      </div>`
   ).join("");
+
+  // transcript
+  get("transcript-text").textContent = data.transcript || "[not available]";
+
+  show("state-results");
 }
 
 function fmt(v)    { return v != null ? v.toFixed(3) : "—"; }
