@@ -95,15 +95,13 @@ async function startAnalysis() {
   sessionStorage.removeItem("acenet_result");
   sessionStorage.removeItem("acenet_error");
 
-  // Start fetch BEFORE navigating so the request is alive on /scanning
   const fd = new FormData();
   fd.append("file", selectedFile);
-  const fetchPromise = fetch("/analyze", { method: "POST", body: fd });
+
+  // Must be assigned BEFORE nav() — renderScanning() reads it synchronously
+  window._aceNetFetch = fetch("/analyze", { method: "POST", body: fd });
 
   nav("/scanning");
-
-  // /scanning calls renderScanning() which animates; we resolve fetchPromise there
-  window._aceNetFetch = fetchPromise;
 }
 
 // ── Scanning screen ──
