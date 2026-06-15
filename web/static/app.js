@@ -182,7 +182,8 @@ function renderResults(data) {
   show("state-results");
 
   const isGenuine = data.verdict === "GENUINE";
-  const pct       = Math.round(data.fake_prob * 100);
+  // Clamp display 1–99 — never show 0% or 100% (no classifier is perfectly certain)
+  const pct       = Math.min(99, Math.max(1, Math.round(data.fake_prob * 100)));
 
   const vc = get("verdict-card");
   if (vc) vc.className = `verdict ${isGenuine ? "genuine" : "fake"}`;
