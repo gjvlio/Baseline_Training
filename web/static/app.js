@@ -1,160 +1,237 @@
 "use strict";
 
+// Processing steps — match exact backend sequence in preprocess.py + inference.py
 const STEPS = [
-  { label: "Extracting audio waveform" },
-  { label: "Running MDCNN + BERT encoder → Z_at" },
-  { label: "Extracting video keyframes (Top-8)" },
-  { label: "Running FVLiteNet encoder → Z_v" },
-  { label: "Computing consistency discriminator" },
-  { label: "Bilinear fusion → P(fake)" },
+  "Extracting audio waveform",
+  "Running MDCNN + BERT encoder → Z_at",
+  "Extracting video keyframes (Top-8)",
+  "Running FVLiteNet encoder → Z_v",
+  "Computing consistency discriminator",
+  "Bilinear fusion → P(fake)",
 ];
-const STEP_MS = [900, 3500, 5200, 7000, 8800, 10200];
+
+// ── State machine ──
+// Pages:  /           → upload
+//         /scanning   → analyzing
+//         /results    → results
+// Data flows via sessionStorage so page refreshes survive.
 
 let selectedFile = null;
-let stepTimers   = [];
-let allDone      = false;
-let pending      = null;
+let stepTimer    = null;
+let currentStep  = 0;
 
-// DOM
-const $idle  = get("state-idle");
-const $sel   = get("state-selected");
-const $ana   = get("state-analyzing");
-const $res   = get("state-results");
-const $err   = get("state-error");
-const $fi    = get("file-input");
-
+// ── DOM helpers ──
 function get(id) { return document.getElementById(id); }
 
 function show(stateId) {
-  [$idle, $sel, $ana, $res, $err].forEach(el => { el.hidden = el.id !== stateId; });
+  ["state-idle", "state-selected", "state-analyzing", "state-results", "state-error"]
+    .forEach(id => { const el = get(id); if (el) el.hidden = el.id !== stateId; });
 }
 
-// ── File selection ──
-$idle.addEventListener("click",     () => $fi.click());
-$sel.addEventListener("click",  e => { if (e.target.id !== "run-btn") $fi.click(); });
-$idle.addEventListener("dragover",  e => { e.preventDefault(); $idle.classList.add("drag-over"); });
-$idle.addEventListener("dragleave",     () => $idle.classList.remove("drag-over"));
-$idle.addEventListener("drop", e => {
-  e.preventDefault(); $idle.classList.remove("drag-over");
-  const f = e.dataTransfer.files[0]; if (f) pick(f);
-});
-$fi.addEventListener("change", () => { if ($fi.files[0]) pick($fi.files[0]); });
+// ── Route → screen mapping ──
+function route() {
+  const path = location.pathname;
+  if (path === "/scanning") {
+    renderScanning();
+  } else if (path === "/results") {
+    renderResults(JSON.parse(sessionStorage.getItem("acenet_result") || "null"));
+  } else {
+    show("state-idle");
+  }
+}
+
+window.addEventListener("popstate", route);
+document.addEventListener("DOMContentLoaded", route);
+
+function nav(path) {
+  history.pushState({}, "", path);
+  route();
+}
+
+// ── Upload screen ──
+const $fi = get("file-input");
+
+function setupUpload() {
+  const $idle = get("state-idle");
+  const $sel  = get("state-selected");
+  if (!$idle) return;
+
+  $idle.addEventListener("click",    () => $fi.click());
+  $idle.addEventListener("dragover", e => { e.preventDefault(); $idle.classList.add("drag-over"); });
+  $idle.addEventListener("dragleave",    () => $idle.classList.remove("drag-over"));
+  $idle.addEventListener("drop", e => {
+    e.preventDefault(); $idle.classList.remove("drag-over");
+    if (e.dataTransfer.files[0]) pick(e.dataTransfer.files[0]);
+  });
+  $fi.addEventListener("change", () => { if ($fi.files[0]) pick($fi.files[0]); });
+
+  if ($sel) {
+    $sel.addEventListener("click", e => { if (e.target.id !== "run-btn") $fi.click(); });
+  }
+
+  const runBtn = get("run-btn");
+  if (runBtn) runBtn.addEventListener("click", e => { e.stopPropagation(); startAnalysis(); });
+
+  const resetBtn = get("reset-btn");
+  if (resetBtn) resetBtn.addEventListener("click", () => nav("/"));
+
+  const retryBtn = get("retry-btn");
+  if (retryBtn) retryBtn.addEventListener("click", () => nav("/"));
+}
+setupUpload();
 
 function pick(f) {
   selectedFile = f;
-  get("file-info").textContent = `${f.name}  ·  ${(f.size / 1e6).toFixed(1)} MB`;
+  const fi = get("file-info");
+  if (fi) fi.textContent = `${f.name}  ·  ${(f.size / 1e6).toFixed(1)} MB`;
   show("state-selected");
 }
 
-get("run-btn").addEventListener("click",  e => { e.stopPropagation(); start(); });
-get("reset-btn").addEventListener("click",  reset);
-get("retry-btn").addEventListener("click",  reset);
-
-function reset() {
-  selectedFile = null; $fi.value = "";
-  stepTimers.forEach(clearTimeout); stepTimers = [];
-  allDone = false; pending = null;
-  show("state-idle");
-}
-
-// ── Analysis ──
-function buildSteps() {
-  get("steps-list").innerHTML = STEPS.map((s, i) =>
-    `<li id="s${i}"><span class="step-icon" id="si${i}"></span>${s.label}</li>`
-  ).join("");
-}
-
-function mark(i) {
-  const li = get(`s${i}`); if (!li || li.classList.contains("done")) return;
-  li.classList.add("done"); get(`si${i}`).textContent = "✓";
-}
-function markAll() { STEPS.forEach((_, i) => mark(i)); }
-
-async function start() {
+// ── Start analysis — fires POST then navigates to /scanning ──
+async function startAnalysis() {
   if (!selectedFile) return;
-  get("analyzing-sub").textContent = selectedFile.name;
-  buildSteps();
-  show("state-analyzing");
-  allDone = false; pending = null;
 
-  stepTimers = STEP_MS.map((ms, i) =>
-    setTimeout(() => {
-      mark(i);
-      if (i === STEPS.length - 1) {
-        allDone = true;
-        if (pending) setTimeout(() => render(pending), 350);
-      }
-    }, ms)
-  );
+  sessionStorage.setItem("acenet_filename", selectedFile.name);
+  sessionStorage.removeItem("acenet_result");
+  sessionStorage.removeItem("acenet_error");
 
+  // Start fetch BEFORE navigating so the request is alive on /scanning
   const fd = new FormData();
   fd.append("file", selectedFile);
+  const fetchPromise = fetch("/analyze", { method: "POST", body: fd });
 
-  try {
-    const resp = await fetch("/analyze", { method: "POST", body: fd });
+  nav("/scanning");
+
+  // /scanning calls renderScanning() which animates; we resolve fetchPromise there
+  window._aceNetFetch = fetchPromise;
+}
+
+// ── Scanning screen ──
+function renderScanning() {
+  show("state-analyzing");
+
+  const sub = get("analyzing-sub");
+  if (sub) sub.textContent = sessionStorage.getItem("acenet_filename") || "";
+
+  // Build step list
+  const ol = get("steps-list");
+  if (ol) {
+    ol.innerHTML = STEPS.map((label, i) =>
+      `<li id="s${i}"><span class="step-icon" id="si${i}"></span>${label}</li>`
+    ).join("");
+  }
+
+  currentStep = 0;
+  if (stepTimer) clearInterval(stepTimer);
+
+  // Advance one step every ~1.8 s until all done OR result arrives
+  stepTimer = setInterval(() => {
+    if (currentStep < STEPS.length) {
+      markStep(currentStep);
+      currentStep++;
+    } else {
+      clearInterval(stepTimer);
+    }
+  }, 1800);
+
+  // Wait for the fetch that was started in startAnalysis()
+  const p = window._aceNetFetch;
+  if (!p) { nav("/"); return; }   // navigated here directly — go back to upload
+
+  p.then(async resp => {
     if (!resp.ok) {
       const e = await resp.json().catch(() => ({ detail: resp.statusText }));
       throw new Error(e.detail || `Server error ${resp.status}`);
     }
-    const data = await resp.json();
-    markAll();
-    if (allDone) setTimeout(() => render(data), 350);
-    else pending = data;
-  } catch (e) {
-    stepTimers.forEach(clearTimeout);
-    get("error-msg").textContent = String(e).replace(/^Error:\s*/, "");
+    return resp.json();
+  })
+  .then(data => {
+    // Complete remaining steps quickly then go to results
+    clearInterval(stepTimer);
+    const remaining = STEPS.length - currentStep;
+    let i = 0;
+    const snap = setInterval(() => {
+      if (currentStep < STEPS.length) { markStep(currentStep); currentStep++; }
+      if (++i >= remaining) {
+        clearInterval(snap);
+        sessionStorage.setItem("acenet_result", JSON.stringify(data));
+        setTimeout(() => nav("/results"), 400);
+      }
+    }, remaining > 0 ? 250 : 0);
+    if (remaining === 0) {
+      sessionStorage.setItem("acenet_result", JSON.stringify(data));
+      setTimeout(() => nav("/results"), 400);
+    }
+  })
+  .catch(err => {
+    clearInterval(stepTimer);
+    sessionStorage.setItem("acenet_error", String(err).replace(/^Error:\s*/, ""));
+    nav("/error");
     show("state-error");
-  }
+    const em = get("error-msg");
+    if (em) em.textContent = sessionStorage.getItem("acenet_error");
+    history.pushState({}, "", "/");
+  });
 }
 
-// ── Results ──
-function render(data) {
+function markStep(i) {
+  const li = get(`s${i}`); if (!li || li.classList.contains("done")) return;
+  li.classList.add("done");
+  const ic = get(`si${i}`); if (ic) ic.textContent = "✓";
+}
+
+// ── Results screen ──
+function renderResults(data) {
+  if (!data) { nav("/"); return; }
+  show("state-results");
+
   const isGenuine = data.verdict === "GENUINE";
   const pct       = Math.round(data.fake_prob * 100);
 
-  // verdict card
   const vc = get("verdict-card");
-  vc.className = `verdict ${isGenuine ? "genuine" : "fake"}`;
-  get("verdict-badge").textContent  = isGenuine ? "Genuine" : "Fake";
-  get("fake-pct").textContent       = `${pct}%`;
-  get("verdict-label").textContent  = isGenuine ? "Likely authentic" : "Likely deepfake";
-  get("verdict-desc").textContent   = isGenuine
-    ? "The model found no significant inconsistency between the audio-text and visual emotion embeddings."
-    : "The model detected a significant mismatch between audio-text and visual emotion embeddings.";
+  if (vc) vc.className = `verdict ${isGenuine ? "genuine" : "fake"}`;
 
-  // score bar — fill position maps 0→green end, 100→red end
-  get("score-fill").style.width            = `${pct}%`;
-  get("score-fill").style.backgroundPosition = `${pct}% 0`;
-  get("score-pct-label").textContent = `${pct}%`;
+  setText("verdict-badge",  isGenuine ? "Genuine" : "Fake");
+  setText("fake-pct",       `${pct}%`);
+  setText("verdict-label",  isGenuine ? "Likely authentic" : "Likely deepfake");
+  setText("verdict-desc",   isGenuine
+    ? "No significant inconsistency detected between audio-text and visual emotion embeddings."
+    : "Significant mismatch detected between audio-text and visual emotion embeddings.");
+
+  // Score bar
+  const fill = get("score-fill");
+  if (fill) {
+    fill.style.width = `${pct}%`;
+    fill.style.backgroundPosition = `${pct}% 0`;
+  }
+  setText("score-pct-label", `${pct}%`);
   const tag = get("score-tag");
-  tag.textContent = isGenuine ? "Genuine" : "Fake";
-  tag.className   = `score-tag ${isGenuine ? "genuine" : "fake"}`;
+  if (tag) { tag.textContent = isGenuine ? "Genuine" : "Fake"; tag.className = `score-tag ${isGenuine ? "genuine" : "fake"}`; }
 
-  // discrepancy L2
-  const l2 = data.discrepancy_l2;
-  get("disc-value").textContent = l2 != null ? l2.toFixed(3) : "—";
+  // L2 discrepancy
+  setText("disc-value", data.discrepancy_l2 != null ? data.discrepancy_l2.toFixed(3) : "—");
 
-  // model stats
-  const ms  = data.model_stats || {};
-  const rows = [
-    ["AUC",  fmt(ms.auc)],
-    ["F1",   fmt(ms.f1)],
-    ["ACC",  pctFmt(ms.accuracy)],
-    ["Prec", fmt(ms.precision)],
-    ["Rec",  fmt(ms.recall)],
-  ];
-  get("stat-grid").innerHTML = rows.map(([k, v]) =>
-    `<div class="stat-item">
-       <span class="stat-val">${v}</span>
-       <span class="stat-key">${k}</span>
-     </div>`
-  ).join("");
+  // Model stats
+  const ms = data.model_stats || {};
+  const sg = get("stat-grid");
+  if (sg) {
+    sg.innerHTML = [
+      ["AUC",  fmt(ms.auc)],
+      ["F1",   fmt(ms.f1)],
+      ["ACC",  pctFmt(ms.accuracy)],
+      ["Prec", fmt(ms.precision)],
+      ["Rec",  fmt(ms.recall)],
+    ].map(([k, v]) =>
+      `<div class="stat-item"><span class="stat-val">${v}</span><span class="stat-key">${k}</span></div>`
+    ).join("");
+  }
 
-  // transcript
-  get("transcript-text").textContent = data.transcript || "[not available]";
+  setText("transcript-text", data.transcript || "[not available]");
 
-  show("state-results");
+  const rb = get("reset-btn");
+  if (rb) rb.onclick = () => { sessionStorage.clear(); nav("/"); };
 }
 
+function setText(id, val) { const el = get(id); if (el) el.textContent = val; }
 function fmt(v)    { return v != null ? v.toFixed(3) : "—"; }
 function pctFmt(v) { return v != null ? `${(v * 100).toFixed(1)}%` : "—"; }

@@ -80,6 +80,15 @@ def health():
     }
 
 
-# Serve frontend (must be last — catches all remaining routes)
+# SPA sub-routes — all return index.html so history.pushState URLs survive refresh
+from fastapi.responses import FileResponse as _FR
 _static = Path(__file__).parent / "static"
+
+@app.get("/scanning")
+@app.get("/results")
+def _spa():
+    return _FR(str(_static / "index.html"))
+
+
+# Static file mount — must be last
 app.mount("/", StaticFiles(directory=str(_static), html=True), name="static")
