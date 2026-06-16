@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Datasets — ACE-Net</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ──────────────────────────────────────────────────────────────
+       Dataset cards
+    ────────────────────────────────────────────────────────────── */
+    .ds-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 40px;
+    }
+    .ds-card {
+      background: var(--surface); border-radius: 20px; padding: 0;
+      box-shadow: var(--shadow); overflow: hidden;
+    }
+    .ds-card-top {
+      padding: 22px 26px 18px;
+      border-bottom: 1px solid var(--line);
+    }
+    .ds-accent-bar {
+      height: 3px; width: 100%;
+    }
+    .ds-card.crema .ds-accent-bar { background: linear-gradient(90deg, var(--green), #34d399); }
+    .ds-card.meld  .ds-accent-bar { background: linear-gradient(90deg, var(--purple), #a78bfa); }
+
+    .ds-name { font-size: 17px; font-weight: 700; margin-bottom: 2px; }
+    .ds-full { font-size: 12px; color: var(--hint); margin-bottom: 16px; }
+
+    .ds-stats {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+    }
+    .ds-stat {
+      background: var(--bg); border-radius: 10px; padding: 10px 8px; text-align: center;
+    }
+    .ds-stat strong { display: block; font-size: 18px; font-weight: 800; letter-spacing: -0.02em; }
+    .ds-stat span   { font-size: 10px; color: var(--hint); font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.04em; }
+
+    .ds-card-body { padding: 18px 26px 22px; }
+
+    .emo-pills { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 14px; }
+    .emo-pill {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      padding: 3px 10px; border-radius: 20px; letter-spacing: 0.04em;
+    }
+    .emo-ang { background: #fee2e2; color: #b91c1c; }
+    .emo-dis { background: #ffedd5; color: #c2410c; }
+    .emo-fea { background: #ede9fe; color: #6d28d9; }
+    .emo-hap { background: #dcfce7; color: #15803d; }
+    .emo-neu { background: #f3f4f6; color: #374151; }
+    .emo-sad { background: #dbeafe; color: #1d4ed8; }
+    .emo-sur { background: #fef9c3; color: #a16207; }
+
+    .ds-role { font-size: 13px; color: var(--sub); line-height: 1.65; }
+    .ds-role strong { color: var(--text); }
+
+    .meld-note {
+      background: #fef9c3; border-left: 3px solid #fde047;
+      border-radius: 6px; padding: 9px 12px; font-size: 12px; color: #713f12;
+      margin-top: 14px; line-height: 1.5;
+    }
+
+    /* ──────────────────────────────────────────────────────────────
+       Paradigm cards — horizontal layout
+    ────────────────────────────────────────────────────────────── */
+    .paradigm-stack { display: flex; flex-direction: column; gap: 16px; margin-bottom: 40px; }
+    .paradigm-card {
+      background: var(--surface); border-radius: 20px; box-shadow: var(--shadow);
+      display: grid; grid-template-columns: 1fr 1fr; overflow: hidden;
+    }
+    .paradigm-left { padding: 26px 28px; border-right: 1px solid var(--line); }
+    .paradigm-right { padding: 26px 28px; background: var(--bg); }
+
+    .paradigm-num {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 10px; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.08em; padding: 4px 12px; border-radius: 20px; margin-bottom: 12px;
+    }
+    .p1 .paradigm-num { background: #ffedd5; color: #c2410c; }
+    .p2 .paradigm-num { background: #fee2e2; color: #b91c1c; }
+
+    .paradigm-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 10px; }
+    .paradigm-card p  { font-size: 13px; color: var(--sub); line-height: 1.7; margin-bottom: 12px; }
+    .paradigm-card p:last-child { margin-bottom: 0; }
+    .paradigm-card strong { color: var(--text); }
+
+    .stats-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+    .stats-chip {
+      font-size: 11px; font-weight: 600; color: var(--sub);
+      background: var(--line); padding: 4px 10px; border-radius: 8px;
+    }
+
+    .filename-box {
+      background: var(--surface); border-radius: 12px; padding: 14px 16px;
+    }
+    .filename-title { font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.07em; color: var(--hint); margin-bottom: 8px; }
+    .filename-box code {
+      display: block; font-family: monospace; font-size: 11px; font-weight: 700;
+      color: var(--text); margin-bottom: 12px; word-break: break-all;
+      background: var(--bg); padding: 6px 8px; border-radius: 6px;
+    }
+    .fd-row { display: flex; gap: 8px; margin-bottom: 6px; align-items: baseline; }
+    .fd-key {
+      font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em;
+      color: var(--hint); width: 48px; flex-shrink: 0; padding-top: 1px;
+    }
+    .fd-val { font-size: 12px; color: var(--sub); line-height: 1.4; }
+    .fd-val em { font-style: normal; font-weight: 600; color: var(--text); }
+
+    /* ──────────────────────────────────────────────────────────────
+       Video gallery
+    ────────────────────────────────────────────────────────────── */
+    .video-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 40px;
+    }
+    .video-card {
+      background: var(--surface); border-radius: 18px; overflow: hidden;
+      box-shadow: var(--shadow); display: flex; flex-direction: column;
+    }
+    .video-badge-row {
+      padding: 12px 16px 0; display: flex; align-items: center; justify-content: space-between;
+    }
+    .vbadge {
+      font-size: 10px; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.06em; padding: 3px 10px; border-radius: 20px;
+    }
+    .vbadge-genuine { background: #dcfce7; color: #15803d; }
+    .vbadge-p1      { background: #ffedd5; color: #c2410c; }
+    .vbadge-p2      { background: #fee2e2; color: #b91c1c; }
+    .video-card video {
+      width: 100%; display: block; background: #0f172a;
+      aspect-ratio: 4/3; object-fit: contain;
+    }
+    .video-info { padding: 12px 16px 16px; flex: 1; }
+    .video-info strong { display: block; font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+    .video-info p { font-size: 12px; color: var(--sub); line-height: 1.55; margin: 0; }
+
+    /* ──────────────────────────────────────────────────────────────
+       Justification cards
+    ────────────────────────────────────────────────────────────── */
+    .just-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+    }
+    .just-card {
+      background: var(--surface); border-radius: 18px; padding: 22px 22px 20px;
+      box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 12px;
+    }
+    .just-header { display: flex; align-items: center; gap: 12px; }
+    .just-icon-wrap {
+      width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .just-icon-wrap.green  { background: #dcfce7; color: var(--green-dk); }
+    .just-icon-wrap.purple { background: #ede9fe; color: var(--purple); }
+    .just-icon-wrap.amber  { background: #fef9c3; color: #a16207; }
+    .just-icon-wrap.red    { background: #fee2e2; color: #b91c1c; }
+    .just-card h4 { font-size: 14px; font-weight: 700; margin: 0; }
+    .just-card ul {
+      margin: 0; padding-left: 16px;
+      font-size: 13px; color: var(--sub); line-height: 1.75;
+    }
+
+    /* ──────────────────────────────────────────────────────────────
+       Section header strip
+    ────────────────────────────────────────────────────────────── */
+    .section-strip {
+      display: flex; align-items: baseline; gap: 10px; margin-bottom: 16px;
+    }
+    .section-strip h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
+    .section-strip .s-count {
+      font-size: 12px; font-weight: 600; color: var(--hint);
+      background: var(--bg); padding: 2px 9px; border-radius: 20px;
+    }
+
+    @media (max-width: 740px) {
+      .ds-grid, .just-grid       { grid-template-columns: 1fr; }
+      .paradigm-card             { grid-template-columns: 1fr; }
+      .paradigm-right            { border-right: none; border-top: 1px solid var(--line); background: var(--bg); }
+      .video-grid                { grid-template-columns: 1fr; }
+      .ds-stats                  { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo"><span class="logo-dot"></span>ACE-Net</div>
+    <nav class="site-nav">
+      <a href="/"              class="nav-link">Detector</a>
+      <a href="/datasets"      class="nav-link">Datasets</a>
+      <a href="/acenet-results" class="nav-link">Training Results</a>
+    </nav>
+  </header>
+
+  <main class="page-main">
+
+    <div class="page-hero">
+      <h1>Research Datasets</h1>
+      <p class="hero-sub">
+        ACE-Net probes audio-visual emotional consistency using two corpora and two
+        controlled manipulation paradigms — covering emotion tampering and cross-identity splicing.
+      </p>
+    </div>
+
+    <!-- ── Source corpora ── -->
+    <div class="section-strip reveal" data-delay="0">
+      <h2>Source Corpora</h2>
+      <span class="s-count">2 datasets</span>
+    </div>
+
+    <div class="ds-grid">
+
+      <div class="ds-card crema reveal" data-delay="60">
+        <div class="ds-accent-bar"></div>
+        <div class="ds-card-top">
+          <div class="ds-name">CREMA-D</div>
+          <div class="ds-full">Crowd-sourced Emotional Multimodal Actors Dataset</div>
+          <div class="ds-stats">
+            <div class="ds-stat"><strong>91</strong><span>Actors</span></div>
+            <div class="ds-stat"><strong>7,442</strong><span>Clips</span></div>
+            <div class="ds-stat"><strong>6</strong><span>Emotions</span></div>
+            <div class="ds-stat"><strong>12</strong><span>Sentences</span></div>
+          </div>
+        </div>
+        <div class="ds-card-body">
+          <div class="emo-pills">
+            <span class="emo-pill emo-ang">ANG</span>
+            <span class="emo-pill emo-dis">DIS</span>
+            <span class="emo-pill emo-fea">FEA</span>
+            <span class="emo-pill emo-hap">HAP</span>
+            <span class="emo-pill emo-neu">NEU</span>
+            <span class="emo-pill emo-sad">SAD</span>
+          </div>
+          <div class="ds-role">
+            Actors performed 12 scripted sentences at Low, Medium, and High emotional intensity
+            in a controlled recording environment. Actor-level disjoint splits prevent speaker
+            memorization across train/val/test.
+            <br><br>
+            <strong>Used for Stage 1 + Stage 2 training and all test evaluation.</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="ds-card meld reveal" data-delay="120">
+        <div class="ds-accent-bar"></div>
+        <div class="ds-card-top">
+          <div class="ds-name">MELD</div>
+          <div class="ds-full">Multimodal EmotionLines Dataset</div>
+          <div class="ds-stats">
+            <div class="ds-stat"><strong>13,708</strong><span>Clips</span></div>
+            <div class="ds-stat"><strong>1,433</strong><span>Dialogues</span></div>
+            <div class="ds-stat"><strong>7</strong><span>Emotions</span></div>
+            <div class="ds-stat"><strong>Friends</strong><span>Source</span></div>
+          </div>
+        </div>
+        <div class="ds-card-body">
+          <div class="emo-pills">
+            <span class="emo-pill emo-ang">Anger</span>
+            <span class="emo-pill emo-dis">Disgust</span>
+            <span class="emo-pill emo-fea">Fear</span>
+            <span class="emo-pill emo-hap">Joy</span>
+            <span class="emo-pill emo-neu">Neutral</span>
+            <span class="emo-pill emo-sad">Sadness</span>
+            <span class="emo-pill emo-sur">Surprise</span>
+          </div>
+          <div class="ds-role">
+            Multi-party dialogues extracted from the Friends TV show. Covers 7 emotion classes
+            in naturalistic, in-the-wild conversational video — a harder cross-corpus test bed.
+          </div>
+          <div class="meld-note">
+            The ACE-Net paper evaluates Stage&#8209;1 classifiers on MELD for cross-corpus
+            generalization. Our replication focuses on CREMA&#8209;D for controlled fake generation.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── Paradigms ── -->
+    <div class="section-strip reveal" data-delay="0">
+      <h2>Deepfake Paradigms</h2>
+      <span class="s-count">2 manipulation types</span>
+    </div>
+
+    <div class="paradigm-stack">
+
+      <!-- P1 -->
+      <div class="paradigm-card p1 reveal" data-delay="0">
+        <div class="paradigm-left">
+          <div class="paradigm-num">
+            <!-- icon: waveform/audio swap -->
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/>
+              <polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/>
+            </svg>
+            Paradigm 1 — Emotion Tampering
+          </div>
+          <h3>Same actor, swapped emotion audio</h3>
+          <p>
+            Video and audio come from <strong>the same actor</strong> performing the same sentence,
+            but the audio track is replaced with a different emotional take. Voice identity is
+            preserved — only the emotion content mismatches.
+          </p>
+          <p>
+            Example: actor's face shows a <strong>Neutral</strong> expression while the audio
+            carries a <strong>Fearful</strong> delivery of the exact same sentence.
+            Subtle — same speaker timbre, different emotional intonation.
+          </p>
+          <div class="stats-row">
+            <span class="stats-chip">3,714 fake pairs</span>
+            <span class="stats-chip">Same actor identity</span>
+            <span class="stats-chip">6 emotion classes</span>
+          </div>
+        </div>
+        <div class="paradigm-right">
+          <div class="filename-box">
+            <div class="filename-title">Filename anatomy</div>
+            <code>1046_IWW_NEU_XX_forged_FEA.mp4</code>
+            <div class="fd-row"><span class="fd-key">Actor</span><span class="fd-val"><em>1046</em></span></div>
+            <div class="fd-row"><span class="fd-key">Sentence</span><span class="fd-val">IWW — <em>"I wonder what this is about"</em></span></div>
+            <div class="fd-row"><span class="fd-key">Video</span><span class="fd-val"><em>NEU</em> (Neutral) — original take</span></div>
+            <div class="fd-row"><span class="fd-key">Audio</span><span class="fd-val"><em>FEA</em> (Fearful) — replaced</span></div>
+            <div class="fd-row"><span class="fd-key">Intensity</span><span class="fd-val">XX (unspecified — varies)</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- P2 -->
+      <div class="paradigm-card p2 reveal" data-delay="80">
+        <div class="paradigm-left">
+          <div class="paradigm-num">
+            <!-- icon: two people / identity -->
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+            Paradigm 2 — Cross-Identity Splicing
+          </div>
+          <h3>Video from actor A, audio from actor B</h3>
+          <p>
+            Both tracks are <strong>real, unmodified</strong> CREMA-D recordings — but spliced
+            from two different people. This simulates face-swap or voice-cloning attacks where
+            neither modality contains synthesis artifacts.
+          </p>
+          <p>
+            Example: actor 1001's face (Disgust, Low intensity) paired with actor 1065's voice
+            (Sadness, High intensity) — both performing the same sentence.
+            The model must detect cross-identity embedding inconsistency.
+          </p>
+          <div class="stats-row">
+            <span class="stats-chip">3,720 fake pairs</span>
+            <span class="stats-chip">Two actor identities</span>
+            <span class="stats-chip">Same sentence, different emotion</span>
+          </div>
+        </div>
+        <div class="paradigm-right">
+          <div class="filename-box">
+            <div class="filename-title">Filename anatomy</div>
+            <code>1001_IEO_DIS_LO___1065_IEO_SAD_HI.mp4</code>
+            <div class="fd-row"><span class="fd-key">Video</span><span class="fd-val">Actor <em>1001</em> · <em>Disgust</em> · Low intensity</span></div>
+            <div class="fd-row"><span class="fd-key">Audio</span><span class="fd-val">Actor <em>1065</em> · <em>Sadness</em> · High intensity</span></div>
+            <div class="fd-row"><span class="fd-key">Sentence</span><span class="fd-val">IEO — <em>"It's eleven o'clock"</em> (both sides)</span></div>
+            <div class="fd-row"><span class="fd-key">Separator</span><span class="fd-val"><em>___</em> marks video|audio boundary</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── Sample clips ── -->
+    <div class="section-strip reveal" data-delay="0">
+      <h2>Sample Clips</h2>
+      <span class="s-count">3 reference clips from CREMA-D</span>
+    </div>
+
+    <div class="video-grid">
+
+      <div class="video-card reveal" data-delay="0">
+        <div class="video-badge-row">
+          <span class="vbadge vbadge-genuine">Genuine</span>
+        </div>
+        <video controls preload="metadata"
+               src="/sample-videos/genuine/1047_IEO_FEA_LO.mp4"></video>
+        <div class="video-info">
+          <strong>Actor 1047 · Fearful · Low</strong>
+          <p>Unmodified CREMA-D clip. Sentence: "It's eleven o'clock". Face, voice, and
+             emotional content are all from the same authentic performance.</p>
+        </div>
+      </div>
+
+      <div class="video-card reveal" data-delay="80">
+        <div class="video-badge-row">
+          <span class="vbadge vbadge-p1">Paradigm 1</span>
+        </div>
+        <video controls preload="metadata"
+               src="/sample-videos/paradigm1_test/1046_IWW_NEU_XX_forged_FEA.mp4"></video>
+        <div class="video-info">
+          <strong>Actor 1046 · NEU face + FEA voice</strong>
+          <p>Face is Neutral, voice is Fearful. Same actor, same sentence — only the emotion
+             modality was swapped. Voice identity is preserved.</p>
+        </div>
+      </div>
+
+      <div class="video-card reveal" data-delay="160">
+        <div class="video-badge-row">
+          <span class="vbadge vbadge-p2">Paradigm 2</span>
+        </div>
+        <video controls preload="metadata" id="p2-video"></video>
+        <div class="video-info">
+          <strong>1001 (video, DIS) + 1065 (audio, SAD)</strong>
+          <p>Both tracks are real, unedited recordings — but from two different people.
+             Face and voice carry different emotional identity signals.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── Justification ── -->
+    <div class="section-strip reveal" data-delay="0">
+      <h2>Why These Datasets?</h2>
+    </div>
+
+    <div class="just-grid">
+
+      <div class="just-card reveal" data-delay="0">
+        <div class="just-header">
+          <div class="just-icon-wrap green">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <circle cx="12" cy="12" r="6"/>
+              <circle cx="12" cy="12" r="2"/>
+            </svg>
+          </div>
+          <h4>Controlled Ground Truth</h4>
+        </div>
+        <ul>
+          <li>Scripted sentences → consistent semantic content across actors</li>
+          <li>Multiple intensity levels → diverse emotional gradient signal</li>
+          <li>Actor-level splits prevent speaker memorization</li>
+          <li>Lab-recorded audio → reliable mel-spectrogram extraction</li>
+        </ul>
+      </div>
+
+      <div class="just-card reveal" data-delay="80">
+        <div class="just-header">
+          <div class="just-icon-wrap purple">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/>
+              <polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/>
+            </svg>
+          </div>
+          <h4>Realistic Attack Simulation</h4>
+        </div>
+        <ul>
+          <li>P1 simulates dubbing attacks (emotion mismatch, same speaker)</li>
+          <li>P2 simulates face-swap / voice-cloning (identity mismatch)</li>
+          <li>Both keep individual modalities authentic — no synthesis artifacts</li>
+          <li>Model must detect semantic inconsistency, not compression noise</li>
+        </ul>
+      </div>
+
+      <div class="just-card reveal" data-delay="0">
+        <div class="just-header">
+          <div class="just-icon-wrap amber">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+          </div>
+          <h4>Balanced Training Conditions</h4>
+        </div>
+        <ul>
+          <li>Stage-2 uses strict 1:1 genuine:fake ratio (7,428 pairs each)</li>
+          <li>Stratified 50/50 P1 + P2 among fakes — no paradigm bias</li>
+          <li>Train / val / test splits are actor-disjoint and shared with Stage-1</li>
+        </ul>
+      </div>
+
+      <div class="just-card reveal" data-delay="80">
+        <div class="just-header">
+          <div class="just-icon-wrap red">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+          </div>
+          <h4>Model Scope &amp; Limitations</h4>
+        </div>
+        <ul>
+          <li>Calibrated for CREMA-D test-split clips only</li>
+          <li>Out-of-distribution videos (MELD, wild footage) yield unreliable scores</li>
+          <li>Stage-1 ~50% emotion accuracy is expected — embeddings, not predictions, matter</li>
+          <li>Stage-2 is trained on CREMA-D fakes; other deepfake types are out-of-distribution</li>
+        </ul>
+      </div>
+
+    </div>
+
+  </main>
+
+  <script>
+    // Active nav
+    document.querySelectorAll('.nav-link').forEach(function(a) {
+      if (a.getAttribute('href') === location.pathname) a.classList.add('active');
+    });
+
+    // P2 video URL with space
+    document.getElementById('p2-video').src = encodeURI(
+      '/sample-videos/paradigm2_test/Copy of 1001_IEO_DIS_LO___1065_IEO_SAD_HI.mp4'
+    );
+
+    // Scroll reveal with stagger via data-delay
+    var io = new IntersectionObserver(function(entries) {
+      entries.forEach(function(e) {
+        if (!e.isIntersecting) return;
+        var delay = parseInt(e.target.dataset.delay || '0', 10);
+        setTimeout(function() { e.target.classList.add('in'); }, delay);
+        io.unobserve(e.target);
+      });
+    }, { threshold: 0.08 });
+    document.querySelectorAll('.reveal').forEach(function(el) { io.observe(el); });
+  </script>
+</body>
+</html>
