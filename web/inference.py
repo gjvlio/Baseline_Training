@@ -94,7 +94,7 @@ def run(batch: dict) -> dict:
     # Temperature T=2 softens over-confident logits (common for BCE-trained MLPs).
     # Proper calibration would use Platt scaling on a held-out val set;
     # T=2 is a reasonable approximation for a demo.
-    TEMPERATURE = 2.0
+    TEMPERATURE = 5.0
     logit     = acenet.discriminator(z_at, z_v)
     fake_prob = float(torch.sigmoid(logit / TEMPERATURE).item())
     # Clamp away from exact 0/1 — no model is ever 100% certain
