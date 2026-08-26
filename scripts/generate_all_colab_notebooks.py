@@ -108,7 +108,7 @@ def create_notebook(item):
                 "!rm -rf Baseline_Training\n",
                 "!git clone https://github.com/gjvlio/Baseline_Training.git\n",
                 "%cd Baseline_Training\n",
-                "!git checkout feat/training-and-preprocessing-jc-turnover\n",
+                "!git checkout feat/baseline-preprocessing-jc\n",
                 "!git pull\n",
                 "!git log --oneline -1"
             ]
