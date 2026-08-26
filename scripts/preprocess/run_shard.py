@@ -92,6 +92,7 @@ class ShardStateTracker:
 
     def save(self):
         try:
+            self.ckpt_path.parent.mkdir(parents=True, exist_ok=True)
             tmp_ckpt = self.ckpt_path.with_suffix(".tmp")
             with open(tmp_ckpt, "w", encoding="utf-8") as f:
                 json.dump(self.state, f, indent=2)
@@ -115,12 +116,17 @@ class ShardStateTracker:
         self.save()
         
         # Write to failed CSV
-        file_exists = self.failed_path.exists()
-        with open(self.failed_path, "a", newline="", encoding="utf-8") as f:
-            writer = csv.DictWriter(f, fieldnames=["clip_id", "video_path", "reason"])
-            if not file_exists:
-                writer.writeheader()
-            writer.writerow({"clip_id": clip_id, "video_path": str(video_path), "reason": reason})
+        try:
+            self.failed_path.parent.mkdir(parents=True, exist_ok=True)
+            file_exists = self.failed_path.exists()
+            with open(self.failed_path, "a", newline="", encoding="utf-8") as f:
+                writer = csv.DictWriter(f, fieldnames=["clip_id", "video_path", "reason"])
+                if not file_exists:
+                    writer.writeheader()
+                writer.writerow({"clip_id": clip_id, "video_path": str(video_path), "reason": reason})
+        except Exception as e:
+            print(f"[Warning] Failed to write to {self.failed_path}: {e}")
+
 
 
 def locate_raw_video(raw_dir, video_path_str, clip_id):
@@ -401,9 +407,16 @@ def main():
             failed_count += 1
             continue
 
-        tmp_wav = shard_out_dir / f"_tmp_{cid}.wav"
+        # Use fast local /tmp SSD for audio extraction instead of Google Drive
+        tmp_dir = Path("/tmp/acenet_preprocess")
+        tmp_dir.mkdir(parents=True, exist_ok=True)
+        tmp_wav = tmp_dir / f"_tmp_{cid}.wav"
+        
         try:
             shard_out_dir.mkdir(parents=True, exist_ok=True)
+            audio_out_dir.mkdir(parents=True, exist_ok=True)
+            text_out_dir.mkdir(parents=True, exist_ok=True)
+            visual_out_dir.mkdir(parents=True, exist_ok=True)
             
             # 1. Extract audio
             extract_audio(v_file, tmp_wav)
