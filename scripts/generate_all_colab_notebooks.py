@@ -1,8 +1,14 @@
 """
-scripts/generate_all_colab_notebooks.py — Master Generator for EXACTLY 22 Single-Round Colab Notebooks.
+scripts/generate_all_colab_notebooks.py — Master Generator with Email-Embedded Notebook Filenames.
 
-One Account = One Notebook = One Shard.
-No Round 2. Total Runtime: ~50 to 65 minutes across 22 concurrent accounts.
+Naming Format:
+{MEMBER}_{CLEAN_EMAIL}_{DATASET}_{SHARD}.ipynb
+
+Examples:
+  MATAN_exconde.matan30_CMU-MOSEI_shard_0001.ipynb
+  EL_elc0re143_MELD_shard_0001.ipynb
+  SHIKI_Shikina.cabral.lexmeet_TRACK_1_shard_0001.ipynb
+  JC_berlogred_TRACK_2_shard_0002.ipynb
 """
 
 import json
@@ -16,59 +22,58 @@ if NOTEBOOKS_DIR.exists():
     shutil.rmtree(NOTEBOOKS_DIR)
 NOTEBOOKS_DIR.mkdir(parents=True, exist_ok=True)
 
-# Master 22-Account Assignment Matrix
+# Master 22-Account Assignment Matrix with exact user emails
 ASSIGNMENTS = [
     # --- MATAN (7 Accounts -> Entire CMU-MOSEI: 7 Shards) ---
-    {"member": "MATAN", "acc_num": 1, "account": "exconde.matan30@gmail.com", "dataset": "CMU-MOSEI", "d_short": "MOSEI", "zip": "cmumosei.zip", "shard": "0001", "s_short": "s01"},
-    {"member": "MATAN", "acc_num": 2, "account": "johnmatters3008@gmail.com", "dataset": "CMU-MOSEI", "d_short": "MOSEI", "zip": "cmumosei.zip", "shard": "0002", "s_short": "s02"},
-    {"member": "MATAN", "acc_num": 3, "account": "mattersjohn3008@gmail.com", "dataset": "CMU-MOSEI", "d_short": "MOSEI", "zip": "cmumosei.zip", "shard": "0003", "s_short": "s03"},
-    {"member": "MATAN", "acc_num": 4, "account": "matan.exconde@gmail.com", "dataset": "CMU-MOSEI", "d_short": "MOSEI", "zip": "cmumosei.zip", "shard": "0004", "s_short": "s04"},
-    {"member": "MATAN", "acc_num": 5, "account": "baemonasa0417@gmail.com", "dataset": "CMU-MOSEI", "d_short": "MOSEI", "zip": "cmumosei.zip", "shard": "0005", "s_short": "s05"},
-    {"member": "MATAN", "acc_num": 6, "account": "baemonrora1408@gmail.com", "dataset": "CMU-MOSEI", "d_short": "MOSEI", "zip": "cmumosei.zip", "shard": "0006", "s_short": "s06"},
-    {"member": "MATAN", "acc_num": 7, "account": "baemonruka3008@gmail.com", "dataset": "CMU-MOSEI", "d_short": "MOSEI", "zip": "cmumosei.zip", "shard": "0007", "s_short": "s07"},
+    {"member": "MATAN", "account": "exconde.matan30@gmail.com", "dataset": "CMU-MOSEI", "zip": "cmumosei.zip", "shard": "0001"},
+    {"member": "MATAN", "account": "johnmatters3008@gmail.com", "dataset": "CMU-MOSEI", "zip": "cmumosei.zip", "shard": "0002"},
+    {"member": "MATAN", "account": "mattersjohn3008@gmail.com", "dataset": "CMU-MOSEI", "zip": "cmumosei.zip", "shard": "0003"},
+    {"member": "MATAN", "account": "matan.exconde@gmail.com", "dataset": "CMU-MOSEI", "zip": "cmumosei.zip", "shard": "0004"},
+    {"member": "MATAN", "account": "baemonasa0417@gmail.com", "dataset": "CMU-MOSEI", "zip": "cmumosei.zip", "shard": "0005"},
+    {"member": "MATAN", "account": "baemonrora1408@gmail.com", "dataset": "CMU-MOSEI", "zip": "cmumosei.zip", "shard": "0006"},
+    {"member": "MATAN", "account": "baemonruka3008@gmail.com", "dataset": "CMU-MOSEI", "zip": "cmumosei.zip", "shard": "0007"},
 
     # --- EL (5 Accounts -> Entire MELD: 5 Shards) ---
-    {"member": "EL", "acc_num": 1, "account": "elc0re143@gmail.com", "dataset": "MELD", "d_short": "MELD", "zip": "meld_raw.zip", "shard": "0001", "s_short": "s01"},
-    {"member": "EL", "acc_num": 2, "account": "micofeipao@gmail.com", "dataset": "MELD", "d_short": "MELD", "zip": "meld_raw.zip", "shard": "0002", "s_short": "s02"},
-    {"member": "EL", "acc_num": 3, "account": "gjrvlio.dev@gmail.com", "dataset": "MELD", "d_short": "MELD", "zip": "meld_raw.zip", "shard": "0003", "s_short": "s03"},
-    {"member": "EL", "acc_num": 4, "account": "geueljohn.rivera.lexmeet@gmail.com", "dataset": "MELD", "d_short": "MELD", "zip": "meld_raw.zip", "shard": "0004", "s_short": "s04"},
-    {"member": "EL", "acc_num": 5, "account": "gelj.riv@gmail.com", "dataset": "MELD", "d_short": "MELD", "zip": "meld_raw.zip", "shard": "0005", "s_short": "s05"},
+    {"member": "EL", "account": "elc0re143@gmail.com", "dataset": "MELD", "zip": "meld_raw.zip", "shard": "0001"},
+    {"member": "EL", "account": "micofeipao@gmail.com", "dataset": "MELD", "zip": "meld_raw.zip", "shard": "0002"},
+    {"member": "EL", "account": "gjrvlio.dev@gmail.com", "dataset": "MELD", "zip": "meld_raw.zip", "shard": "0003"},
+    {"member": "EL", "account": "geueljohn.rivera.lexmeet@gmail.com", "dataset": "MELD", "zip": "meld_raw.zip", "shard": "0004"},
+    {"member": "EL", "account": "gelj.riv@gmail.com", "dataset": "MELD", "zip": "meld_raw.zip", "shard": "0005"},
 
     # --- SHIKI (4 Accounts -> Track 1 [2 shards], Mustard [1 shard], Track 2 [1 shard]) ---
-    {"member": "SHIKI", "acc_num": 1, "account": "Shikina.cabral.lexmeet@gmail.com", "dataset": "TRACK_1", "d_short": "TRACK1", "zip": "tracks_1_2_3_4.zip", "shard": "0001", "s_short": "s01"},
-    {"member": "SHIKI", "acc_num": 2, "account": "cshikina18@gmail.com", "dataset": "TRACK_1", "d_short": "TRACK1", "zip": "tracks_1_2_3_4.zip", "shard": "0002", "s_short": "s02"},
-    {"member": "SHIKI", "acc_num": 3, "account": "forbaselineai@gmail.com", "dataset": "MUSTARD", "d_short": "MUSTARD", "zip": "mustard.zip", "shard": "0001", "s_short": "s01"},
-    {"member": "SHIKI", "acc_num": 4, "account": "shikinaexoexo@gmail.com", "dataset": "TRACK_2", "d_short": "TRACK2", "zip": "tracks_1_2_3_4.zip", "shard": "0001", "s_short": "s01"},
+    {"member": "SHIKI", "account": "Shikina.cabral.lexmeet@gmail.com", "dataset": "TRACK_1", "zip": "tracks_1_2_3_4.zip", "shard": "0001"},
+    {"member": "SHIKI", "account": "cshikina18@gmail.com", "dataset": "TRACK_1", "zip": "tracks_1_2_3_4.zip", "shard": "0002"},
+    {"member": "SHIKI", "account": "forbaselineai@gmail.com", "dataset": "MUSTARD", "zip": "mustard.zip", "shard": "0001"},
+    {"member": "SHIKI", "account": "shikinaexoexo@gmail.com", "dataset": "TRACK_2", "zip": "tracks_1_2_3_4.zip", "shard": "0001"},
 
     # --- JC (6 Accounts -> Track 2 [2 shards], Entire Track 3 [4 shards]) ---
-    {"member": "JC", "acc_num": 1, "account": "berlogred@gmail.com", "dataset": "TRACK_2", "d_short": "TRACK2", "zip": "tracks_1_2_3_4.zip", "shard": "0002", "s_short": "s02"},
-    {"member": "JC", "acc_num": 2, "account": "caparasjc1025@gmail.com", "dataset": "TRACK_2", "d_short": "TRACK2", "zip": "tracks_1_2_3_4.zip", "shard": "0003", "s_short": "s03"},
-    {"member": "JC", "acc_num": 3, "account": "caparaschristine01@gmail.com", "dataset": "TRACK_3", "d_short": "TRACK3", "zip": "tracks_1_2_3_4.zip", "shard": "0001", "s_short": "s01"},
-    {"member": "JC", "acc_num": 4, "account": "promptingacc2@gmail.com", "dataset": "TRACK_3", "d_short": "TRACK3", "zip": "tracks_1_2_3_4.zip", "shard": "0002", "s_short": "s02"},
-    {"member": "JC", "acc_num": 5, "account": "promptingacc@gmail.com", "dataset": "TRACK_3", "d_short": "TRACK3", "zip": "tracks_1_2_3_4.zip", "shard": "0003", "s_short": "s03"},
-    {"member": "JC", "acc_num": 6, "account": "johnchristan.caparas.lexmeet@gmail.com", "dataset": "TRACK_3", "d_short": "TRACK3", "zip": "tracks_1_2_3_4.zip", "shard": "0004", "s_short": "s04"},
+    {"member": "JC", "account": "berlogred@gmail.com", "dataset": "TRACK_2", "zip": "tracks_1_2_3_4.zip", "shard": "0002"},
+    {"member": "JC", "account": "caparasjc1025@gmail.com", "dataset": "TRACK_2", "zip": "tracks_1_2_3_4.zip", "shard": "0003"},
+    {"member": "JC", "account": "caparaschristine01@gmail.com", "dataset": "TRACK_3", "zip": "tracks_1_2_3_4.zip", "shard": "0001"},
+    {"member": "JC", "account": "promptingacc2@gmail.com", "dataset": "TRACK_3", "zip": "tracks_1_2_3_4.zip", "shard": "0002"},
+    {"member": "JC", "account": "promptingacc@gmail.com", "dataset": "TRACK_3", "zip": "tracks_1_2_3_4.zip", "shard": "0003"},
+    {"member": "JC", "account": "johnchristan.caparas.lexmeet@gmail.com", "dataset": "TRACK_3", "zip": "tracks_1_2_3_4.zip", "shard": "0004"},
 ]
 
 def create_notebook(item):
     member = item["member"]
-    acc_num = item["acc_num"]
     acc = item["account"]
     dataset = item["dataset"]
-    d_short = item["d_short"]
     zip_file = item["zip"]
     shard = item["shard"]
-    s_short = item["s_short"]
     
-    nb_filename = f"{member}_acc{acc_num}_{d_short}_{s_short}.ipynb"
+    # Clean email username (e.g. Shikina.cabral.lexmeet)
+    email_user = acc.split("@")[0]
+    nb_filename = f"{member}_{email_user}_{dataset}_shard_{shard}.ipynb"
     
     cells = [
         {
             "cell_type": "markdown",
             "metadata": {},
             "source": [
-                f"# ACE-Net Universal Shard Preprocessor (One-Pass Suite)\n",
-                f"### Assigned Member: **{member} (Account {acc_num})**\n",
-                f"### Target Account: `{acc}`\n",
+                f"# ACE-Net Universal Shard Preprocessor\n",
+                f"### Assigned Member: **{member}**\n",
+                f"### Target Account / Google Profile: `{acc}`\n",
                 f"### Target Dataset: **{dataset}** | Shard: **`shard_{shard}`**\n",
                 f"### Output Target: `Google Drive > THESIS_MOTHERFILE > Baseline preprocessed > {dataset}`"
             ]
@@ -224,12 +229,12 @@ def create_notebook(item):
 
 def main():
     print("=" * 70)
-    print("  GENERATING EXACTLY 22 ONE-PASS PRODUCTION NOTEBOOKS")
+    print("  GENERATING 22 PRODUCTION NOTEBOOKS WITH EXACT TEAM EMAILS")
     print("=" * 70)
     
     for item in ASSIGNMENTS:
         fn = create_notebook(item)
-        print(f"[{item['member']:<5}] -> {fn:<30} (Account {item['acc_num']}: {item['account']})")
+        print(f"[{item['member']:<5}] -> {fn}")
         
     print("\n" + "=" * 70)
     print(f"[SUCCESS] Generated all {len(ASSIGNMENTS)} production notebooks in:")
