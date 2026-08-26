@@ -82,7 +82,8 @@ for cfg in test_configs:
             "metadata": {},
             "outputs": [],
             "source": [
-                "!pip install --prefer-binary -q openai-whisper facenet-pytorch\n",
+                "!pip install -q --no-deps facenet-pytorch\n",
+                "!pip install -q --no-deps git+https://github.com/openai/whisper.git\n",
                 "print('Dependencies installed successfully!')"
             ]
         },
