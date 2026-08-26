@@ -130,7 +130,7 @@ def create_notebook(item):
                 "!rm -rf Baseline_Training\n",
                 "!git clone https://github.com/gjvlio/Baseline_Training.git\n",
                 "%cd Baseline_Training\n",
-                "!git checkout feat/training-and-preprocessing\n",
+                "!git checkout feat/training-and-preprocessing-jc-turnover\n",
                 "!git pull\n",
                 "!git log --oneline -1"
             ]
@@ -146,7 +146,7 @@ def create_notebook(item):
             "metadata": {},
             "outputs": [],
             "source": [
-                "!pip -q install openai-whisper transformers facenet-pytorch librosa opencv-python tqdm pandas\n",
+                "!pip install --prefer-binary -q openai-whisper facenet-pytorch\n",
                 "print('Dependencies installed successfully!')"
             ]
         },

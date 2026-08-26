@@ -82,7 +82,7 @@ for cfg in test_configs:
             "metadata": {},
             "outputs": [],
             "source": [
-                "!pip -q install openai-whisper transformers facenet-pytorch librosa opencv-python tqdm pandas\n",
+                "!pip install --prefer-binary -q openai-whisper facenet-pytorch\n",
                 "print('Dependencies installed successfully!')"
             ]
         },

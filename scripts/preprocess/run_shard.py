@@ -312,10 +312,24 @@ def main():
     failed_path = base_preprocessed_dir / "logs" / f"{shard_id}_failed.csv"
     manifest_out_path = base_preprocessed_dir / "manifests" / f"{shard_id}_manifest.csv"
     
-    # Locate Manifest
-    manifest_path = Path(args.manifest) if args.manifest else (REPO_ROOT / "data" / "manifests" / "shards" / dataset_name / f"{shard_id}_manifest.csv")
-    if not manifest_path.exists():
-        print(f"[ERROR] Shard manifest not found: {manifest_path}")
+    # Locate Manifest (Checks data/manifests/shards, Manifests/shards, and data/manifests)
+    manifest_path = None
+    if args.manifest:
+        manifest_path = Path(args.manifest)
+    else:
+        candidate_manifests = [
+            REPO_ROOT / "data" / "manifests" / "shards" / dataset_name / f"{shard_id}_manifest.csv",
+            REPO_ROOT / "Manifests" / "shards" / dataset_name / f"{shard_id}_manifest.csv",
+            REPO_ROOT / "data" / "manifests" / dataset_name / f"{shard_id}_manifest.csv",
+        ]
+        for cm in candidate_manifests:
+            if cm.exists():
+                manifest_path = cm
+                break
+
+    if not manifest_path or not manifest_path.exists():
+        print(f"[ERROR] Shard manifest not found for {dataset_name} [{shard_id}]")
+        print(f"Looked in: {[str(c) for c in candidate_manifests]}")
         sys.exit(1)
 
     print("=" * 70)
