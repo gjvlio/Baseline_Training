@@ -425,9 +425,15 @@ def main():
         finally:
             if tmp_wav.exists():
                 tmp_wav.unlink()
+            # OOM Prevention: Periodically clear CUDA cache and collect garbage
+            if device == "cuda" and (success_count + failed_count) % 25 == 0:
+                torch.cuda.empty_cache()
+                import gc
+                gc.collect()
 
     # Finalize Shard Manifest
     if processed_records:
+
         manifest_out_path.parent.mkdir(parents=True, exist_ok=True)
         with open(manifest_out_path, "w", newline="", encoding="utf-8") as out_f:
             writer = csv.DictWriter(out_f, fieldnames=list(rows[0].keys()) + ["transcript", "n_keyframes", "visual_ok", "has_audio", "has_text", "has_visual"])
