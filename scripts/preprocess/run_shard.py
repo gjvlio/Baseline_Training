@@ -93,10 +93,8 @@ class ShardStateTracker:
     def save(self):
         try:
             self.ckpt_path.parent.mkdir(parents=True, exist_ok=True)
-            tmp_ckpt = self.ckpt_path.with_suffix(".tmp")
-            with open(tmp_ckpt, "w", encoding="utf-8") as f:
+            with open(self.ckpt_path, "w", encoding="utf-8") as f:
                 json.dump(self.state, f, indent=2)
-            tmp_ckpt.replace(self.ckpt_path)
         except Exception as e:
             print(f"[Warning] Checkpoint write error: {e}")
 
@@ -196,15 +194,10 @@ def process_audio(wav_path, dest_dir, clip_id):
     log_mel = librosa.power_to_db(mel, ref=np.max).astype(np.float32)
     
     out_file = dest_dir / f"{clip_id}_melspec.npy"
-    tmp_file = dest_dir / f".tmp_{clip_id}_melspec.npy"
     dest_dir.mkdir(parents=True, exist_ok=True)
     
-    np.save(tmp_file, log_mel)
-    # Verification
-    loaded = np.load(tmp_file)
-    if loaded.shape[0] != N_MELS:
-        raise ValueError(f"Corrupted mel spectrogram shape: {loaded.shape}")
-    tmp_file.replace(out_file)
+    # Direct save without .tmp rename (Google Drive FUSE safe)
+    np.save(out_file, log_mel)
 
 
 def process_text(wav_path, dest_dir, clip_id, whisper_model, tokenizer):
@@ -219,17 +212,12 @@ def process_text(wav_path, dest_dir, clip_id, whisper_model, tokenizer):
     
     dest_dir.mkdir(parents=True, exist_ok=True)
     
-    # Save input_ids
+    # Direct save without .tmp rename (Google Drive FUSE safe)
     out_ids = dest_dir / f"{clip_id}_input_ids.npy"
-    tmp_ids = dest_dir / f".tmp_{clip_id}_input_ids.npy"
-    np.save(tmp_ids, input_ids)
-    tmp_ids.replace(out_ids)
-    
-    # Save attention_mask
     out_mask = dest_dir / f"{clip_id}_attention_mask.npy"
-    tmp_mask = dest_dir / f".tmp_{clip_id}_attention_mask.npy"
-    np.save(tmp_mask, attention_mask)
-    tmp_mask.replace(out_mask)
+    
+    np.save(out_ids, input_ids)
+    np.save(out_mask, attention_mask)
     
     return text
 
@@ -337,7 +325,7 @@ def main():
         print(f"[ERROR] Shard manifest not found for {dataset_name} [{shard_id}]")
         print(f"Looked in: {[str(c) for c in candidate_manifests]}")
         sys.exit(1)
-
+        
     print("=" * 70)
     print(f" ACE-NET UNIVERSAL SHARD PREPROCESSOR")
     print(f" Account    : {args.account}")
@@ -348,31 +336,34 @@ def main():
     print(f" Device     : {device}")
     print("=" * 70)
 
+    # 1. UPFRONT DIRECTORY CREATION (Guarantees Google Drive folder tree exists immediately)
+    shard_out_dir.mkdir(parents=True, exist_ok=True)
+    audio_out_dir.mkdir(parents=True, exist_ok=True)
+    text_out_dir.mkdir(parents=True, exist_ok=True)
+    visual_out_dir.mkdir(parents=True, exist_ok=True)
+    ckpt_path.parent.mkdir(parents=True, exist_ok=True)
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    manifest_out_path.parent.mkdir(parents=True, exist_ok=True)
+
     # Initialize Models
     print("\n[1/3] Loading feature extractors (Whisper, BERT, MTCNN, MobileNetV3)...")
     import whisper
-    whisper_model = whisper.load_model("base", device=device)
+    whisper_model = whisper.load_model("base", device="cpu")
     tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
-    mtcnn = MTCNN(keep_all=True, device=device)
-
-    mobilenet = tv_models.mobilenet_v3_small(weights=tv_models.MobileNet_V3_Small_Weights.DEFAULT)
-    mobilenet_features = mobilenet.features.to(device).eval()
-
+    mtcnn = MTCNN(keep_all=True, device=device, min_face_size=40, thresholds=[0.6, 0.7, 0.7])
+    mobilenet = tv_models.mobilenet_v3_small(pretrained=True).eval().to(device)
+    mobilenet_features = mobilenet.features
     mobilenet_transform = tv_transforms.Compose([
         tv_transforms.ToTensor(),
-        tv_transforms.Resize((IMG_SIZE, IMG_SIZE), antialias=True),
-        tv_transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        tv_transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
     ])
 
-    # Load tracker
-    tracker = ShardStateTracker(ckpt_path, log_path, failed_path, args.account, dataset_name, shard_id)
-    
-    # Read manifest
-    rows = []
+    tracker = ShardStateTracker(ckpt_path, failed_path)
+
+    # Read rows
     with open(manifest_path, newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
-        for r in reader:
-            rows.append(r)
+        rows = list(reader)
             
     if args.limit:
         rows = rows[:args.limit]
@@ -384,7 +375,7 @@ def main():
     failed_count = 0
     processed_records = []
 
-    for row in tqdm(rows, desc=f"{dataset_name}-{shard_id}"):
+    for idx, row in enumerate(tqdm(rows, desc=f"{dataset_name}-{shard_id}")):
         cid = row.get("clip_id")
         vpath_str = row.get("video_path", "")
         
@@ -407,17 +398,11 @@ def main():
             failed_count += 1
             continue
 
-        # Use fast local /tmp SSD for audio extraction instead of Google Drive
         tmp_dir = Path("/tmp/acenet_preprocess")
         tmp_dir.mkdir(parents=True, exist_ok=True)
         tmp_wav = tmp_dir / f"_tmp_{cid}.wav"
         
         try:
-            shard_out_dir.mkdir(parents=True, exist_ok=True)
-            audio_out_dir.mkdir(parents=True, exist_ok=True)
-            text_out_dir.mkdir(parents=True, exist_ok=True)
-            visual_out_dir.mkdir(parents=True, exist_ok=True)
-            
             # 1. Extract audio
             extract_audio(v_file, tmp_wav)
             process_audio(tmp_wav, audio_out_dir, cid)
@@ -445,14 +430,27 @@ def main():
             row["has_visual"] = 1
             processed_records.append(row)
             
+            # Continuously save manifest every 10 successful/failed attempts to minimize loss
+            if (success_count + failed_count) % 10 == 0:
+                 with open(manifest_out_path, "w", newline="", encoding="utf-8") as out_f:
+                    writer = csv.DictWriter(out_f, fieldnames=list(rows[0].keys()) + ["transcript", "n_keyframes", "visual_ok", "has_audio", "has_text", "has_visual"])
+                    writer.writeheader()
+                    writer.writerows(processed_records)
+            
         except Exception as e:
             err_msg = f"{type(e).__name__}: {str(e)}"
             tracker.mark_failed(cid, str(v_file), err_msg)
             failed_count += 1
         finally:
             if tmp_wav.exists():
-                tmp_wav.unlink()
-            # OOM Prevention: Periodically clear CUDA cache and collect garbage
+                try:
+                    tmp_wav.unlink()
+                except Exception:
+                    pass
+            # Periodic batch checkpoint saving every 10 clips
+            if (success_count + failed_count) % 10 == 0:
+                tracker.save()
+            # OOM Prevention: Periodically clear CUDA cache and collect garbage every 25 clips
             if device == "cuda" and (success_count + failed_count) % 25 == 0:
                 torch.cuda.empty_cache()
                 import gc
@@ -460,8 +458,6 @@ def main():
 
     # Finalize Shard Manifest
     if processed_records:
-
-        manifest_out_path.parent.mkdir(parents=True, exist_ok=True)
         with open(manifest_out_path, "w", newline="", encoding="utf-8") as out_f:
             writer = csv.DictWriter(out_f, fieldnames=list(rows[0].keys()) + ["transcript", "n_keyframes", "visual_ok", "has_audio", "has_text", "has_visual"])
             writer.writeheader()
