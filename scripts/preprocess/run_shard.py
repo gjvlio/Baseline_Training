@@ -358,7 +358,7 @@ def main():
         tv_transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
     ])
 
-    tracker = ShardStateTracker(ckpt_path, failed_path)
+    tracker = ShardStateTracker(ckpt_path, log_path, failed_path, args.account, dataset_name, shard_id)
 
     # Read rows
     with open(manifest_path, newline="", encoding="utf-8") as f:
