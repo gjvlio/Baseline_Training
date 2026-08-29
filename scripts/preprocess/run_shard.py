@@ -71,6 +71,7 @@ class ShardStateTracker:
         self.log_path.parent.mkdir(parents=True, exist_ok=True)
         self.failed_path.parent.mkdir(parents=True, exist_ok=True)
         
+        self.failed_records = []
         self.state = {
             "account": account,
             "dataset": dataset,
@@ -106,24 +107,29 @@ class ShardStateTracker:
             self.state["completed_ids"].append(clip_id)
         if clip_id in self.state["failed_ids"]:
             self.state["failed_ids"].remove(clip_id)
-        self.save()
 
     def mark_failed(self, clip_id, video_path, reason):
         if clip_id not in self.state["failed_ids"]:
             self.state["failed_ids"].append(clip_id)
-        self.save()
-        
-        # Write to failed CSV
+        self.failed_records.append({
+            "clip_id": clip_id,
+            "video_path": str(video_path),
+            "reason": reason
+        })
+
+    def finalize_failed_csv(self):
+        """Writes exactly ONE single clean failed.csv with detailed error reasons."""
+        if not self.failed_records:
+            return
         try:
             self.failed_path.parent.mkdir(parents=True, exist_ok=True)
-            file_exists = self.failed_path.exists()
-            with open(self.failed_path, "a", newline="", encoding="utf-8") as f:
+            with open(self.failed_path, "w", newline="", encoding="utf-8") as f:
                 writer = csv.DictWriter(f, fieldnames=["clip_id", "video_path", "reason"])
-                if not file_exists:
-                    writer.writeheader()
-                writer.writerow({"clip_id": clip_id, "video_path": str(video_path), "reason": reason})
+                writer.writeheader()
+                writer.writerows(self.failed_records)
         except Exception as e:
-            print(f"[Warning] Failed to write to {self.failed_path}: {e}")
+            print(f"[Warning] Failed to write {self.failed_path}: {e}")
+
 
 
 
@@ -430,13 +436,6 @@ def main():
             row["has_visual"] = 1
             processed_records.append(row)
             
-            # Continuously save manifest every 10 successful/failed attempts to minimize loss
-            if (success_count + failed_count) % 10 == 0:
-                 with open(manifest_out_path, "w", newline="", encoding="utf-8") as out_f:
-                    writer = csv.DictWriter(out_f, fieldnames=list(rows[0].keys()) + ["transcript", "n_keyframes", "visual_ok", "has_audio", "has_text", "has_visual"])
-                    writer.writeheader()
-                    writer.writerows(processed_records)
-            
         except Exception as e:
             err_msg = f"{type(e).__name__}: {str(e)}"
             tracker.mark_failed(cid, str(v_file), err_msg)
@@ -447,7 +446,7 @@ def main():
                     tmp_wav.unlink()
                 except Exception:
                     pass
-            # Periodic batch checkpoint saving every 10 clips
+            # Periodic batch checkpoint saving every 10 clips to preserve resume progress
             if (success_count + failed_count) % 10 == 0:
                 tracker.save()
             # OOM Prevention: Periodically clear CUDA cache and collect garbage every 25 clips
@@ -456,13 +455,18 @@ def main():
                 import gc
                 gc.collect()
 
-    # Finalize Shard Manifest
+    # 1. Finalize Exactly ONE Clean Shard Manifest CSV
     if processed_records:
+        manifest_out_path.parent.mkdir(parents=True, exist_ok=True)
         with open(manifest_out_path, "w", newline="", encoding="utf-8") as out_f:
             writer = csv.DictWriter(out_f, fieldnames=list(rows[0].keys()) + ["transcript", "n_keyframes", "visual_ok", "has_audio", "has_text", "has_visual"])
             writer.writeheader()
             writer.writerows(processed_records)
 
+    # 2. Finalize Exactly ONE Clean Failed CSV with Reasons
+    tracker.finalize_failed_csv()
+
+    # 3. Finalize Exactly ONE Clean Checkpoint JSON
     tracker.state["status"] = "COMPLETED" if failed_count == 0 else "COMPLETED_WITH_FAILURES"
     tracker.save()
 
