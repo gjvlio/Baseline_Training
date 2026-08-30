@@ -300,7 +300,11 @@ def main():
     shard_id = f"shard_{int(args.shard):04d}"
     
     drive_root = Path(args.drive_root)
-    base_preprocessed_dir = drive_root / "Baseline preprocessed" / dataset_name
+    # Check if drive_root already contains 'Baseline preprocessed' or 'Baseline_training'
+    if "baseline" in drive_root.name.lower():
+        base_preprocessed_dir = drive_root / dataset_name
+    else:
+        base_preprocessed_dir = drive_root / "Baseline_training" / "Baseline preprocessed" / dataset_name
     
     shard_out_dir = base_preprocessed_dir / "shards" / shard_id
     audio_out_dir = shard_out_dir / "audio"
@@ -351,11 +355,38 @@ def main():
     log_path.parent.mkdir(parents=True, exist_ok=True)
     manifest_out_path.parent.mkdir(parents=True, exist_ok=True)
 
-    # Initialize Models
+    # Initialize Models with Network Retry Logic
     print("\n[1/3] Loading feature extractors (Whisper, BERT, MTCNN, MobileNetV3)...")
     import whisper
-    whisper_model = whisper.load_model("base", device="cpu")
-    tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
+    import time
+    
+    # 1. Robust Whisper Load with Retries
+    whisper_model = None
+    for attempt in range(1, 6):
+        try:
+            whisper_model = whisper.load_model("base", device="cpu")
+            break
+        except Exception as e:
+            print(f"[Warning] Whisper download failed (attempt {attempt}/5): {e}")
+            time.sleep(3 * attempt)
+            
+    if not whisper_model:
+        raise RuntimeError("Failed to load Whisper model after 5 attempts due to network timeout.")
+
+    # 2. Robust Tokenizer Load with Retries
+    tokenizer = None
+    for attempt in range(1, 6):
+        try:
+            tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
+            break
+        except Exception as e:
+            print(f"[Warning] BertTokenizer download failed (attempt {attempt}/5): {e}")
+            time.sleep(3 * attempt)
+
+    if not tokenizer:
+        raise RuntimeError("Failed to load BertTokenizer after 5 attempts.")
+
+    # 3. Visual Models
     mtcnn = MTCNN(keep_all=True, device=device, min_face_size=40, thresholds=[0.6, 0.7, 0.7])
     mobilenet = tv_models.mobilenet_v3_small(pretrained=True).eval().to(device)
     mobilenet_features = mobilenet.features
