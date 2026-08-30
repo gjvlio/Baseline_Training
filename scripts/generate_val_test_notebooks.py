@@ -194,9 +194,9 @@ def create_eval_notebook(item):
                 "LOCAL_RAW = '/content/data/raw'\n",
                 "os.makedirs(LOCAL_RAW, exist_ok=True)\n",
                 "\n",
-                f"print('Fast unzipping {zips} to local SSD (/content/data/raw)...')\n",
+                f'print("Fast unzipping {zips} to local SSD (/content/data/raw)...")\n',
                 f"{zip_unzip_str}\n",
-                "print('Unzip complete! Local files ready.')"
+                'print("Unzip complete! Local files ready.")'
             ]
         },
         {
