@@ -82,23 +82,19 @@ class DriveBaselineDataset(Dataset):
                 if shards_p.exists():
                     self.shard_dirs.extend([s for s in shards_p.iterdir() if s.is_dir()])
 
-        # Instant in-memory clip to shard directory mapping (scans only ~22 manifest CSVs, takes 0.05s)
-        self.clip_to_shard = {}
-        for s in self.shard_dirs:
-            # Check manifest inside shard parent
-            mf = s.parent.parent / "manifests" / f"{s.name}_manifest.csv"
-            if not mf.exists():
-                mf = s / f"{s.name}_manifest.csv"
-            if mf.exists():
-                try:
-                    with open(mf, newline="", encoding="utf-8") as f_mf:
-                        r_mf = csv.DictReader(f_mf)
-                        for row_mf in r_mf:
-                            c = row_mf.get("clip_id")
-                            if c:
-                                self.clip_to_shard[c] = s
-                except Exception:
-                    pass
+        # Read CSV manifest to populate samples
+        with open(manifest_csv, newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for r in reader:
+                cid = r.get("clip_id")
+                label_str = r.get("fake_label", "0")
+                label = int(label_str) if label_str in ("0", "1") else 0
+                pipeline = r.get("source_pipeline", "")
+                self.samples.append({
+                    "clip_id": cid,
+                    "label": label,
+                    "pipeline": pipeline,
+                })
 
     def __len__(self):
         return len(self.samples)
