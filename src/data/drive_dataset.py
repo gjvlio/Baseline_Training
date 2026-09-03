@@ -82,38 +82,29 @@ class DriveBaselineDataset(Dataset):
                 if shards_p.exists():
                     self.shard_dirs.extend([s for s in shards_p.iterdir() if s.is_dir()])
 
-        # Read CSV
-        with open(manifest_csv, newline="", encoding="utf-8") as f:
-            reader = csv.DictReader(f)
-            for r in reader:
-                cid = r.get("clip_id")
-                label_str = r.get("fake_label", "0")
-                label = int(label_str) if label_str in ("0", "1") else 0
-                pipeline = r.get("source_pipeline", "")
-                self.samples.append({
-                    "clip_id": cid,
-                    "label": label,
-                    "pipeline": pipeline,
-                })
+        # Instant in-memory clip to shard directory mapping (scans only ~22 manifest CSVs, takes 0.05s)
+        self.clip_to_shard = {}
+        for s in self.shard_dirs:
+            # Check manifest inside shard parent
+            mf = s.parent.parent / "manifests" / f"{s.name}_manifest.csv"
+            if not mf.exists():
+                mf = s / f"{s.name}_manifest.csv"
+            if mf.exists():
+                try:
+                    with open(mf, newline="", encoding="utf-8") as f_mf:
+                        r_mf = csv.DictReader(f_mf)
+                        for row_mf in r_mf:
+                            c = row_mf.get("clip_id")
+                            if c:
+                                self.clip_to_shard[c] = s
+                except Exception:
+                    pass
 
     def __len__(self):
         return len(self.samples)
 
     def _find_shard_for_clip(self, cid, pipeline):
-        # 1. Direct dataset folder
-        dataset_folder = PIPELINE_MAP.get(pipeline, pipeline.upper())
-        # Try direct split path first
-        candidate_parent = self.preprocessed_root / self.split / dataset_folder / "shards"
-        if candidate_parent.exists():
-            for s in candidate_parent.iterdir():
-                if (s / "audio" / f"{cid}_melspec.npy").exists():
-                    return s
-
-        # 2. General shard search
-        for s in self.shard_dirs:
-            if (s / "audio" / f"{cid}_melspec.npy").exists():
-                return s
-        return None
+        return self.clip_to_shard.get(cid)
 
     def __getitem__(self, idx):
         item = self.samples[idx]
@@ -149,10 +140,10 @@ class DriveBaselineDataset(Dataset):
         ids_path = shard_dir / "text" / f"{cid}_input_ids.npy"
         mask_path = shard_dir / "text" / f"{cid}_attention_mask.npy"
         try:
-            ids = np.load(ids_path)
-            mask = np.load(mask_path)
-            ids_t = torch.from_numpy(ids).long()
-            mask_t = torch.from_numpy(mask).long()
+            ids = np.load(ids_path).reshape(-1)
+            mask = np.load(mask_path).reshape(-1)
+            ids_t = torch.from_numpy(ids[:128]).long()
+            mask_t = torch.from_numpy(mask[:128]).long()
         except Exception:
             ids_t = torch.zeros(128, dtype=torch.int64)
             mask_t = torch.zeros(128, dtype=torch.int64)

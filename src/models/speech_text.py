@@ -41,6 +41,10 @@ class SpeechTextModule(nn.Module):
         self.emotion_head = nn.Linear(d_model, n_classes) if n_classes else None
 
     def encode_text(self, input_ids, attention_mask):
+        if input_ids.dim() == 3:
+            input_ids = input_ids.squeeze(1)
+        if attention_mask.dim() == 3:
+            attention_mask = attention_mask.squeeze(1)
         with torch.no_grad():
             out = self.bert(input_ids=input_ids, attention_mask=attention_mask)
         t = self.text_proj(out.last_hidden_state)     # [B, Lt, d]

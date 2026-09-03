@@ -139,7 +139,8 @@ def train_engine(args):
         total_train_loss = 0.0
         start_t = time.time()
 
-        for batch in train_loader:
+        pbar = tqdm(train_loader, desc=f"Epoch {epoch:02d}/{args.epochs:02d} [Train]", leave=False)
+        for batch in pbar:
             labels = batch["label"].to(device)
             batch_dev = {
                 "melspec": batch["melspec"].to(device),
@@ -158,6 +159,7 @@ def train_engine(args):
             optimizer.step()
 
             total_train_loss += loss.item() * labels.size(0)
+            pbar.set_postfix({"loss": f"{loss.item():.4f}"})
 
         scheduler.step()
         avg_train_loss = total_train_loss / max(len(train_ds), 1)
