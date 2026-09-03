@@ -53,11 +53,34 @@ def _fixed_len_mel(mel, augment=False):
     out[:, :T] = mel
     return out
 
+PIPELINE_MAP = {
+    "mosei_real": "CMU-MOSEI",
+    "meld_real": "MELD",
+    "mustard": "MUSTARD",
+    "track1": "TRACK_1",
+    "track2": "TRACK_2",
+    "track3": "TRACK_3"
+}
+
 class DriveBaselineDataset(Dataset):
-    def __init__(self, manifest_csv, preprocessed_root, augment=False):
+    def __init__(self, manifest_csv, preprocessed_root, split="TRAIN", augment=False):
         self.augment = augment
         self.preprocessed_root = Path(preprocessed_root)
         self.samples = []
+        self.split = split
+
+        # Build fast lookup map for shards under this split
+        split_dir = self.preprocessed_root / split
+        if not split_dir.exists():
+            split_dir = self.preprocessed_root
+
+        # Scan shard directories once (only ~22 folders total, takes 0.01 seconds!)
+        self.shard_dirs = []
+        for d in split_dir.iterdir():
+            if d.is_dir():
+                shards_p = d / "shards"
+                if shards_p.exists():
+                    self.shard_dirs.extend([s for s in shards_p.iterdir() if s.is_dir()])
 
         # Read CSV
         with open(manifest_csv, newline="", encoding="utf-8") as f:
@@ -71,28 +94,36 @@ class DriveBaselineDataset(Dataset):
                     "clip_id": cid,
                     "label": label,
                     "pipeline": pipeline,
-                    "shard_rel": r.get("shard_dir", "")
                 })
-
-        # Pre-index existing files in preprocessed_root for instant lookup
-        self.file_index = {}
-        for mel_path in self.preprocessed_root.glob("**/*_melspec.npy"):
-            file_cid = mel_path.name.replace("_melspec.npy", "")
-            shard_d = mel_path.parent.parent
-            self.file_index[file_cid] = shard_d
 
     def __len__(self):
         return len(self.samples)
+
+    def _find_shard_for_clip(self, cid, pipeline):
+        # 1. Direct dataset folder
+        dataset_folder = PIPELINE_MAP.get(pipeline, pipeline.upper())
+        # Try direct split path first
+        candidate_parent = self.preprocessed_root / self.split / dataset_folder / "shards"
+        if candidate_parent.exists():
+            for s in candidate_parent.iterdir():
+                if (s / "audio" / f"{cid}_melspec.npy").exists():
+                    return s
+
+        # 2. General shard search
+        for s in self.shard_dirs:
+            if (s / "audio" / f"{cid}_melspec.npy").exists():
+                return s
+        return None
 
     def __getitem__(self, idx):
         item = self.samples[idx]
         cid = item["clip_id"]
         label = item["label"]
+        pipeline = item["pipeline"]
 
         # Locate Shard Directory
-        shard_dir = self.file_index.get(cid)
+        shard_dir = self._find_shard_for_clip(cid, pipeline)
         if not shard_dir:
-            # Fallback zero tensors
             return {
                 "melspec": torch.zeros((N_MELS, FIXED_MEL_LEN), dtype=torch.float32),
                 "mel_lengths": FIXED_MEL_LEN,

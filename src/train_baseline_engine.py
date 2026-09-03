@@ -83,9 +83,9 @@ def train_engine(args):
 
     # 1. Datasets & Loaders
     print("\n[1/4] Initializing PyTorch DataLoaders...")
-    train_ds = DriveBaselineDataset(args.train_manifest, args.preprocessed_root, augment=True)
-    val_ds = DriveBaselineDataset(args.val_manifest, args.preprocessed_root, augment=False)
-    test_ds = DriveBaselineDataset(args.test_manifest, args.preprocessed_root, augment=False)
+    train_ds = DriveBaselineDataset(args.train_manifest, args.preprocessed_root, split="TRAIN", augment=True)
+    val_ds = DriveBaselineDataset(args.val_manifest, args.preprocessed_root, split="VAL", augment=False)
+    test_ds = DriveBaselineDataset(args.test_manifest, args.preprocessed_root, split="TEST", augment=False)
 
     print(f"  -> Train Samples : {len(train_ds):,}")
     print(f"  -> Val Samples   : {len(val_ds):,}")
