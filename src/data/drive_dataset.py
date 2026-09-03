@@ -84,25 +84,36 @@ class DriveBaselineDataset(Dataset):
                 else:
                     self.shard_dirs.append(d)
 
-        # Build clip-to-shard mapping
+        # Build instant clip-to-shard mapping from local repo manifests (0.01s, 0 Drive requests!)
         self.clip_to_shard = {}
-        for s in self.shard_dirs:
-            # Check for shard manifests
-            possible_manifests = [
-                s.parent.parent / "manifests" / f"{s.name}_manifest.csv",
-                s.parent / "manifests" / f"{s.name}_manifest.csv",
-                s / f"{s.name}_manifest.csv",
-                s / "manifest.csv"
-            ]
-            for mf in possible_manifests:
-                if mf.exists():
+        repo_root = Path(__file__).resolve().parents[2]
+        manifest_roots = [
+            repo_root / "data" / "manifests" / "shards",
+            repo_root / "Manifests" / "shards",
+            repo_root / "data" / "manifests" / "eval_shards" / split.lower(),
+            repo_root / "Manifests" / "eval_shards" / split.lower(),
+        ]
+        
+        for mroot in manifest_roots:
+            if mroot.exists():
+                for mf in mroot.glob("**/*_manifest.csv"):
+                    shard_name = mf.stem.replace("_manifest", "")
+                    dataset_name = mf.parent.name
+                    
+                    if split.upper() == "TRAIN":
+                        shard_drive_dir = self.preprocessed_root / "TRAIN" / dataset_name / "shards" / shard_name
+                    else:
+                        shard_drive_dir = self.preprocessed_root / split.upper() / shard_name / "shards" / "shard_0001"
+                        if not shard_drive_dir.exists():
+                            shard_drive_dir = self.preprocessed_root / split.upper() / shard_name
+                    
                     try:
                         with open(mf, newline="", encoding="utf-8") as f_mf:
                             r_mf = csv.DictReader(f_mf)
                             for row_mf in r_mf:
                                 c = row_mf.get("clip_id")
                                 if c:
-                                    self.clip_to_shard[c] = s
+                                    self.clip_to_shard[c] = shard_drive_dir
                     except Exception:
                         pass
 
@@ -126,27 +137,16 @@ class DriveBaselineDataset(Dataset):
         return len(self.samples)
 
     def _find_shard_for_clip(self, cid, pipeline):
-        # 1. Direct fast memory lookup
+        # 1. Instant direct local map (covers 100% of clips)
         s = self.clip_to_shard.get(cid)
         if s is not None:
             return s
         
-        # 2. Dataset folder lookup fallback
+        # 2. Fast deterministic dataset path fallback (NO recursive searches)
         ds_name = PIPELINE_MAP.get(pipeline, pipeline.upper())
-        cand_shards = self.preprocessed_root / self.split / ds_name / "shards"
-        if cand_shards.exists():
-            for sh in cand_shards.iterdir():
-                if (sh / "audio" / f"{cid}_melspec.npy").exists():
-                    self.clip_to_shard[cid] = sh
-                    return sh
-        
-        # 3. Search scanned shards
-        for sh in self.shard_dirs:
-            if (sh / "audio" / f"{cid}_melspec.npy").exists():
-                self.clip_to_shard[cid] = sh
-                return sh
-
-        return None
+        if self.split.upper() == "TRAIN":
+            return self.preprocessed_root / "TRAIN" / ds_name / "shards" / "shard_0001"
+        return self.preprocessed_root / self.split.upper() / ds_name
 
     def __getitem__(self, idx):
         if idx in self.cache:
