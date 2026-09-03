@@ -74,13 +74,37 @@ class DriveBaselineDataset(Dataset):
         if not split_dir.exists():
             split_dir = self.preprocessed_root
 
-        # Scan shard directories once (only ~22 folders total, takes 0.01 seconds!)
+        # Scan shard directories under this split
         self.shard_dirs = []
         for d in split_dir.iterdir():
             if d.is_dir():
                 shards_p = d / "shards"
                 if shards_p.exists():
                     self.shard_dirs.extend([s for s in shards_p.iterdir() if s.is_dir()])
+                else:
+                    self.shard_dirs.append(d)
+
+        # Build clip-to-shard mapping
+        self.clip_to_shard = {}
+        for s in self.shard_dirs:
+            # Check for shard manifests
+            possible_manifests = [
+                s.parent.parent / "manifests" / f"{s.name}_manifest.csv",
+                s.parent / "manifests" / f"{s.name}_manifest.csv",
+                s / f"{s.name}_manifest.csv",
+                s / "manifest.csv"
+            ]
+            for mf in possible_manifests:
+                if mf.exists():
+                    try:
+                        with open(mf, newline="", encoding="utf-8") as f_mf:
+                            r_mf = csv.DictReader(f_mf)
+                            for row_mf in r_mf:
+                                c = row_mf.get("clip_id")
+                                if c:
+                                    self.clip_to_shard[c] = s
+                    except Exception:
+                        pass
 
         # Read CSV manifest to populate samples
         with open(manifest_csv, newline="", encoding="utf-8") as f:
@@ -100,7 +124,27 @@ class DriveBaselineDataset(Dataset):
         return len(self.samples)
 
     def _find_shard_for_clip(self, cid, pipeline):
-        return self.clip_to_shard.get(cid)
+        # 1. Direct fast memory lookup
+        s = self.clip_to_shard.get(cid)
+        if s is not None:
+            return s
+        
+        # 2. Dataset folder lookup fallback
+        ds_name = PIPELINE_MAP.get(pipeline, pipeline.upper())
+        cand_shards = self.preprocessed_root / self.split / ds_name / "shards"
+        if cand_shards.exists():
+            for sh in cand_shards.iterdir():
+                if (sh / "audio" / f"{cid}_melspec.npy").exists():
+                    self.clip_to_shard[cid] = sh
+                    return sh
+        
+        # 3. Search scanned shards
+        for sh in self.shard_dirs:
+            if (sh / "audio" / f"{cid}_melspec.npy").exists():
+                self.clip_to_shard[cid] = sh
+                return sh
+
+        return None
 
     def __getitem__(self, idx):
         item = self.samples[idx]
