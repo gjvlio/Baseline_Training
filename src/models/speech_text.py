@@ -48,7 +48,9 @@ class SpeechTextModule(nn.Module):
 
     def forward(self, melspec, mel_lengths, input_ids, attention_mask,
                 return_embedding=False):
-        # melspec: [B,1,F,T]  input_ids/attention_mask: [B, Lt]
+        # melspec: [B,1,F,T] (or [B,F,T] -> unsqueeze to [B,1,F,T])
+        if melspec.dim() == 3:
+            melspec = melspec.unsqueeze(1)
         z_a, a_pad_mask = self.mdcnn(melspec, mel_lengths)        # [B,Ta,d]
         t_seq = self.encode_text(input_ids, attention_mask)       # [B,Lt,d]
         t_pad_mask = attention_mask == 0                          # True=pad
