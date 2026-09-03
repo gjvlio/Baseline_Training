@@ -92,9 +92,31 @@ def train_engine(args):
     print(f"  -> Val Samples   : {len(val_ds):,}")
     print(f"  -> Test Samples  : {len(test_ds):,}")
 
-    train_loader = DataLoader(train_ds, batch_size=args.batch_size, shuffle=True, num_workers=args.num_workers, pin_memory=True)
-    val_loader = DataLoader(val_ds, batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True)
-    test_loader = DataLoader(test_ds, batch_size=args.batch_size, shuffle=False, num_workers=args.num_workers, pin_memory=True)
+    train_loader = DataLoader(
+        train_ds, 
+        batch_size=args.batch_size, 
+        shuffle=True, 
+        num_workers=args.num_workers, 
+        pin_memory=True,
+        prefetch_factor=2 if args.num_workers > 0 else None,
+        persistent_workers=True if args.num_workers > 0 else False
+    )
+    val_loader = DataLoader(
+        val_ds, 
+        batch_size=args.batch_size, 
+        shuffle=False, 
+        num_workers=args.num_workers, 
+        pin_memory=True,
+        prefetch_factor=2 if args.num_workers > 0 else None,
+        persistent_workers=True if args.num_workers > 0 else False
+    )
+    test_loader = DataLoader(
+        test_ds, 
+        batch_size=args.batch_size, 
+        shuffle=False, 
+        num_workers=args.num_workers, 
+        pin_memory=True
+    )
 
     # 2. Build Model
     print("\n[2/4] Building ACE-Net Model Architecture...")

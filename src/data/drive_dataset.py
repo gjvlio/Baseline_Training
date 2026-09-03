@@ -120,6 +120,8 @@ class DriveBaselineDataset(Dataset):
                     "pipeline": pipeline,
                 })
 
+        self.cache = {}
+
     def __len__(self):
         return len(self.samples)
 
@@ -147,6 +149,9 @@ class DriveBaselineDataset(Dataset):
         return None
 
     def __getitem__(self, idx):
+        if idx in self.cache:
+            return self.cache[idx]
+
         item = self.samples[idx]
         cid = item["clip_id"]
         label = item["label"]
@@ -155,7 +160,7 @@ class DriveBaselineDataset(Dataset):
         # Locate Shard Directory
         shard_dir = self._find_shard_for_clip(cid, pipeline)
         if not shard_dir:
-            return {
+            sample_data = {
                 "melspec": torch.zeros((N_MELS, FIXED_MEL_LEN), dtype=torch.float32),
                 "mel_lengths": FIXED_MEL_LEN,
                 "input_ids": torch.zeros(128, dtype=torch.int64),
@@ -165,6 +170,8 @@ class DriveBaselineDataset(Dataset):
                 "frame_mask": torch.ones(N_KEYFRAMES, dtype=torch.float32),
                 "label": torch.tensor(label, dtype=torch.float32)
             }
+            self.cache[idx] = sample_data
+            return sample_data
 
         # 1. Load Audio
         mel_path = shard_dir / "audio" / f"{cid}_melspec.npy"
@@ -230,7 +237,7 @@ class DriveBaselineDataset(Dataset):
         except Exception:
             alpha_t = torch.ones(N_KEYFRAMES, dtype=torch.float32) / N_KEYFRAMES
 
-        return {
+        out_dict = {
             "melspec": mel_t,
             "mel_lengths": FIXED_MEL_LEN,
             "input_ids": ids_t,
@@ -240,3 +247,5 @@ class DriveBaselineDataset(Dataset):
             "frame_mask": frame_mask,
             "label": torch.tensor(label, dtype=torch.float32)
         }
+        self.cache[idx] = out_dict
+        return out_dict
