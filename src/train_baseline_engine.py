@@ -45,7 +45,7 @@ def evaluate_model(model, dataloader, device):
             # Move tensors to device
             batch_dev = {
                 "melspec": batch["melspec"].to(device),
-                "mel_lengths": batch["mel_lengths"],
+                "mel_lengths": batch["mel_lengths"].to(device) if torch.is_tensor(batch["mel_lengths"]) else torch.tensor(batch["mel_lengths"], device=device),
                 "input_ids": batch["input_ids"].to(device),
                 "attention_mask": batch["attention_mask"].to(device),
                 "frames": batch["frames"].to(device),
@@ -143,7 +143,7 @@ def train_engine(args):
             labels = batch["label"].to(device)
             batch_dev = {
                 "melspec": batch["melspec"].to(device),
-                "mel_lengths": batch["mel_lengths"],
+                "mel_lengths": batch["mel_lengths"].to(device) if torch.is_tensor(batch["mel_lengths"]) else torch.tensor(batch["mel_lengths"], device=device),
                 "input_ids": batch["input_ids"].to(device),
                 "attention_mask": batch["attention_mask"].to(device),
                 "frames": batch["frames"].to(device),
