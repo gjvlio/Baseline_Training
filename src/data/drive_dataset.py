@@ -24,8 +24,9 @@ IMG_SIZE = 224
 
 def _load_frame(path, aug=None):
     try:
-        img = Image.open(path).convert("RGB").resize((IMG_SIZE, IMG_SIZE))
-        arr = np.asarray(img, dtype=np.float32) / 255.0
+        with Image.open(path) as img:
+            img_rgb = img.convert("RGB").resize((IMG_SIZE, IMG_SIZE))
+            arr = np.asarray(img_rgb, dtype=np.float32) / 255.0
         if aug is not None:
             arr = arr * aug["bright"]
             mean = arr.mean()
@@ -131,8 +132,6 @@ class DriveBaselineDataset(Dataset):
                     "pipeline": pipeline,
                 })
 
-        self.cache = {}
-
     def __len__(self):
         return len(self.samples)
 
@@ -149,9 +148,6 @@ class DriveBaselineDataset(Dataset):
         return self.preprocessed_root / self.split.upper() / ds_name
 
     def __getitem__(self, idx):
-        if idx in self.cache:
-            return self.cache[idx]
-
         item = self.samples[idx]
         cid = item["clip_id"]
         label = item["label"]
@@ -160,7 +156,7 @@ class DriveBaselineDataset(Dataset):
         # Locate Shard Directory
         shard_dir = self._find_shard_for_clip(cid, pipeline)
         if not shard_dir:
-            sample_data = {
+            return {
                 "melspec": torch.zeros((N_MELS, FIXED_MEL_LEN), dtype=torch.float32),
                 "mel_lengths": FIXED_MEL_LEN,
                 "input_ids": torch.zeros(128, dtype=torch.int64),
@@ -170,8 +166,6 @@ class DriveBaselineDataset(Dataset):
                 "frame_mask": torch.ones(N_KEYFRAMES, dtype=torch.float32),
                 "label": torch.tensor(label, dtype=torch.float32)
             }
-            self.cache[idx] = sample_data
-            return sample_data
 
         # 1. Load Audio
         mel_path = shard_dir / "audio" / f"{cid}_melspec.npy"
@@ -247,5 +241,4 @@ class DriveBaselineDataset(Dataset):
             "frame_mask": frame_mask,
             "label": torch.tensor(label, dtype=torch.float32)
         }
-        self.cache[idx] = out_dict
         return out_dict

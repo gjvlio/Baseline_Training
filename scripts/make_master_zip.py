@@ -33,11 +33,17 @@ def build_file_list(drive_root):
             for mf in mroot.glob("**/*_manifest.csv"):
                 shard_name = mf.stem.replace("_manifest", "")
                 group_or_ds = mf.parent.name
-                split = "VAL" if "val" in str(mf).lower() else ("TEST" if "test" in str(mf).lower() else "TRAIN")
+                posix_p = mf.as_posix().lower()
+                if "/test/" in posix_p:
+                    split = "TEST"
+                elif "/val/" in posix_p:
+                    split = "VAL"
+                else:
+                    split = "TRAIN"
                 if split == "TRAIN":
                     rel_shard = Path("TRAIN") / group_or_ds / "shards" / shard_name
                 else:
-                    rel_shard = Path(split) / group_or_ds / "shards" / "shard_0001"
+                    rel_shard = Path(split) / shard_name / "shards" / "shard_0001"
                 
                 try:
                     with open(mf, newline="", encoding="utf-8") as f:

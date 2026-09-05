@@ -10,6 +10,7 @@ Trains Stage-2 Consistency Discriminator on the full 14k dataset using:
 """
 
 import os
+import sys
 import time
 import argparse
 from pathlib import Path
@@ -33,17 +34,17 @@ def compute_metrics(y_true, y_pred_prob, threshold=0.5):
         auc = float('nan')
     return {"accuracy": acc, "precision": prec, "recall": rec, "f1": f1, "auc": auc}
 
-def evaluate_model(model, dataloader, device):
+def evaluate_model(model, dataloader, device, desc="Evaluating"):
     model.eval()
     total_loss = 0.0
     all_targets = []
     all_probs = []
     criterion = nn.BCEWithLogitsLoss()
 
+    pbar = tqdm(dataloader, desc=desc, leave=False, dynamic_ncols=True)
     with torch.no_grad():
-        for batch in dataloader:
+        for batch in pbar:
             labels = batch["label"].to(device)
-            # Move tensors to device
             batch_dev = {
                 "melspec": batch["melspec"].to(device),
                 "mel_lengths": batch["mel_lengths"].to(device) if torch.is_tensor(batch["mel_lengths"]) else torch.tensor(batch["mel_lengths"], device=device),
@@ -60,6 +61,7 @@ def evaluate_model(model, dataloader, device):
             probs = torch.sigmoid(logits).cpu().numpy()
             all_probs.extend(probs)
             all_targets.extend(labels.cpu().numpy())
+            pbar.set_postfix({"eval_loss": f"{loss.item():.4f}"})
 
     all_targets = np.array(all_targets)
     all_probs = np.array(all_probs)
@@ -92,12 +94,13 @@ def train_engine(args):
     print(f"  -> Val Samples   : {len(val_ds):,}")
     print(f"  -> Test Samples  : {len(test_ds):,}")
 
+    use_pin = torch.cuda.is_available()
     train_loader = DataLoader(
         train_ds, 
         batch_size=args.batch_size, 
         shuffle=True, 
         num_workers=args.num_workers, 
-        pin_memory=True,
+        pin_memory=use_pin,
         prefetch_factor=2 if args.num_workers > 0 else None,
         persistent_workers=True if args.num_workers > 0 else False
     )
@@ -106,7 +109,7 @@ def train_engine(args):
         batch_size=args.batch_size, 
         shuffle=False, 
         num_workers=args.num_workers, 
-        pin_memory=True,
+        pin_memory=use_pin,
         prefetch_factor=2 if args.num_workers > 0 else None,
         persistent_workers=True if args.num_workers > 0 else False
     )
@@ -115,7 +118,7 @@ def train_engine(args):
         batch_size=args.batch_size, 
         shuffle=False, 
         num_workers=args.num_workers, 
-        pin_memory=True
+        pin_memory=use_pin
     )
 
     # 2. Build Model
@@ -160,10 +163,12 @@ def train_engine(args):
     for epoch in range(1, args.epochs + 1):
         model.train()
         total_train_loss = 0.0
+        running_loss = 0.0
         start_t = time.time()
 
-        pbar = tqdm(train_loader, desc=f"Epoch {epoch:02d}/{args.epochs:02d} [Train]", leave=False)
-        for batch in pbar:
+        current_lr = optimizer.param_groups[0]["lr"]
+        pbar = tqdm(train_loader, desc=f"Epoch {epoch:02d}/{args.epochs:02d} [Train]", dynamic_ncols=True, leave=False)
+        for i, batch in enumerate(pbar, 1):
             labels = batch["label"].to(device)
             batch_dev = {
                 "melspec": batch["melspec"].to(device),
@@ -181,12 +186,15 @@ def train_engine(args):
             loss.backward()
             optimizer.step()
 
-            total_train_loss += loss.item() * labels.size(0)
-            pbar.set_postfix({"loss": f"{loss.item():.4f}"})
+            batch_loss_val = loss.item()
+            total_train_loss += batch_loss_val * labels.size(0)
+            running_loss += batch_loss_val
+            avg_running = running_loss / i
+            pbar.set_postfix({"loss": f"{batch_loss_val:.4f}", "avg": f"{avg_running:.4f}", "lr": f"{current_lr:.1e}"})
 
         scheduler.step()
         avg_train_loss = total_train_loss / max(len(train_ds), 1)
-        val_metrics = evaluate_model(model, val_loader, device)
+        val_metrics = evaluate_model(model, val_loader, device, desc=f"Epoch {epoch:02d}/{args.epochs:02d} [Val]")
 
         epoch_time = time.time() - start_t
         print(f"{epoch:<8} | {avg_train_loss:<12.4f} | {val_metrics['loss']:<10.4f} | {val_metrics['accuracy']:<10.4f} | {val_metrics['auc']:<10.4f} | {val_metrics['f1']:<10.4f} | {epoch_time:.1f}s")
@@ -198,6 +206,8 @@ def train_engine(args):
             torch.save(model.state_dict(), str(best_model_path))
             print(f"         ⭐ New Best Model Saved! (Val AUC: {best_val_auc:.4f} | Val Acc: {best_val_acc:.4f})")
 
+        sys.stdout.flush()
+
     print("=" * 80)
     print(f"🎉 Training Complete! Best model saved to: {best_model_path}")
 
@@ -206,7 +216,7 @@ def train_engine(args):
     if best_model_path.exists():
         model.load_state_dict(torch.load(best_model_path, map_location=device))
     
-    test_metrics = evaluate_model(model, test_loader, device)
+    test_metrics = evaluate_model(model, test_loader, device, desc="Evaluating [Test]")
 
     print("\n" + "=" * 80)
     print("                 🏆 OFFICIAL BASELINE TEST EVALUATION REPORT 🏆")
@@ -219,6 +229,7 @@ def train_engine(args):
     print("=" * 80)
     print(f"📍 Checkpoint saved in Google Drive: {best_model_path}")
     print("=" * 80)
+    sys.stdout.flush()
 
 def main():
     parser = argparse.ArgumentParser(description="ACE-Net Baseline Training Engine")
@@ -231,7 +242,7 @@ def main():
     parser.add_argument("--batch-size", type=int, default=32)
     parser.add_argument("--epochs", type=int, default=20)
     parser.add_argument("--lr", type=float, default=1e-4)
-    parser.add_argument("--num-workers", type=int, default=2)
+    parser.add_argument("--num-workers", type=int, default=0)
     parser.add_argument("--freeze-backbones", action="store_true")
     parser.add_argument("--device", type=str, default="cuda")
     args = parser.parse_args()
