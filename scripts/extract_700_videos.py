@@ -41,21 +41,18 @@ def main():
     if not zip_path.exists():
         raise FileNotFoundError(f"❌ Hindi mahanap ang fakeavceleb.zip sa: {args.zip_path}")
 
-    # Read target filenames
-    target_filenames = set()
+    # Read target exact relative paths (700 unique paths)
+    target_rel_paths = set()
     with open(manifest_p, newline="", encoding="utf-8") as f:
         for r in csv.DictReader(f):
-            fn = r.get("filename")
-            if fn:
-                target_filenames.add(fn.lower())
-            rel = r.get("rel_path")
+            rel = r.get("rel_path", "").replace("\\", "/").strip().lower()
             if rel:
-                target_filenames.add(Path(rel).name.lower())
+                target_rel_paths.add(rel)
 
     print("=" * 80)
     print("      ⚡ SELECTIVE 700-CLIP FAST UNZIPPER (COLAB NVMe) ⚡")
     print(f"  Source Zip : {zip_path} ({zip_path.stat().st_size / (1024**3):.2f} GB)")
-    print(f"  Target Set : {len(target_filenames)} unique MP4 targets")
+    print(f"  Target Set : {len(target_rel_paths)} exact target clips")
     print(f"  Output Dir : {out_dir}")
     print("=" * 80)
 
@@ -66,14 +63,16 @@ def main():
         namelist = zf.namelist()
         print(f"  -> Total files in zip archive: {len(namelist):,}")
         
-        # Filter matching entries
+        # Match exact relative path suffix
         matching_members = []
         for member in namelist:
-            m_name = Path(member).name.lower()
-            if m_name in target_filenames:
-                matching_members.append(member)
+            m_norm = member.replace("\\", "/").lower()
+            for target_rel in target_rel_paths:
+                if m_norm.endswith(target_rel):
+                    matching_members.append(member)
+                    break
 
-        print(f"  -> Found {len(matching_members)} matching target videos to extract!")
+        print(f"  -> Matched EXACTLY {len(matching_members)} / {len(target_rel_paths)} target videos to extract!")
         print("  -> Extracting with live progress...")
         
         for member in tqdm(matching_members, desc="Extracting 700 MP4s", dynamic_ncols=True):
