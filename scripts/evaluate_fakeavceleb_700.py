@@ -31,11 +31,60 @@ N_MELS = 80
 N_KEYFRAMES = 8
 IMG_SIZE = 224
 
-def get_face_detector():
-    cascade_path = cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'
-    return cv2.CascadeClassifier(cascade_path)
+def get_face_detector(device="cpu"):
+    # 1. Try MTCNN
+    try:
+        from facenet_pytorch import MTCNN
+        return MTCNN(keep_all=False, device=device, post_process=False)
+    except Exception:
+        pass
+    # 2. Try OpenCV Haar Cascade
+    try:
+        if hasattr(cv2, "CascadeClassifier") and hasattr(cv2, "data") and hasattr(cv2.data, "haarcascades"):
+            cascade_path = cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
+            detector = cv2.CascadeClassifier(cascade_path)
+            if not detector.empty():
+                return detector
+    except Exception:
+        pass
+    return None
 
-def extract_visual_frames(video_path, face_cascade):
+def extract_face_crop(frame, detector=None):
+    h, w, _ = frame.shape
+    if detector is not None:
+        try:
+            # If MTCNN
+            if hasattr(detector, "detect"):
+                boxes, _ = detector.detect(frame)
+                if boxes is not None and len(boxes) > 0:
+                    box = boxes[0].astype(int)
+                    x1, y1 = max(0, box[0]), max(0, box[1])
+                    x2, y2 = min(w, box[2]), min(h, box[3])
+                    if x2 > x1 and y2 > y1:
+                        return frame[y1:y2, x1:x2]
+            # If CascadeClassifier
+            elif hasattr(detector, "detectMultiScale"):
+                gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                faces = detector.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=4, minSize=(60, 60))
+                if len(faces) > 0:
+                    faces = sorted(faces, key=lambda b: b[2] * b[3], reverse=True)
+                    x, y, fw, fh = faces[0]
+                    mx, my = int(0.15 * fw), int(0.15 * fh)
+                    x1, y1 = max(0, x - mx), max(0, y - my)
+                    x2, y2 = min(w, x + fw + mx), min(h, y + fh + my)
+                    return frame[y1:y2, x1:x2]
+        except Exception:
+            pass
+
+    # High-quality talking head center-upper crop fallback
+    sz = min(h, w)
+    y1 = max(0, int(0.05 * h))
+    y2 = min(h, y1 + int(sz * 0.9))
+    x1 = max(0, (w - sz) // 2)
+    x2 = min(w, x1 + sz)
+    return frame[y1:y2, x1:x2]
+
+def extract_visual_frames(video_path, face_detector):
     cap = cv2.VideoCapture(str(video_path))
     total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     if total_frames <= 0:
@@ -54,21 +103,7 @@ def extract_visual_frames(video_path, face_cascade):
         if not success:
             break
         if current_idx in sample_indices:
-            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=4, minSize=(60, 60))
-            h, w, _ = frame.shape
-            if len(faces) > 0:
-                faces = sorted(faces, key=lambda b: b[2] * b[3], reverse=True)
-                x, y, fw, fh = faces[0]
-                mx, my = int(0.15 * fw), int(0.15 * fh)
-                x1, y1 = max(0, x - mx), max(0, y - my)
-                x2, y2 = min(w, x + fw + mx), min(h, y + fh + my)
-                face_crop = frame[y1:y2, x1:x2]
-            else:
-                sz = min(h, w)
-                y1, x1 = (h - sz) // 2, (w - sz) // 2
-                face_crop = frame[y1:y1+sz, x1:x1+sz]
-            
+            face_crop = extract_face_crop(frame, face_detector)
             face_rgb = cv2.cvtColor(face_crop, cv2.COLOR_BGR2RGB)
             face_resized = cv2.resize(face_rgb, (IMG_SIZE, IMG_SIZE))
             arr = (face_resized.astype(np.float32) / 255.0 - _IMAGENET_MEAN) / _IMAGENET_STD
@@ -160,7 +195,7 @@ def main():
         records = list(csv.DictReader(f))
     print(f"\n[2/3] Loaded {len(records)} test clips from manifest (350 Real / 350 Fake).")
 
-    face_cascade = get_face_detector()
+    face_detector = get_face_detector(device=device)
     results = []
     y_true = []
     y_pred_acenet = []
@@ -201,7 +236,7 @@ def main():
 
                 if video_path and video_path.exists():
                     mel_t = extract_audio_mel(video_path)
-                    frames_t, frame_mask = extract_visual_frames(video_path, face_cascade)
+                    frames_t, frame_mask = extract_visual_frames(video_path, face_detector)
                     torch.save(mel_t, mel_cache_p)
                     torch.save((frames_t, frame_mask), vis_cache_p)
                 else:
