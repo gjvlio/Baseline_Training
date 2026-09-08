@@ -41,18 +41,22 @@ def main():
     if not zip_path.exists():
         raise FileNotFoundError(f"❌ Hindi mahanap ang fakeavceleb.zip sa: {args.zip_path}")
 
-    # Read target exact relative paths (700 unique paths)
+    # Read target exact relative paths from one or more manifests
     target_rel_paths = set()
-    with open(manifest_p, newline="", encoding="utf-8") as f:
-        for r in csv.DictReader(f):
-            rel = r.get("rel_path", "").replace("\\", "/").strip().lower()
-            if rel:
-                target_rel_paths.add(rel)
+    manifest_list = [Path(m.strip()) for m in args.manifest.split(",") if m.strip()]
+    
+    for mf in manifest_list:
+        if mf.exists():
+            with open(mf, newline="", encoding="utf-8") as f:
+                for r in csv.DictReader(f):
+                    rel = r.get("rel_path", "").replace("\\", "/").strip().lower()
+                    if rel:
+                        target_rel_paths.add(rel)
 
     print("=" * 80)
-    print("      ⚡ SELECTIVE 700-CLIP FAST UNZIPPER (COLAB NVMe) ⚡")
+    print("      ⚡ SELECTIVE MULTI-MANIFEST FAST UNZIPPER (COLAB NVMe) ⚡")
     print(f"  Source Zip : {zip_path} ({zip_path.stat().st_size / (1024**3):.2f} GB)")
-    print(f"  Target Set : {len(target_rel_paths)} exact target clips")
+    print(f"  Target Set : {len(target_rel_paths)} exact target clips (from {len(manifest_list)} manifests)")
     print(f"  Output Dir : {out_dir}")
     print("=" * 80)
 
