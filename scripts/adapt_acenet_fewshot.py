@@ -117,20 +117,29 @@ def extract_audio_mel(video_path):
         return torch.zeros((N_MELS, FIXED_MEL_LEN), dtype=torch.float32)
 
 class FakeAVAdaptationDataset(Dataset):
-    def __init__(self, manifest_csv, raw_dir, cache_dir):
+    def __init__(self, manifest_path=None, raw_dir="/content/fakeav_raw", cache_dir="/content/fakeav_preprocessed_700", items=None):
         self.raw_dir = Path(raw_dir)
         self.cache_dir = Path(cache_dir)
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         self.samples = []
 
-        with open(manifest_csv, newline="", encoding="utf-8") as f:
-            for r in csv.DictReader(f):
+        if items is not None:
+            for r in items:
                 self.samples.append({
                     "clip_id": r["clip_id"],
                     "fake_label": int(r["fake_label"]),
-                    "rel_path": r.get("rel_path", ""),
-                    "filename": r.get("filename", "")
+                    "rel_path": r.get("rel_path", r.get("video_path", "")),
+                    "filename": r.get("filename", Path(r.get("rel_path", r.get("video_path", ""))).name)
                 })
+        elif manifest_path:
+            with open(manifest_path, newline="", encoding="utf-8") as f:
+                for r in csv.DictReader(f):
+                    self.samples.append({
+                        "clip_id": r["clip_id"],
+                        "fake_label": int(r["fake_label"]),
+                        "rel_path": r.get("rel_path", r.get("video_path", "")),
+                        "filename": r.get("filename", Path(r.get("rel_path", r.get("video_path", ""))).name)
+                    })
 
     def __len__(self):
         return len(self.samples)
@@ -182,9 +191,87 @@ class FakeAVAdaptationDataset(Dataset):
             "label": torch.tensor(label, dtype=torch.float32)
         }
 
+def create_disjoint_splits(
+    meta_csv_path: str,
+    n_adapt_real: int = 150,
+    n_adapt_fake: int = 150,
+    n_test_real: int = 350,
+    n_test_fake: int = 350,
+    seed: int = 42
+) -> tuple[list[dict], list[dict]]:
+    """
+    Creates strict speaker-disjoint adaptation and test splits from FakeAVCeleb
+    (Exact implementation from DeepSentinel's scripts/train_adaptation.py).
+    """
+    with open(meta_csv_path, "r", encoding="utf-8", errors="replace") as f:
+        all_clips = list(csv.DictReader(f))
+
+    rng = random.Random(seed)
+    
+    speaker_clips = defaultdict(lambda: {"real": [], "fake": []})
+    for c in all_clips:
+        spk = c.get("speaker_id") or c.get("source", "unknown")
+        is_real = str(c.get("fake_label", "")).strip() == "0" or "real" in str(c.get("type", "")).lower() or str(c.get("method", "")).lower() == "real"
+        c["fake_label"] = 0 if is_real else 1
+        c["speaker_id"] = spk
+        if is_real:
+            speaker_clips[spk]["real"].append(c)
+        else:
+            speaker_clips[spk]["fake"].append(c)
+
+    all_speakers = list(speaker_clips.keys())
+    rng.shuffle(all_speakers)
+
+    # 20% speakers for adaptation (Set A), 80% for test (Set B)
+    split_idx = max(5, int(len(all_speakers) * 0.20))
+    adapt_speakers = set(all_speakers[:split_idx])
+    test_speakers = set(all_speakers[split_idx:])
+
+    adapt_reals, adapt_fakes = [], []
+    for spk in adapt_speakers:
+        adapt_reals.extend(speaker_clips[spk]["real"])
+        adapt_fakes.extend(speaker_clips[spk]["fake"])
+
+    test_reals, test_fakes = [], []
+    for spk in test_speakers:
+        test_reals.extend(speaker_clips[spk]["real"])
+        test_fakes.extend(speaker_clips[spk]["fake"])
+
+    rng.shuffle(adapt_reals)
+    rng.shuffle(adapt_fakes)
+    rng.shuffle(test_reals)
+    rng.shuffle(test_fakes)
+
+    # Strictly enforce 1:1 balance in adaptation training set (150 Real / 150 Fake)
+    n_adapt = min(len(adapt_reals), len(adapt_fakes), n_adapt_real, n_adapt_fake)
+    adapt_set = adapt_reals[:n_adapt] + adapt_fakes[:n_adapt]
+    
+    t_reals = test_reals[:n_test_real] if (n_test_real and n_test_real > 0) else test_reals
+    t_fakes = test_fakes[:n_test_fake] if (n_test_fake and n_test_fake > 0) else test_fakes
+    test_set = t_reals + t_fakes
+
+    rng.shuffle(adapt_set)
+    rng.shuffle(test_set)
+
+    # Strict Overlap Verification
+    adapt_clip_ids = {c["clip_id"] for c in adapt_set}
+    test_clip_ids = {c["clip_id"] for c in test_set}
+    overlap_clips = adapt_clip_ids.intersection(test_clip_ids)
+    
+    adapt_spk_ids = {c["speaker_id"] for c in adapt_set}
+    test_spk_ids = {c["speaker_id"] for c in test_set}
+    overlap_spks = adapt_spk_ids.intersection(test_spk_ids)
+
+    assert len(overlap_clips) == 0, f"DATA LEAKAGE ERROR: {len(overlap_clips)} overlapping clips!"
+    assert len(overlap_spks) == 0, f"SPEAKER OVERLAP ERROR: {len(overlap_spks)} overlapping speakers!"
+
+    return adapt_set, test_set
+
+
 def main():
     parser = argparse.ArgumentParser(description="ACE-Net Few-Shot Domain Adaptation Engine")
     parser.add_argument("--manifest", type=str, default="Manifests/fakeavceleb_adapt_300.csv", help="Path to 300 adaptation manifest")
+    parser.add_argument("--meta-csv", type=str, default=None, help="Optional path to FakeAVCeleb meta CSV to generate Seed 42 splits on the fly")
     parser.add_argument("--raw-dir", type=str, default="/content/fakeav_raw", help="Path to raw videos")
     parser.add_argument("--cache-dir", type=str, default="/content/fakeav_preprocessed_700", help="Feature cache directory")
     parser.add_argument("--init-ckpt", type=str, required=True, help="Path to pre-trained baseline model checkpoint (.pth or .pt)")
@@ -192,6 +279,7 @@ def main():
     parser.add_argument("--epochs", type=int, default=5, help="Number of adaptation epochs")
     parser.add_argument("--lr", type=float, default=5e-6, help="Adaptation learning rate")
     parser.add_argument("--batch-size", type=int, default=16, help="Batch size")
+    parser.add_argument("--seed", type=int, default=42, help="Random seed")
     parser.add_argument("--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu")
     args = parser.parse_args()
 
@@ -202,7 +290,6 @@ def main():
     print("=" * 80)
     print("      ⚡ ACE-NET FEW-SHOT DOMAIN ADAPTATION ENGINE (SEED 42) ⚡")
     print(f"  Init Checkpoint : {args.init_ckpt}")
-    print(f"  Adapt Manifest  : {args.manifest}")
     print(f"  Epochs          : {args.epochs}")
     print(f"  Learning Rate   : {args.lr}")
     print(f"  Batch Size      : {args.batch_size}")
@@ -210,9 +297,16 @@ def main():
     print(f"  Device          : {device}")
     print("=" * 80)
 
-    # 1. Dataset & DataLoader
-    adapt_ds = FakeAVAdaptationDataset(args.manifest, args.raw_dir, args.cache_dir)
-    print(f"\n[1/3] Loaded {len(adapt_ds)} adaptation clips (150 Real / 150 Fake from Speaker Set A).")
+    # 1. Dataset & DataLoader (Dynamic Seed 42 split or pre-generated manifest)
+    if args.meta_csv and Path(args.meta_csv).exists():
+        print(f"\n[1/3] Dynamically generating Seed {args.seed} speaker-disjoint splits from: {args.meta_csv}")
+        adapt_set, _ = create_disjoint_splits(args.meta_csv, n_adapt_real=150, n_adapt_fake=150, seed=args.seed)
+        adapt_ds = FakeAVAdaptationDataset(manifest_path=None, raw_dir=args.raw_dir, cache_dir=args.cache_dir, items=adapt_set)
+    else:
+        print(f"\n[1/3] Loading Seed {args.seed} adaptation manifest from: {args.manifest}")
+        adapt_ds = FakeAVAdaptationDataset(manifest_path=args.manifest, raw_dir=args.raw_dir, cache_dir=args.cache_dir)
+
+    print(f"  -> Loaded {len(adapt_ds)} adaptation clips (150 Real / 150 Fake from Speaker Set A).")
 
     adapt_loader = DataLoader(adapt_ds, batch_size=args.batch_size, shuffle=True, num_workers=0)
 
