@@ -247,17 +247,25 @@ def main():
                     frames_t = torch.zeros((N_KEYFRAMES, 3, IMG_SIZE, IMG_SIZE), dtype=torch.float32)
                     frame_mask = torch.zeros(N_KEYFRAMES, dtype=torch.float32)
 
+            input_ids = torch.zeros((1, 128), dtype=torch.int64, device=device)
+            input_ids[0, 0] = 101
+            input_ids[0, 1] = 102
+            attention_mask = torch.zeros((1, 128), dtype=torch.int64, device=device)
+            attention_mask[0, 0] = 1
+            attention_mask[0, 1] = 1
+
             batch_dev = {
                 "melspec": mel_t.unsqueeze(0).to(device),
                 "mel_lengths": torch.tensor([FIXED_MEL_LEN], device=device),
-                "input_ids": torch.zeros((1, 128), dtype=torch.int64, device=device),
-                "attention_mask": torch.zeros((1, 128), dtype=torch.int64, device=device),
+                "input_ids": input_ids,
+                "attention_mask": attention_mask,
                 "frames": frames_t.unsqueeze(0).to(device),
                 "alpha": (torch.ones((1, N_KEYFRAMES), dtype=torch.float32) / N_KEYFRAMES).to(device),
                 "frame_mask": frame_mask.unsqueeze(0).to(device)
             }
 
             logits = model(batch_dev).squeeze(-1)
+            logits = torch.nan_to_num(logits, nan=0.0)
             score_acenet = torch.sigmoid(logits).item()
             pred_acenet = 1 if score_acenet >= 0.5 else 0
 

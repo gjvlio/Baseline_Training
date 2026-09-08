@@ -180,11 +180,19 @@ class FakeAVAdaptationDataset(Dataset):
                 frames_t = torch.zeros((N_KEYFRAMES, 3, IMG_SIZE, IMG_SIZE), dtype=torch.float32)
                 frame_mask = torch.zeros(N_KEYFRAMES, dtype=torch.float32)
 
+        # Create valid BERT tokens [CLS]=101, [SEP]=102 with valid attention mask
+        input_ids = torch.zeros(128, dtype=torch.int64)
+        input_ids[0] = 101
+        input_ids[1] = 102
+        attention_mask = torch.zeros(128, dtype=torch.int64)
+        attention_mask[0] = 1
+        attention_mask[1] = 1
+
         return {
             "melspec": mel_t,
             "mel_lengths": FIXED_MEL_LEN,
-            "input_ids": torch.zeros(128, dtype=torch.int64),
-            "attention_mask": torch.zeros(128, dtype=torch.int64),
+            "input_ids": input_ids,
+            "attention_mask": attention_mask,
             "frames": frames_t,
             "alpha": torch.ones(N_KEYFRAMES, dtype=torch.float32) / N_KEYFRAMES,
             "frame_mask": frame_mask,
@@ -331,13 +339,16 @@ def main():
     # 3. Adaptation Training Loop
     print("\n[3/3] Starting Few-Shot Fine-Tuning (4-5 Epochs)...")
     print("-" * 80)
-    print(f"{'Epoch':<8} | {'Adapt Loss':<12} | {'LR':<10} | {'Time'}")
+    print(f"{'Epoch':<8} | {'Adapt Loss':<12} | {'Train Acc':<10} | {'LR':<10} | {'Time'}")
     print("-" * 80)
 
     t0 = time.time()
     for epoch in range(1, args.epochs + 1):
         model.train()
+        model.freeze_extractors() # Ensure speech_text and visual backbones remain in eval mode!
         total_loss = 0.0
+        correct_preds = 0
+        total_samples = 0
         start_t = time.time()
 
         pbar = tqdm(adapt_loader, desc=f"Adapt Epoch {epoch:02d}/{args.epochs:02d}", dynamic_ncols=True, leave=False)
@@ -355,16 +366,26 @@ def main():
 
             optimizer.zero_grad()
             logits = model(batch_dev).squeeze(-1)
+            logits = torch.nan_to_num(logits, nan=0.0)
             loss = criterion(logits, labels)
+
+            if torch.isnan(loss) or torch.isinf(loss):
+                continue
+
             loss.backward()
+            torch.nn.utils.clip_grad_norm_(trainable_params, max_norm=1.0)
             optimizer.step()
 
+            preds = (torch.sigmoid(logits) >= 0.5).float()
+            correct_preds += (preds == labels).sum().item()
+            total_samples += labels.size(0)
             total_loss += loss.item() * labels.size(0)
             pbar.set_postfix({"loss": f"{loss.item():.4f}"})
 
-        avg_loss = total_loss / len(adapt_ds)
+        avg_loss = total_loss / max(1, total_samples)
+        acc = (correct_preds / max(1, total_samples)) * 100.0
         ep_time = time.time() - start_t
-        print(f"{epoch:<8} | {avg_loss:<12.4f} | {args.lr:<10.1e} | {ep_time:.1f}s")
+        print(f"{epoch:<8} | {avg_loss:<12.4f} | {acc:<9.1f}% | {args.lr:<10.1e} | {ep_time:.1f}s")
         sys.stdout.flush()
 
     # Save Adapted Model

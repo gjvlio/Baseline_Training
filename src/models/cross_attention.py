@@ -29,9 +29,18 @@ class CrossAttentionBlock(nn.Module):
 
     def forward(self, q, kv, kv_pad_mask=None):
         # q: [B, Lq, d]  kv: [B, Lk, d]  kv_pad_mask: [B, Lk] True=pad
+        if kv_pad_mask is not None:
+            # If any batch item has all keys masked out, unmask the first key to prevent softmax(all -inf) -> NaN
+            all_masked = kv_pad_mask.all(dim=-1)
+            if all_masked.any():
+                kv_pad_mask = kv_pad_mask.clone()
+                kv_pad_mask[all_masked, 0] = False
+
         out, _ = self.attn(q, kv, kv, key_padding_mask=kv_pad_mask, need_weights=False)
+        out = torch.nan_to_num(out, nan=0.0)
         out = self.out_proj(out)
-        return self.norm(q + out)                     # Residual + LayerNorm
+        res = self.norm(q + out)                     # Residual + LayerNorm
+        return torch.nan_to_num(res, nan=0.0)
 
 
 class BidirectionalCrossAttention(nn.Module):
@@ -50,7 +59,8 @@ class BidirectionalCrossAttention(nn.Module):
         keep = (~pad_mask).unsqueeze(-1).float()      # [B,L,1]
         summed = (seq * keep).sum(dim=1)
         denom = keep.sum(dim=1).clamp(min=1.0)
-        return summed / denom
+        out = summed / denom
+        return torch.nan_to_num(out, nan=0.0)
 
     def forward(self, a_seq, t_seq, a_pad_mask=None, t_pad_mask=None):
         # A->T: acoustic queries attend to text
@@ -61,4 +71,5 @@ class BidirectionalCrossAttention(nn.Module):
         a_bar = self._masked_mean(a_ctx, a_pad_mask)             # [B, d]
         t_bar = self._masked_mean(t_ctx, t_pad_mask)             # [B, d]
         z_at = a_bar + t_bar                                     # Eq.: sum -> z_at
-        return z_at
+        return torch.nan_to_num(z_at, nan=0.0)
+
