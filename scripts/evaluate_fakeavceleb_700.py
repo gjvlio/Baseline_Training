@@ -17,7 +17,10 @@ import torch
 import cv2
 import librosa
 from PIL import Image
-from sklearn.metrics import roc_auc_score, accuracy_score, balanced_accuracy_score, precision_recall_fscore_support
+from sklearn.metrics import (
+    roc_auc_score, accuracy_score, balanced_accuracy_score,
+    precision_recall_fscore_support, confusion_matrix
+)
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
@@ -264,14 +267,17 @@ def main():
                 y_pred_deepsentinel.append(ds_score)
             methods.append(method)
 
+            pred_ds = int(ds_score >= 0.5) if not np.isnan(ds_score) else ""
             results.append({
                 "clip_id": cid,
                 "fake_label": label,
                 "method": method,
                 "type": row.get("type", ""),
                 "deepsentinel_score": f"{ds_score:.6f}" if not np.isnan(ds_score) else "",
+                "deepsentinel_pred": pred_ds,
                 "acenet_score": f"{score_acenet:.6f}",
-                "acenet_pred": pred_acenet
+                "acenet_pred": pred_acenet,
+                "acenet_correct": int(pred_acenet == label)
             })
 
     elapsed = time.time() - t0
@@ -294,11 +300,25 @@ def main():
     fpr = fp / (tn + fp) if (tn + fp) > 0 else 0.0
     fnr = fn / (tp + fn) if (tp + fn) > 0 else 0.0
 
-    fieldnames = ["clip_id", "fake_label", "method", "type", "deepsentinel_score", "acenet_score", "acenet_pred"]
+    # Save Predictions CSV
+    out_csv_p.parent.mkdir(parents=True, exist_ok=True)
+    fieldnames = [
+        "clip_id", "fake_label", "method", "type",
+        "deepsentinel_score", "deepsentinel_pred",
+        "acenet_score", "acenet_pred", "acenet_correct"
+    ]
     with open(out_csv_p, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(results)
+
+    # Save Metrics Summary CSV
+    metrics_csv_p = out_csv_p.parent / f"metrics_{out_csv_p.stem}.csv"
+    metrics_data = [
+        {"model": "ACE-Net Baseline", "auc": f"{auc:.6f}", "accuracy": f"{acc:.6f}", "balanced_acc": f"{bal_acc:.6f}",
+         "precision": f"{prec:.6f}", "recall_tpr": f"{rec:.6f}", "specificity_tnr": f"{tnr:.6f}", "f1_score": f"{f1:.6f}",
+         "tp": tp, "tn": tn, "fp": fp, "fn": fn, "fpr": f"{fpr:.6f}", "fnr": f"{fnr:.6f}", "delong_pval": ""}
+    ]
 
     print("\n" + "=" * 80)
     print("        🏆 OFFICIAL FAKEAVCELEB (N=700) ACE-NET BASELINE RESULTS 🏆")
@@ -326,7 +346,21 @@ def main():
         ds_tn, ds_fp, ds_fn, ds_tp = confusion_matrix(y_true, ds_binary).ravel()
         ds_auc = roc_auc_score(y_true, ds_pred_arr)
         ds_acc = accuracy_score(y_true, ds_binary)
+        ds_prec, ds_rec, ds_f1, _ = precision_recall_fscore_support(y_true, ds_binary, average="binary", zero_division=0)
+        ds_tpr = ds_tp / (ds_tp + ds_fn) if (ds_tp + ds_fn) > 0 else 0.0
+        ds_tnr = ds_tn / (ds_tn + ds_fp) if (ds_tn + ds_fp) > 0 else 0.0
+        ds_fpr = ds_fp / (ds_tn + ds_fp) if (ds_tn + ds_fp) > 0 else 0.0
+        ds_fnr = ds_fn / (ds_tp + ds_fn) if (ds_tp + ds_fn) > 0 else 0.0
         p_val = delong_roc_test(y_true, ds_pred_arr, y_pred)
+
+        metrics_data[0]["delong_pval"] = f"{p_val:.6f}"
+        metrics_data.insert(0, {
+            "model": "DeepSentinel", "auc": f"{ds_auc:.6f}", "accuracy": f"{ds_acc:.6f}",
+            "balanced_acc": f"{balanced_accuracy_score(y_true, ds_binary):.6f}",
+            "precision": f"{ds_prec:.6f}", "recall_tpr": f"{ds_rec:.6f}", "specificity_tnr": f"{ds_tnr:.6f}",
+            "f1_score": f"{ds_f1:.6f}", "tp": ds_tp, "tn": ds_tn, "fp": ds_fp, "fn": ds_fn,
+            "fpr": f"{ds_fpr:.6f}", "fnr": f"{ds_fnr:.6f}", "delong_pval": "reference"
+        })
 
         print("📊 HEAD-TO-HEAD COMPARISON (DeepSentinel vs. ACE-Net Baseline):")
         print(f"{'Metric':<22} | {'DeepSentinel':<16} | {'ACE-Net Baseline':<16} | {'Margin':<10}")
@@ -341,7 +375,13 @@ def main():
         print(f"  DeLong Test p-value: p = {p_val:.5f} {'(Statistically Significant, p < 0.05! ⭐)' if p_val < 0.05 else ''}")
         print("-" * 80)
 
-    print(f"💾 Paired predictions saved to: {out_csv_p}")
+    with open(metrics_csv_p, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=list(metrics_data[0].keys()))
+        writer.writeheader()
+        writer.writerows(metrics_data)
+
+    print(f"💾 Paired predictions CSV saved to : {out_csv_p}")
+    print(f"📊 Summary metrics CSV saved to     : {metrics_csv_p}")
     print("=" * 80)
 
 if __name__ == "__main__":
