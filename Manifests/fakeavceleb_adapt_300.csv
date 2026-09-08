@@ -1,301 +1,301 @@
-clip_id,fake_label,method,type,speaker_id,z_at_exists,z_v_exists
-fav_id01004_00028_id01091_oM2XdIGMM2c,0,fsgan,FakeVideo-RealAudio,id01004,0,0
-fav_id00459_00382_id00769_wavtolip,0,wav2lip,FakeVideo-RealAudio,id00459,0,0
-fav_id02808_00056_fake,0,rtvc,RealVideo-FakeAudio,id02808,0,0
-fav_id01589_00017_id01204_biYGqpYBp7o,0,fsgan,FakeVideo-RealAudio,id01589,0,0
-fav_id01683_00052_2_id06269_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,id01683,0,0
-fav_id00305_00113_id01099_wavtolip,0,wav2lip,FakeVideo-RealAudio,id00305,0,0
-fav_id00097_00162_id00025_PjSeVtbvSjA,0,fsgan,FakeVideo-RealAudio,id00097,0,0
-fav_id00841_00078_2_id00428_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,id00841,0,0
-fav_id01236_00005_id01452_wavtolip,0,wav2lip,FakeVideo-RealAudio,id01236,0,0
-fav_id00559_00078_id03205_gXytNIcANKw,0,fsgan,FakeVideo-RealAudio,id00559,0,0
-fav_id04939_00174_id00707_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id04939,0,0
-fav_id00963_00028_id00241_DlI4wqSFwbI_id00535_wavtolip,1,fsgan-wav2lip,FakeVideo-FakeAudio,id00963,0,0
-fav_id00832_00078_id00460_9sVM1Crx1FA,0,fsgan,FakeVideo-RealAudio,id00832,0,0
-fav_id00291_00052_id03696_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id00291,0,0
-fav_id01530_00002_id02051_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id01530,0,0
-fav_id01018_00072_id00071_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id01018,0,0
-fav_id01212_00183_id01204_biYGqpYBp7o,0,fsgan,FakeVideo-RealAudio,id01212,0,0
-fav_id00305_00113_id00192_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id00305,0,0
-fav_id00981_00092_id01052_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id00981,0,0
-fav_id03844_00028_id03858_uKVqPfRf-ac,0,fsgan,FakeVideo-RealAudio,id03844,0,0
-fav_id00496_00015_id00823_wavtolip,0,wav2lip,FakeVideo-RealAudio,id00496,0,0
-fav_id03844_00028_id00330_zCFFgGSIZ_s,0,fsgan,FakeVideo-RealAudio,id03844,0,0
-fav_id00860_00154_id00459_ubskcDDe7kM_id00078_wavtolip,1,fsgan-wav2lip,FakeVideo-FakeAudio,id00860,0,0
-fav_id01225_00300_id01238_VPdv2sexRy0,0,fsgan,FakeVideo-RealAudio,id01225,0,0
-fav_id01048_00160_3_id01192_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,id01048,1,1
-fav_id02838_00080_id01838_q_lUk55OrL0_id02824_wavtolip,1,fsgan-wav2lip,FakeVideo-FakeAudio,id02838,0,0
-fav_id04599_00111_id07161_OYWKr82Zu38,0,fsgan,FakeVideo-RealAudio,id04599,0,0
-fav_id00478_00109_11_id02005_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,id00478,0,0
-fav_id05231_00149_id01178_6XpgYMiKxhc_faceswap_id00371_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,id05231,0,0
-fav_id02838_00080_id01907_LBcRkuRq0uY,0,fsgan,FakeVideo-RealAudio,id02838,0,0
-fav_id01105_00083_id00971_wavtolip,0,wav2lip,FakeVideo-RealAudio,id01105,0,0
-fav_id00832_00078_id00577_wavtolip,0,wav2lip,FakeVideo-RealAudio,id00832,0,0
-fav_id01004_00028,0,real,RealVideo-RealAudio,id01004,1,1
-fav_id03211_00032_id02587_KzwJPH5_8j0,0,fsgan,FakeVideo-RealAudio,id03211,0,0
-fav_id01920_00099,0,real,RealVideo-RealAudio,id01920,1,1
-fav_id02561_02561_0_id08299_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,id02561,0,0
-fav_id00860_00154_id04537_G1e1UFopjfI_faceswap_id07108_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,id00860,0,0
-fav_id03781_00113_id00381_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id03781,0,0
-fav_id00555_00005_id00431_DyRvPN6rEfU_id00752_wavtolip,1,fsgan-wav2lip,FakeVideo-FakeAudio,id00555,0,0
-fav_id00180_00206_id02464_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id00180,0,0
-fav_id07200_00045_id04599_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id07200,0,0
-fav_id00018_00181_id03757_L-M-XbdFLQM_id00088_wavtolip,1,fsgan-wav2lip,FakeVideo-FakeAudio,id00018,0,0
-fav_id00981_00092_id00055_XzCF6sJ8Axc,0,fsgan,FakeVideo-RealAudio,id00981,0,0
-fav_id00781_00092_id00476_UgdYVJ6xPYg_faceswap_id01610_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,id00781,0,0
-fav_id00291_00052_id03707_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id00291,0,0
-fav_id03525_00048_id01044_yL58R6zBNf4,0,fsgan,FakeVideo-RealAudio,id03525,0,0
-fav_id00097_00162_id00272_VLY1boTtbRM_id00190_wavtolip,1,fsgan-wav2lip,FakeVideo-FakeAudio,id00097,0,0
-fav_id08402_00092_id04414_wavtolip,0,wav2lip,FakeVideo-RealAudio,id08402,0,0
-fav_id00082_00052_id00103_qpTVaP4y5DQ_id04537_wavtolip,1,fsgan-wav2lip,FakeVideo-FakeAudio,id00082,0,0
-fav_id01105_00083_0,0,faceswap,FakeVideo-RealAudio,id01105,0,0
-fav_id04820_00015_id01783_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id04820,0,0
-fav_id01154_00118_id02567_4Ao5jgpSXdw_faceswap_id01058_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,id01154,0,0
-fav_id03211_00032_id06066_wavtolip,0,wav2lip,FakeVideo-RealAudio,id03211,0,0
-fav_id07182_00040_fake,0,rtvc,RealVideo-FakeAudio,id07182,0,0
-fav_id02561_02561_id04691_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id02561,0,0
-fav_id03525_00048_id01163_wavtolip,0,wav2lip,FakeVideo-RealAudio,id03525,0,0
-fav_id08613_00074,0,faceswap,FakeVideo-RealAudio,id08613,1,1
-fav_id00752_00340_id00261_wavtolip,0,wav2lip,FakeVideo-RealAudio,id00752,0,0
-fav_id03211_00032,0,real,RealVideo-RealAudio,id03211,1,1
-fav_id01211_00023_0,0,faceswap,FakeVideo-RealAudio,id01211,0,0
-fav_id00841_00078_id01075_MtJUiHspdT0_faceswap_id00462_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,id00841,0,0
-fav_id00395_00420_id00395_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id00395,0,0
-fav_id01589_00017_id01204_biYGqpYBp7o_id05268_wavtolip,1,fsgan-wav2lip,FakeVideo-FakeAudio,id01589,0,0
-fav_id00183_00015_id00559_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id00183,0,0
-fav_id00185_00015_id00305_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id00185,0,0
-fav_id00395_00420_id00287_wavtolip,0,wav2lip,FakeVideo-RealAudio,id00395,0,0
-fav_id00459_00382_id00769_BqHVSZdoVpM_faceswap,0,faceswap,FakeVideo-RealAudio,id00459,0,0
-fav_id08402_00092_id03379_A32nCObAHiI,0,fsgan,FakeVideo-RealAudio,id08402,0,0
-fav_id01105_00083_id00021_6uNNej-JZ-c,0,fsgan,FakeVideo-RealAudio,id01105,0,0
-fav_id00841_00078_id01245_7pYBPczR_z0,0,fsgan,FakeVideo-RealAudio,id00841,0,0
-fav_id09143_00056_id01204_biYGqpYBp7o_faceswap,0,faceswap,FakeVideo-RealAudio,id09143,0,0
-fav_id01105_00083_id00945_V-rSeF8o5pc,0,fsgan,FakeVideo-RealAudio,id01105,0,0
-fav_id03816_00093_id00071_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id03816,0,0
-fav_id00185_00015_id01126_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id00185,0,0
-fav_id00385_00439_id03696_wavtolip,0,wav2lip,FakeVideo-RealAudio,id00385,0,0
-fav_id00363_00014_id00566_wavtolip,0,wav2lip,FakeVideo-RealAudio,id00363,0,0
-fav_id00271_00028_id00633_wavtolip,0,wav2lip,FakeVideo-RealAudio,id00271,0,0
-fav_id01098_00044_id00919_wavtolip,0,wav2lip,FakeVideo-RealAudio,id01098,0,0
-fav_id03816_00093_id03941_SsYtP8Ze88Q_id03649_wavtolip,1,fsgan-wav2lip,FakeVideo-FakeAudio,id03816,0,0
-fav_id01004_00028_id03781_jbHfYGVNqTg,0,fsgan,FakeVideo-RealAudio,id01004,0,0
-fav_id05235_00052_id01907_LBcRkuRq0uY_faceswap_id04055_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,id05235,0,0
-fav_id01075_00160_id00100_wavtolip,0,wav2lip,FakeVideo-RealAudio,id01075,0,0
-fav_id01211_00023_id04219_9llHvP-jYDg,0,fsgan,FakeVideo-RealAudio,id01211,0,0
-fav_id07108_00412_id04562_qio_Gs7wjvY,0,fsgan,FakeVideo-RealAudio,id07108,0,0
-fav_id01105_00083_id00169__V1xAwwG29U_id01192_wavtolip,1,fsgan-wav2lip,FakeVideo-FakeAudio,id01105,0,0
-fav_id01075_00160_id00835_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id01075,0,0
-fav_id00459_00382_id00032_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id00459,0,0
-fav_id00460_00005_id04437_2csrqaF55pk_id02808_wavtolip,1,fsgan-wav2lip,FakeVideo-FakeAudio,id00460,0,0
-fav_id01227_00052_id01216_wavtolip,0,wav2lip,FakeVideo-RealAudio,id01227,0,0
-fav_id00777_00160_id01035_6EWG3Ywu3jg,0,fsgan,FakeVideo-RealAudio,id00777,0,0
-fav_id00398_00016_id00616_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id00398,0,0
-fav_id00434_00046_id00330_zCFFgGSIZ_s_faceswap_id00823_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,id00434,0,0
-fav_id04884_00028_id06878_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id04884,0,0
-fav_id04547_00052_id01783_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id04547,0,0
-fav_id00235_00052,0,real,RealVideo-RealAudio,id00235,1,1
-fav_id03844_00028,0,real,RealVideo-RealAudio,id03844,1,1
-fav_id01227_00052_id01217_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id01227,0,0
-fav_id04884_00028_id02553_QTahH2rc8go_id06269_wavtolip,1,fsgan-wav2lip,FakeVideo-FakeAudio,id04884,0,0
-fav_id07210_00005_id04560_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id07210,0,0
-fav_id00478_00206_id02051_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id00478,0,0
-fav_id00555_00005_id00428_Kr7n-68JWww_faceswap,0,faceswap,FakeVideo-RealAudio,id00555,0,0
-fav_id01212_00183_id05332_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id01212,0,0
-fav_id00291_00052_id00680_NPT6JF_2F4M_id01248_wavtolip,1,fsgan-wav2lip,FakeVideo-FakeAudio,id00291,1,1
-fav_id01048_00160_id00018_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id01048,0,0
-fav_id00018_00181_id03678_dsfCxodI9i8,0,fsgan,FakeVideo-RealAudio,id00018,0,0
-fav_id05235_00052_id04547_wavtolip,0,wav2lip,FakeVideo-RealAudio,id05235,0,0
-fav_id01098_00044_id01052_Kf4nlIEHfaU,0,fsgan,FakeVideo-RealAudio,id01098,0,0
-fav_id01163_00195_id04219_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id01163,0,0
-fav_id00434_00046_id00569_gSynmpwioV4,0,fsgan,FakeVideo-RealAudio,id00434,0,0
-fav_id01098_00044_id00358_vsVwGKy79kM_id00498_wavtolip,1,fsgan-wav2lip,FakeVideo-FakeAudio,id01098,0,0
-fav_id01216_00025_id01075_MtJUiHspdT0_id00616_wavtolip,1,fsgan-wav2lip,FakeVideo-FakeAudio,id01216,0,0
-fav_id01683_00052_id06470_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id01683,0,0
-fav_id07210_00005_id07195_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id07210,1,1
-fav_id01098_00044_id01102_aGFUkdgmo3A_faceswap_id01102_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,id01098,1,1
-fav_id01227_00052_id00261_gYQ5Scz5FnA_faceswap_id00841_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,id01227,0,0
-fav_id01018_00072_id03649_389qfFqUddI,0,fsgan,FakeVideo-RealAudio,id01018,0,0
-fav_id02005_00052_id00987_wavtolip,0,wav2lip,FakeVideo-RealAudio,id02005,0,0
-fav_id00685_00146_id00685_wavtolip,0,wav2lip,FakeVideo-RealAudio,id00685,0,0
-fav_id00459_00382_id03344_wavtolip,0,wav2lip,FakeVideo-RealAudio,id00459,0,0
-fav_id05920_00161,0,real,RealVideo-RealAudio,id05920,1,1
-fav_id00271_00028_id00495_E46aiMUC4A0_faceswap_id00826_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,id00271,0,0
-fav_id00752_00340_id00100_sZ0Ex4WUEgM,0,fsgan,FakeVideo-RealAudio,id00752,0,0
-fav_id01225_00300_id00098_Rs_fnQ0tnqQ_id01004_wavtolip,1,fsgan-wav2lip,FakeVideo-FakeAudio,id01225,0,0
-fav_id01211_00023_id01192_kAht8HG7-1s_id00020_wavtolip,1,fsgan-wav2lip,FakeVideo-FakeAudio,id01211,0,0
-fav_id00981_00092_id00192_By3wxX0dyDw_id00063_wavtolip,1,fsgan-wav2lip,FakeVideo-FakeAudio,id00981,0,0
-fav_id00018_00181_id00264_wavtolip,0,wav2lip,FakeVideo-RealAudio,id00018,0,0
-fav_id00813_00169_id00434_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id00813,0,0
-fav_id03816_00093_id00071_JU1cVINUTZA_id00330_wavtolip,1,fsgan-wav2lip,FakeVideo-FakeAudio,id03816,0,0
-fav_id02561_02561_1_id03168_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,id02561,0,0
-fav_id07108_00412_id03180_wavtolip,0,wav2lip,FakeVideo-RealAudio,id07108,1,1
-fav_id07182_00040_id07161_wavtolip,0,wav2lip,FakeVideo-RealAudio,id07182,0,0
-fav_id03651_00092_id00270_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id03651,0,0
-fav_id00496_00015_id00287_2NpfYjyMsPM,0,fsgan,FakeVideo-RealAudio,id00496,0,0
-fav_id01589_00017,0,real,RealVideo-RealAudio,id01589,1,1
-fav_id04691_1_2_id06470_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,id04691,0,0
-fav_id05920_00161_id05845_XfMHm6CEwPw_faceswap_id05845_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,id05920,0,0
-fav_id01163_00195_id00088_6WIDWxr8vuU_id01211_wavtolip,1,fsgan-wav2lip,FakeVideo-FakeAudio,id01163,0,0
-fav_id03525_00048_1,0,faceswap,FakeVideo-RealAudio,id03525,0,0
-fav_id04939_00174_id02586_dEYzYDsbAeo_id00832_wavtolip,1,fsgan-wav2lip,FakeVideo-FakeAudio,id04939,1,1
-fav_id00145_00043_id00261_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id00145,0,0
-fav_id00496_00015_id00806_wavtolip,0,wav2lip,FakeVideo-RealAudio,id00496,0,0
-fav_id04689_00005_id05252_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id04689,0,0
-fav_id00498_00014_id00498_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id00498,0,0
-fav_id00383_00171,0,real,RealVideo-RealAudio,id00383,1,1
-fav_id04547_00052_2_id05251_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,id04547,0,0
-fav_id01227_00052_id02466_wavtolip,0,wav2lip,FakeVideo-RealAudio,id01227,0,0
-fav_id01211_00023_id01192_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id01211,0,0
-fav_id00860_00154_id04554_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id00860,0,0
-fav_id02332_00055_0_id00560_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,id02332,0,0
-fav_id04562_00221_id00745_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id04562,0,0
-fav_id01211_00023_id04219_9llHvP-jYDg_faceswap,0,faceswap,FakeVideo-RealAudio,id01211,0,0
-fav_id01589_00017_id02365_KTHM_LvjcgY_id01204_wavtolip,1,fsgan-wav2lip,FakeVideo-FakeAudio,id01589,0,0
-fav_id00555_00005_id00428_Kr7n-68JWww_faceswap_id03556_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,id00555,0,0
-fav_id01018_00072_fake,0,rtvc,RealVideo-FakeAudio,id01018,0,0
-fav_id00813_00169_id00234_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id00813,0,0
-fav_id07200_00045_id07195_wXqfHGtaBn4,0,fsgan,FakeVideo-RealAudio,id07200,0,0
-fav_id01105_00083_id04216_uDwxIsHkBIM,0,fsgan,FakeVideo-RealAudio,id01105,0,0
-fav_id03525_00048_id00777_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id03525,0,0
-fav_id01920_00099_id00761_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id01920,0,0
-fav_id01048_00160_id01096_GHuYIC1WDks,0,fsgan,FakeVideo-RealAudio,id01048,0,0
-fav_id00383_00171_id01217_7lVC4xEK_6E,0,fsgan,FakeVideo-RealAudio,id00383,0,0
-fav_id07901_00040_id08397_wavtolip,0,wav2lip,FakeVideo-RealAudio,id07901,0,0
-fav_id02838_00080_id05235_ASy8lP3SRtw,0,fsgan,FakeVideo-RealAudio,id02838,0,0
-fav_id08299_00110_id03028_wavtolip,0,wav2lip,FakeVideo-RealAudio,id08299,0,0
-fav_id00752_00340_id02464_1hxJsZYV7mI,0,fsgan,FakeVideo-RealAudio,id00752,0,0
-fav_id00391_00052_id01179_RnqLJMrWELw_id01856_wavtolip,1,fsgan-wav2lip,FakeVideo-FakeAudio,id00391,0,0
-fav_id00781_00092_fake,0,rtvc,RealVideo-FakeAudio,id00781,0,0
-fav_id00097_00162_id03605_JGZt9DAhBRs,0,fsgan,FakeVideo-RealAudio,id00097,0,0
-fav_id01018_00072_id03589_wavtolip,0,wav2lip,FakeVideo-RealAudio,id01018,0,0
-fav_id05920_00161_id05845_XfMHm6CEwPw,0,fsgan,FakeVideo-RealAudio,id05920,0,0
-fav_id01154_00118_id00519_riI0J9g9OG4_id01099_wavtolip,1,fsgan-wav2lip,FakeVideo-FakeAudio,id01154,0,0
-fav_id03211_00032_id02587_KzwJPH5_8j0_id06054_wavtolip,1,fsgan-wav2lip,FakeVideo-FakeAudio,id03211,0,0
-fav_id05235_00052_id04820_wavtolip,0,wav2lip,FakeVideo-RealAudio,id05235,0,0
-fav_id01004_00028_id00842_wavtolip,0,wav2lip,FakeVideo-RealAudio,id01004,0,0
-fav_id04884_00028_id06470_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id04884,0,0
-fav_id04820_00015_id00832_wavtolip,0,wav2lip,FakeVideo-RealAudio,id04820,0,0
-fav_id00097_00162_id01238_VPdv2sexRy0,0,fsgan,FakeVideo-RealAudio,id00097,0,0
-fav_id00305_00113_id03205_gXytNIcANKw_id00999_wavtolip,1,fsgan-wav2lip,FakeVideo-FakeAudio,id00305,0,0
-fav_id03651_00092_id03716_s-lxbGafZQA,0,fsgan,FakeVideo-RealAudio,id03651,0,0
-fav_id01589_00017_id04687_cSxCV6zdmwo,0,fsgan,FakeVideo-RealAudio,id01589,0,0
-fav_id00403_00052_id03589_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id00403,0,0
-fav_id00220_00027_id03656_wavtolip,0,wav2lip,FakeVideo-RealAudio,id00220,0,0
-fav_id07200_00045_id04601_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id07200,0,0
-fav_id01225_00300_id00841_wavtolip,0,wav2lip,FakeVideo-RealAudio,id01225,0,0
-fav_id00813_00169_id00330_zCFFgGSIZ_s_id03371_wavtolip,1,fsgan-wav2lip,FakeVideo-FakeAudio,id00813,0,0
-fav_id05268_00010_id04774_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,id05268,0,0
-fav_id04562_00221_0,0,faceswap,FakeVideo-RealAudio,id04562,0,0
-fav_id01154_00118_id00055_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id01154,0,0
-fav_id04884_00028_id02493_zYAm6W46Mcg_id04111_wavtolip,1,fsgan-wav2lip,FakeVideo-FakeAudio,id04884,0,0
-fav_id00476_00109_id02005_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id00476,0,0
-fav_id00555_00005_id03696_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id00555,0,0
-fav_id04691_1_1,0,faceswap,FakeVideo-RealAudio,id04691,0,0
-fav_id00305_00113_id00535_BhvTIJ-YG5s,0,fsgan,FakeVideo-RealAudio,id00305,0,0
-fav_id00183_00015_2_id00559_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,id00183,0,0
-fav_id01211_00023_id00179_Ux9OYyipQi8,0,fsgan,FakeVideo-RealAudio,id01211,0,0
-fav_id07210_00005_id07194_NDJaiff98Fo_faceswap_id08457_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,id07210,0,0
-fav_id04691_1_3_id04789_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,id04691,0,0
-fav_id01163_00195_id00529_xtx2GeQN-DQ_id00169_wavtolip,1,fsgan-wav2lip,FakeVideo-FakeAudio,id01163,0,0
-fav_id00395_00420_id00581_wavtolip,0,wav2lip,FakeVideo-RealAudio,id00395,0,0
-fav_id00398_00016_id00618__TwV2SmUIlY_faceswap_id00272_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,id00398,0,0
-fav_id00496_00015_id00634_wavtolip,0,wav2lip,FakeVideo-RealAudio,id00496,0,0
-fav_id06066_00028_id09116_EahYpHnFjzw,0,fsgan,FakeVideo-RealAudio,id06066,0,0
-fav_id00498_00014_id00171_wavtolip,0,wav2lip,FakeVideo-RealAudio,id00498,0,0
-fav_id02619_00015_id06439_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id02619,0,0
-fav_id01683_00052_id00597_uJ61GYESokY,0,fsgan,FakeVideo-RealAudio,id01683,0,0
-fav_id01163_00195_id04221_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id01163,0,0
-fav_id04820_00015_id04374_wavtolip,0,wav2lip,FakeVideo-RealAudio,id04820,0,0
-fav_id01225_00300_fake,0,rtvc,RealVideo-FakeAudio,id01225,0,0
-fav_id02561_02561_id00056_wavtolip,0,wav2lip,FakeVideo-RealAudio,id02561,0,0
-fav_id00498_00014_id00055_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id00498,0,0
-fav_id04599_00111_id00685_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id04599,0,0
-fav_id00291_00052_id00428_Kr7n-68JWww,0,fsgan,FakeVideo-RealAudio,id00291,0,0
-fav_id04599_00111_id06354_PmWLmcJNUhM,0,fsgan,FakeVideo-RealAudio,id04599,1,1
-fav_id00082_00052_id07058_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id00082,0,0
-fav_id00097_00162_id01217_wavtolip,0,wav2lip,FakeVideo-RealAudio,id00097,0,0
-fav_id06066_00028_id00430_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id06066,0,0
-fav_id00383_00171_id01248_2y-HnTO8WrQ,0,fsgan,FakeVideo-RealAudio,id00383,0,0
-fav_id09174_00015_id00363_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id09174,0,0
-fav_id02561_02561_id04789_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id02561,0,0
-fav_id00832_00078_id05980_bbg4HtuM_jo_id03713_wavtolip,1,fsgan-wav2lip,FakeVideo-FakeAudio,id00832,0,0
-fav_id03525_00048_1_id03757_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,id03525,0,0
-fav_id01018_00072_id00569_gSynmpwioV4,0,fsgan,FakeVideo-RealAudio,id01018,0,0
-fav_id02332_00055_id04687_cSxCV6zdmwo,0,fsgan,FakeVideo-RealAudio,id02332,0,0
-fav_id00395_00420_id03816_XXD0yTNei50,0,fsgan,FakeVideo-RealAudio,id00395,0,0
-fav_id00752_00340_id01227_eNr-P3gIrgo_faceswap_id00841_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,id00752,0,0
-fav_id01236_00005_id01691_IVtS5z8Jrrk,0,fsgan,FakeVideo-RealAudio,id01236,0,0
-fav_id05920_00161_id07049_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id05920,0,0
-fav_id01920_00099_id01076_9bqxgm5fT58_id01597_wavtolip,1,fsgan-wav2lip,FakeVideo-FakeAudio,id01920,0,0
-fav_id00183_00015_id00305_wavtolip,0,wav2lip,FakeVideo-RealAudio,id00183,0,0
-fav_id00018_00181_id01201_Q8XWfmNiWYA_faceswap_id01239_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,id00018,0,0
-fav_id01227_00052_id00097_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id01227,0,0
-fav_id01048_00160_id01192_kAht8HG7-1s,0,fsgan,FakeVideo-RealAudio,id01048,0,0
-fav_id00685_00146_id04928_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id00685,0,0
-fav_id07182_00040_id04537_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id07182,0,0
-fav_id00082_00052_id00769_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id00082,0,0
-fav_id00235_00052_id02619_6AKIR2gTCNU,0,fsgan,FakeVideo-RealAudio,id00235,0,0
-fav_id01075_00160_id01216_IRxEWpT_lZs,0,fsgan,FakeVideo-RealAudio,id01075,0,0
-fav_id02296_00019_id01691_IVtS5z8Jrrk,0,fsgan,FakeVideo-RealAudio,id02296,0,0
-fav_id03945_00063,0,real,RealVideo-RealAudio,id03945,1,1
-fav_id01048_00160_id01042_afqWPqWwJIY_id00345_wavtolip,1,fsgan-wav2lip,FakeVideo-FakeAudio,id01048,1,1
-fav_id00305_00113_id00909_wavtolip,0,wav2lip,FakeVideo-RealAudio,id00305,0,0
-fav_id00478_00206_id02268_wavtolip,0,wav2lip,FakeVideo-RealAudio,id00478,0,0
-fav_id00559_00078_id00305_LdcY3ILdQrE_faceswap_id00963_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,id00559,0,0
-fav_id01236_00005_id02268_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id01236,0,0
-fav_id00963_00028_id01099_ZpgbIKxzkrg_id00519_wavtolip,1,fsgan-wav2lip,FakeVideo-FakeAudio,id00963,0,0
-fav_id00752_00340_id00428_Kr7n-68JWww,0,fsgan,FakeVideo-RealAudio,id00752,0,0
-fav_id01004_00028_id00428_Kr7n-68JWww_faceswap_id00462_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,id01004,0,0
-fav_id02332_00055_2_id02332_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,id02332,1,1
-fav_id05920_00161_id06437_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id05920,0,0
-fav_id00860_00154_id04537_G1e1UFopjfI_faceswap_id04554_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,id00860,0,0
-fav_id00305_00113_1_id03205_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,id00305,1,1
-fav_id02005_00052_id02342_RJPBPhJB8TA_faceswap,0,faceswap,FakeVideo-RealAudio,id02005,0,0
-fav_id04490_00054_id06343_wavtolip,0,wav2lip,FakeVideo-RealAudio,id04490,0,0
-fav_id00498_00014_id00055_XzCF6sJ8Axc_id00548_wavtolip,1,fsgan-wav2lip,FakeVideo-FakeAudio,id00498,0,0
-fav_id00498_00014_id00520_wavtolip,0,wav2lip,FakeVideo-RealAudio,id00498,0,0
-fav_id05920_00161_id03559_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id05920,0,0
-fav_id03781_00113_id00428_wavtolip,0,wav2lip,FakeVideo-RealAudio,id03781,0,0
-fav_id00777_00160_id00243_wavtolip,0,wav2lip,FakeVideo-RealAudio,id00777,0,0
-fav_id08299_00110_2_id00126_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,id08299,1,1
-fav_id00385_00439_id00261_gYQ5Scz5FnA,0,fsgan,FakeVideo-RealAudio,id00385,0,0
-fav_id00220_00027_id04376_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,id00220,0,0
-fav_id04691_1_2,0,faceswap,FakeVideo-RealAudio,id04691,0,0
-fav_id01211_00023_id04219_9llHvP-jYDg_faceswap_id01239_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,id01211,0,0
-fav_id00235_00052_0,0,faceswap,FakeVideo-RealAudio,id00235,0,0
-fav_id02332_00055_id04687_cSxCV6zdmwo_id04687_wavtolip,1,fsgan-wav2lip,FakeVideo-FakeAudio,id02332,0,0
-fav_id00459_00382_id04562_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id00459,0,0
-fav_id06066_00028_id00763_lI1GEn3Ima0_id00579_wavtolip,1,fsgan-wav2lip,FakeVideo-FakeAudio,id06066,0,0
-fav_id00383_00171_id01217_7lVC4xEK_6E_faceswap_id01227_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,id00383,0,0
-fav_id00180_00206_id00418_KSTOz7H0OuQ,0,fsgan,FakeVideo-RealAudio,id00180,0,0
-fav_id00496_00015_id00897_0ayFw8JhoyI,0,fsgan,FakeVideo-RealAudio,id00496,0,0
-fav_id02808_00056_id01532_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id02808,0,0
-fav_id02808_00056_id00460_9sVM1Crx1FA,0,fsgan,FakeVideo-RealAudio,id02808,0,0
-fav_id00391_00052_id00366_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id00391,1,1
-fav_id03569_00065_id01838_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id03569,1,1
-fav_id01225_00300_id00291_L_SLT-j82Ms_id00383_wavtolip,1,fsgan-wav2lip,FakeVideo-FakeAudio,id01225,0,0
-fav_id01004_00028_id01005_lJZrqhcRFSA,0,fsgan,FakeVideo-RealAudio,id01004,0,0
-fav_id09174_00015_id09171_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id09174,0,0
-fav_id00434_00046_id00330_zCFFgGSIZ_s_faceswap,0,faceswap,FakeVideo-RealAudio,id00434,0,0
-fav_id02005_00052_id01597_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id02005,0,0
-fav_id00235_00052_id05845_XfMHm6CEwPw_faceswap_id06445_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,id00235,0,0
-fav_id00478_00206_id01530_wavtolip,0,wav2lip,FakeVideo-RealAudio,id00478,0,0
-fav_id02838_00080_id04374_SWltOOZmlWM,0,fsgan,FakeVideo-RealAudio,id02838,0,0
-fav_id00183_00015_1_id00368_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,id00183,0,0
-fav_id05235_00052_id00829_wavtolip,0,wav2lip,FakeVideo-RealAudio,id05235,0,0
-fav_id00434_00046_id00330_zCFFgGSIZ_s_id03716_wavtolip,1,fsgan-wav2lip,FakeVideo-FakeAudio,id00434,0,0
-fav_id00180_00206_id00835_zWTp4szbb5k,0,fsgan,FakeVideo-RealAudio,id00180,0,0
-fav_id03651_00092_id03649_389qfFqUddI_id03651_wavtolip,1,fsgan-wav2lip,FakeVideo-FakeAudio,id03651,0,0
-fav_id00781_00092_id00476_UgdYVJ6xPYg_faceswap,0,faceswap,FakeVideo-RealAudio,id00781,0,0
-fav_id01227_00052_id00180_wavtolip,0,wav2lip,FakeVideo-RealAudio,id01227,0,0
-fav_id02808_00056_id05231_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id02808,0,0
-fav_id00398_00016_id00100_sZ0Ex4WUEgM,0,fsgan,FakeVideo-RealAudio,id00398,0,0
-fav_id00478_00206_id00781_fvsSae9yc0A,0,fsgan,FakeVideo-RealAudio,id00478,0,0
-fav_id00291_00052_id02464_wavtolip,1,wav2lip,FakeVideo-FakeAudio,id00291,0,0
-fav_id00403_00052_id00365_wavtolip,0,wav2lip,FakeVideo-RealAudio,id00403,0,0
-fav_id01683_00052_id04884_eq_wk7h1Gzo,0,fsgan,FakeVideo-RealAudio,id01683,0,0
-fav_id00777_00160_id00264_wavtolip,0,wav2lip,FakeVideo-RealAudio,id00777,0,0
-fav_id03781_00113_id01225_wavtolip,0,wav2lip,FakeVideo-RealAudio,id03781,0,0
-fav_id00183_00015_id00306_CDX55F3nWNc,0,fsgan,FakeVideo-RealAudio,id00183,0,0
-fav_id01004_00028_id00418_wavtolip,0,wav2lip,FakeVideo-RealAudio,id01004,0,0
-fav_id00082_00052_id07194_NDJaiff98Fo,0,fsgan,FakeVideo-RealAudio,id00082,0,0
+clip_id,fake_label,method,type,rel_path,filename,speaker_id
+fav_id00366_00118,0,real,RealVideo-RealAudio,RealVideo-RealAudio/African/men/id00366/00118.mp4,00118.mp4,id00366
+fav_id01126_00040_id00535_BhvTIJ-YG5s_faceswap_id00919_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (European)/men/id01126/00040_id00535_BhvTIJ-YG5s_faceswap_id00919_wavtolip.mp4,00040_id00535_BhvTIJ-YG5s_faceswap_id00919_wavtolip.mp4,id01126
+fav_id00021_00010_id01192_kAht8HG7-1s_id04221_wavtolip,1,wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (American)/men/id00021/00010_id01192_kAht8HG7-1s_id04221_wavtolip.mp4,00010_id01192_kAht8HG7-1s_id04221_wavtolip.mp4,id00021
+fav_id00060_00307_id00529_xtx2GeQN-DQ_faceswap_id04073_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (American)/men/id00060/00307_id00529_xtx2GeQN-DQ_faceswap_id04073_wavtolip.mp4,00307_id00529_xtx2GeQN-DQ_faceswap_id04073_wavtolip.mp4,id00060
+fav_id01995_00071_id00166_wavtolip,1,wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/African/men/id01995/00071_id00166_wavtolip.mp4,00071_id00166_wavtolip.mp4,id01995
+fav_id04529_00186_id01026_rM4ZERt7oM0_faceswap_id07377_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Asian (South)/women/id04529/00186_id01026_rM4ZERt7oM0_faceswap_id07377_wavtolip.mp4,00186_id01026_rM4ZERt7oM0_faceswap_id07377_wavtolip.mp4,id04529
+fav_id06158_00015,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (East)/women/id06158/00015.mp4,00015.mp4,id06158
+fav_fav_spk_dia510_utt5,1,faceswap,FakeVideo-RealAudio,MELD/MELD-RAW/MELD.Raw/train/train_splits/dia510_utt5.mp4,dia510_utt5.mp4,fav_spk
+fav_id00415_00017_id00192_By3wxX0dyDw_faceswap_id00909_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (European)/men/id00415/00017_id00192_By3wxX0dyDw_faceswap_id00909_wavtolip.mp4,00017_id00192_By3wxX0dyDw_faceswap_id00909_wavtolip.mp4,id00415
+fav_id09116_00026_id00430_q7jhSsGElK4_faceswap_id09175_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Asian (East)/women/id09116/00026_id00430_q7jhSsGElK4_faceswap_id09175_wavtolip.mp4,00026_id00430_q7jhSsGElK4_faceswap_id09175_wavtolip.mp4,id09116
+fav_id00520_00187_1_id00055_wavtolip,1,wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (European)/men/id00520/00187_1_id00055_wavtolip.mp4,00187_1_id00055_wavtolip.mp4,id00520
+fav_id00042_00028_id00569_gSynmpwioV4_id00806_wavtolip,1,wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (European)/women/id00042/00028_id00569_gSynmpwioV4_id00806_wavtolip.mp4,00028_id00569_gSynmpwioV4_id00806_wavtolip.mp4,id00042
+fav_fav_spk_dia749_utt3,1,faceswap,FakeVideo-RealAudio,MELD/MELD-RAW/MELD.Raw/train/train_splits/dia749_utt3.mp4,dia749_utt3.mp4,fav_spk
+fav_id01231_00015,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (American)/women/id01231/00015.mp4,00015.mp4,id01231
+fav_id02071_00195_id02838_wavtolip,1,wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/African/women/id02071/00195_id02838_wavtolip.mp4,00195_id02838_wavtolip.mp4,id02071
+fav_id00761_00072_id01835_UZbWA0QfXXA_faceswap_id01036_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/African/men/id00761/00072_id01835_UZbWA0QfXXA_faceswap_id01036_wavtolip.mp4,00072_id01835_UZbWA0QfXXA_faceswap_id01036_wavtolip.mp4,id00761
+fav_id00350_00015_id06354_PmWLmcJNUhM_faceswap,1,fsgan,FakeVideo-RealAudio,FakeVideo-RealAudio/Asian (South)/men/id00350/00015_id06354_PmWLmcJNUhM_faceswap.mp4,00015_id06354_PmWLmcJNUhM_faceswap.mp4,id00350
+fav_id05252_00052,0,real,RealVideo-RealAudio,RealVideo-RealAudio/African/women/id05252/00052.mp4,00052.mp4,id05252
+fav_id03371_00430,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (European)/women/id03371/00430.mp4,00430.mp4,id03371
+fav_fav_spk_W-ptEZFARVo_007,1,faceswap,FakeVideo-RealAudio,CMU-MOSEI/segments/W-ptEZFARVo_007.mp4,W-ptEZFARVo_007.mp4,fav_spk
+fav_id00709_00206,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (European)/men/id00709/00206.mp4,00206.mp4,id00709
+fav_id05931_00013_id01026_rM4ZERt7oM0_faceswap_id04070_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Asian (South)/women/id05931/00013_id01026_rM4ZERt7oM0_faceswap_id04070_wavtolip.mp4,00013_id01026_rM4ZERt7oM0_faceswap_id04070_wavtolip.mp4,id05931
+fav_fav_spk_FAKE_T1_1042_ITH_ANG_XX__AUDIO_1042_ITH_DIS_XX_styletts,1,faceswap,FakeVideo-RealAudio,synthetic/track1_fakes/videos/FAKE_T1_1042_ITH_ANG_XX__AUDIO_1042_ITH_DIS_XX_styletts.mp4,FAKE_T1_1042_ITH_ANG_XX__AUDIO_1042_ITH_DIS_XX_styletts.mp4,fav_spk
+fav_id03589_00002_id03844_wavtolip,1,wav2lip,FakeVideo-RealAudio,FakeVideo-RealAudio/Caucasian (European)/women/id03589/00002_id03844_wavtolip.mp4,00002_id03844_wavtolip.mp4,id03589
+fav_id00633_00088,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (European)/women/id00633/00088.mp4,00088.mp4,id00633
+fav_id02040_00476_id00944_wavtolip,1,wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/African/men/id02040/00476_id00944_wavtolip.mp4,00476_id00944_wavtolip.mp4,id02040
+fav_id00385_00439_id00291_L_SLT-j82Ms_faceswap_id00145_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (American)/women/id00385/00439_id00291_L_SLT-j82Ms_faceswap_id00145_wavtolip.mp4,00439_id00291_L_SLT-j82Ms_faceswap_id00145_wavtolip.mp4,id00385
+fav_id00519_00028,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (European)/men/id00519/00028.mp4,00028.mp4,id00519
+fav_id00944_00135_id01528_SBAS9Kcb8QY_faceswap_id01179_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/African/men/id00944/00135_id01528_SBAS9Kcb8QY_faceswap_id01179_wavtolip.mp4,00135_id01528_SBAS9Kcb8QY_faceswap_id01179_wavtolip.mp4,id00944
+fav_id06467_00010,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (East)/men/id06467/00010.mp4,00010.mp4,id06467
+fav_id09175_00072,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (East)/women/id09175/00072.mp4,00072.mp4,id09175
+fav_id01856_00006_id01856_wavtolip,1,wav2lip,FakeVideo-RealAudio,FakeVideo-RealAudio/African/men/id01856/00006_id01856_wavtolip.mp4,00006_id01856_wavtolip.mp4,id01856
+fav_id01091_00236_id03696_Kz45DNXKLXI_faceswap_id01231_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (American)/women/id01091/00236_id03696_Kz45DNXKLXI_faceswap_id01231_wavtolip.mp4,00236_id03696_Kz45DNXKLXI_faceswap_id01231_wavtolip.mp4,id01091
+fav_id01175_00025,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (American)/men/id01175/00025.mp4,00025.mp4,id01175
+fav_id00919_00063,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (European)/men/id00919/00063.mp4,00063.mp4,id00919
+fav_id00371_00099,0,real,RealVideo-RealAudio,RealVideo-RealAudio/African/women/id00371/00099.mp4,00099.mp4,id00371
+fav_id05478_00135_id02619_wavtolip,1,wav2lip,FakeVideo-RealAudio,FakeVideo-RealAudio/Asian (South)/women/id05478/00135_id02619_wavtolip.mp4,00135_id02619_wavtolip.mp4,id05478
+fav_id02342_00191,0,real,RealVideo-RealAudio,RealVideo-RealAudio/African/men/id02342/00191.mp4,00191.mp4,id02342
+fav_id02342_00191_id02005_7_Egh9mW5y4_faceswap_id02342_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/African/men/id02342/00191_id02005_7_Egh9mW5y4_faceswap_id02342_wavtolip.mp4,00191_id02005_7_Egh9mW5y4_faceswap_id02342_wavtolip.mp4,id02342
+fav_id00359_00053_id02586_dEYzYDsbAeo_id01907_wavtolip,1,wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/African/women/id00359/00053_id02586_dEYzYDsbAeo_id01907_wavtolip.mp4,00053_id02586_dEYzYDsbAeo_id01907_wavtolip.mp4,id00359
+fav_id01182_00167,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (American)/men/id01182/00167.mp4,00167.mp4,id01182
+fav_id00042_00028,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (European)/women/id00042/00028.mp4,00028.mp4,id00042
+fav_fav_spk_dia249_utt3,1,faceswap,FakeVideo-RealAudio,MELD/MELD-RAW/MELD.Raw/test/output_repeated_splits_test/dia249_utt3.mp4,dia249_utt3.mp4,fav_spk
+fav_id00634_00078,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (European)/women/id00634/00078.mp4,00078.mp4,id00634
+fav_id00418_00052_id00431_DyRvPN6rEfU_id03781_wavtolip,1,wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (American)/women/id00418/00052_id00431_DyRvPN6rEfU_id03781_wavtolip.mp4,00052_id00431_DyRvPN6rEfU_id03781_wavtolip.mp4,id00418
+fav_id07049_00043,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (South)/women/id07049/00043.mp4,00043.mp4,id07049
+fav_fav_spk_FAKE_T2_1017_IEO_HAP_LO__AUDIO_1017_IEO_NEU_XX_wav2lip,1,wav2lip,FakeVideo-RealAudio,synthetic/track2_fakes/videos/FAKE_T2_1017_IEO_HAP_LO__AUDIO_1017_IEO_NEU_XX_wav2lip.mp4,FAKE_T2_1017_IEO_HAP_LO__AUDIO_1017_IEO_NEU_XX_wav2lip.mp4,fav_spk
+fav_id06334_00015_id03599_y27BDmRUqMQ_faceswap_id07200_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Asian (South)/men/id06334/00015_id03599_y27BDmRUqMQ_faceswap_id07200_wavtolip.mp4,00015_id03599_y27BDmRUqMQ_faceswap_id07200_wavtolip.mp4,id06334
+fav_id08457_00417_id08313_wavtolip,1,wav2lip,FakeVideo-RealAudio,FakeVideo-RealAudio/Asian (South)/men/id08457/00417_id08313_wavtolip.mp4,00417_id08313_wavtolip.mp4,id08457
+fav_id00775_00092,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (American)/men/id00775/00092.mp4,00092.mp4,id00775
+fav_id02268_00036,0,real,RealVideo-RealAudio,RealVideo-RealAudio/African/men/id02268/00036.mp4,00036.mp4,id02268
+fav_id00428_00017,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (American)/women/id00428/00017.mp4,00017.mp4,id00428
+fav_fav_spk_FAKE_T3_1074_ITH_NEU_XX__AUDIO_1074_ITH_SAD_XX_sadtalker,1,faceswap,FakeVideo-RealAudio,synthetic/track3_fakes/videos/FAKE_T3_1074_ITH_NEU_XX__AUDIO_1074_ITH_SAD_XX_sadtalker.mp4,FAKE_T3_1074_ITH_NEU_XX__AUDIO_1074_ITH_SAD_XX_sadtalker.mp4,fav_spk
+fav_id01223_00255,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (American)/women/id01223/00255.mp4,00255.mp4,id01223
+fav_id01452_00001,0,real,RealVideo-RealAudio,RealVideo-RealAudio/African/men/id01452/00001.mp4,00001.mp4,id01452
+fav_id00498_00014_id00192_By3wxX0dyDw_faceswap_id00594_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (European)/men/id00498/00014_id00192_By3wxX0dyDw_faceswap_id00594_wavtolip.mp4,00014_id00192_By3wxX0dyDw_faceswap_id00594_wavtolip.mp4,id00498
+fav_id06269_00005,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (East)/men/id06269/00005.mp4,00005.mp4,id06269
+fav_id00529_00409,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (American)/men/id00529/00409.mp4,00409.mp4,id00529
+fav_id06437_00028,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (South)/women/id06437/00028.mp4,00028.mp4,id06437
+fav_id01091_00236,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (American)/women/id01091/00236.mp4,00236.mp4,id01091
+fav_id04687_00066_id02493_zYAm6W46Mcg_faceswap_id05332_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Asian (East)/men/id04687/00066_id02493_zYAm6W46Mcg_faceswap_id05332_wavtolip.mp4,00066_id02493_zYAm6W46Mcg_faceswap_id05332_wavtolip.mp4,id04687
+fav_id00806_00005_id00379_fgkgYHCuk4g_faceswap_id00232_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (European)/women/id00806/00005_id00379_fgkgYHCuk4g_faceswap_id00232_wavtolip.mp4,00005_id00379_fgkgYHCuk4g_faceswap_id00232_wavtolip.mp4,id00806
+fav_id00990_00160,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (European)/men/id00990/00160.mp4,00160.mp4,id00990
+fav_id07078_00405_id04070_F3CgrqRjcgw_faceswap_id01026_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Asian (South)/women/id07078/00405_id04070_F3CgrqRjcgw_faceswap_id01026_wavtolip.mp4,00405_id04070_F3CgrqRjcgw_faceswap_id01026_wavtolip.mp4,id07078
+fav_id06269_00005_id02493_zYAm6W46Mcg_id04691_wavtolip,1,wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Asian (East)/men/id06269/00005_id02493_zYAm6W46Mcg_id04691_wavtolip.mp4,00005_id02493_zYAm6W46Mcg_id04691_wavtolip.mp4,id06269
+fav_id00582_00006,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (East)/women/id00582/00006.mp4,00006.mp4,id00582
+fav_id00287_00005,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (European)/women/id00287/00005.mp4,00005.mp4,id00287
+fav_id01856_00006,0,real,RealVideo-RealAudio,RealVideo-RealAudio/African/men/id01856/00006.mp4,00006.mp4,id01856
+fav_id00368_00078_id00548_DXbYU3qhN7U_faceswap_id00548_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (European)/men/id00368/00078_id00548_DXbYU3qhN7U_faceswap_id00548_wavtolip.mp4,00078_id00548_DXbYU3qhN7U_faceswap_id00548_wavtolip.mp4,id00368
+fav_id00476_00109_id01835_wavtolip,1,wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/African/men/id00476/00109_id01835_wavtolip.mp4,00109_id01835_wavtolip.mp4,id00476
+fav_id00560_00041,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (East)/men/id00560/00041.mp4,00041.mp4,id00560
+fav_fav_spk_xlNDpmKgSIc_000,1,faceswap,FakeVideo-RealAudio,CMU-MOSEI/segments/xlNDpmKgSIc_000.mp4,xlNDpmKgSIc_000.mp4,fav_spk
+fav_id06427_00138,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (East)/women/id06427/00138.mp4,00138.mp4,id06427
+fav_id04540_00078,0,real,RealVideo-RealAudio,RealVideo-RealAudio/African/women/id04540/00078.mp4,00078.mp4,id04540
+fav_id03668_00143,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (American)/men/id03668/00143.mp4,00143.mp4,id03668
+fav_id07195_00186,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (South)/men/id07195/00186.mp4,00186.mp4,id07195
+fav_id04561_00248,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (South)/men/id04561/00248.mp4,00248.mp4,id04561
+fav_id00857_00347,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (South)/men/id00857/00347.mp4,00347.mp4,id00857
+fav_id06776_00021_id04111_wavtolip,1,wav2lip,FakeVideo-RealAudio,FakeVideo-RealAudio/Asian (East)/men/id06776/00021_id04111_wavtolip.mp4,00021_id04111_wavtolip.mp4,id06776
+fav_id01091_00236_id03696_Kz45DNXKLXI_faceswap_id01248_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (American)/women/id01091/00236_id03696_Kz45DNXKLXI_faceswap_id01248_wavtolip.mp4,00236_id03696_Kz45DNXKLXI_faceswap_id01248_wavtolip.mp4,id01091
+fav_id00087_00002,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (American)/men/id00087/00002.mp4,00002.mp4,id00087
+fav_id03028_00466,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (East)/men/id03028/00466.mp4,00466.mp4,id03028
+fav_id00732_00118_id04537_G1e1UFopjfI_faceswap_id04554_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Asian (South)/men/id00732/00118_id04537_G1e1UFopjfI_faceswap_id04554_wavtolip.mp4,00118_id04537_G1e1UFopjfI_faceswap_id04554_wavtolip.mp4,id00732
+fav_id00020_00206,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (American)/men/id00020/00206.mp4,00206.mp4,id00020
+fav_id01036_00010,0,real,RealVideo-RealAudio,RealVideo-RealAudio/African/men/id01036/00010.mp4,00010.mp4,id01036
+fav_id01042_00154,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (American)/men/id01042/00154.mp4,00154.mp4,id01042
+fav_id05743_00015,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (East)/men/id05743/00015.mp4,00015.mp4,id05743
+fav_id02948_00298_id04820_64ybrA1atlM_faceswap_id05251_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/African/women/id02948/00298_id04820_64ybrA1atlM_faceswap_id05251_wavtolip.mp4,00298_id04820_64ybrA1atlM_faceswap_id05251_wavtolip.mp4,id02948
+fav_id00262_00028_id00287_2NpfYjyMsPM_faceswap_id00379_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (European)/women/id00262/00028_id00287_2NpfYjyMsPM_faceswap_id00379_wavtolip.mp4,00028_id00287_2NpfYjyMsPM_faceswap_id00379_wavtolip.mp4,id00262
+fav_id00264_00257_id03757_L-M-XbdFLQM_id00943_wavtolip,1,wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (American)/men/id00264/00257_id03757_L-M-XbdFLQM_id00943_wavtolip.mp4,00257_id03757_L-M-XbdFLQM_id00943_wavtolip.mp4,id00264
+fav_id00359_00053,0,real,RealVideo-RealAudio,RealVideo-RealAudio/African/women/id00359/00053.mp4,00053.mp4,id00359
+fav_id00897_00005,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (European)/women/id00897/00005.mp4,00005.mp4,id00897
+fav_fav_spk_dia195_utt9,1,faceswap,FakeVideo-RealAudio,MELD/MELD-RAW/MELD.Raw/train/train_splits/dia195_utt9.mp4,dia195_utt9.mp4,fav_spk
+fav_fav_spk_dia77_utt7,1,faceswap,FakeVideo-RealAudio,MELD/MELD-RAW/MELD.Raw/dev/dev_splits_complete/dia77_utt7.mp4,dia77_utt7.mp4,fav_spk
+fav_id00428_00017_id01005_wavtolip,1,wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (American)/women/id00428/00017_id01005_wavtolip.mp4,00017_id01005_wavtolip.mp4,id00428
+fav_id04601_00118,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (South)/men/id04601/00118.mp4,00118.mp4,id04601
+fav_id04070_00072,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (South)/women/id04070/00072.mp4,00072.mp4,id04070
+fav_id08313_00202,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (South)/men/id08313/00202.mp4,00202.mp4,id08313
+fav_id00835_00195,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (American)/women/id00835/00195.mp4,00195.mp4,id00835
+fav_id00241_00015,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (European)/men/id00241/00015.mp4,00015.mp4,id00241
+fav_id00325_00015,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (European)/women/id00325/00015.mp4,00015.mp4,id00325
+fav_id03205_00150,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (European)/men/id03205/00150.mp4,00150.mp4,id03205
+fav_id03815_00118,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (South)/women/id03815/00118.mp4,00118.mp4,id03815
+fav_id00381_00030,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (American)/women/id00381/00030.mp4,00030.mp4,id00381
+fav_id05434_00052_id00417_GhIZam3v09g_faceswap_id03559_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Asian (South)/women/id05434/00052_id00417_GhIZam3v09g_faceswap_id03559_wavtolip.mp4,00052_id00417_GhIZam3v09g_faceswap_id03559_wavtolip.mp4,id05434
+fav_id00098_00004_id00398_wavtolip,1,wav2lip,FakeVideo-RealAudio,FakeVideo-RealAudio/Caucasian (American)/women/id00098/00004_id00398_wavtolip.mp4,00004_id00398_wavtolip.mp4,id00098
+fav_id01192_00217_id00169__V1xAwwG29U_id00345_wavtolip,1,wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (American)/men/id01192/00217_id00169__V1xAwwG29U_id00345_wavtolip.mp4,00217_id00169__V1xAwwG29U_id00345_wavtolip.mp4,id01192
+fav_id00383_00171_id01004_867Wlj7Gw68_id00100_wavtolip,1,wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (American)/women/id00383/00171_id01004_867Wlj7Gw68_id00100_wavtolip.mp4,00171_id01004_867Wlj7Gw68_id00100_wavtolip.mp4,id00383
+fav_id01238_00037_id00100_sZ0Ex4WUEgM_id00261_wavtolip,1,wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (American)/women/id01238/00037_id00100_sZ0Ex4WUEgM_id00261_wavtolip.mp4,00037_id00100_sZ0Ex4WUEgM_id00261_wavtolip.mp4,id01238
+fav_id01044_00336,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (American)/men/id01044/00336.mp4,00336.mp4,id01044
+fav_id00169_00021,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (American)/men/id00169/00021.mp4,00021.mp4,id00169
+fav_id01123_00072,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (European)/men/id01123/00072.mp4,00072.mp4,id01123
+fav_id00694_00340_id00535_BhvTIJ-YG5s_faceswap_id01099_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (European)/men/id00694/00340_id00535_BhvTIJ-YG5s_faceswap_id01099_wavtolip.mp4,00340_id00535_BhvTIJ-YG5s_faceswap_id01099_wavtolip.mp4,id00694
+fav_id01920_00099_id00476_UgdYVJ6xPYg_faceswap_id01597_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/African/men/id01920/00099_id00476_UgdYVJ6xPYg_faceswap_id01597_wavtolip.mp4,00099_id00476_UgdYVJ6xPYg_faceswap_id01597_wavtolip.mp4,id01920
+fav_fav_spk_FAKE_T2_1081_IOM_DIS_XX__AUDIO_1081_IOM_FEA_XX_wav2lip,1,wav2lip,FakeVideo-RealAudio,synthetic/track2_fakes/videos/FAKE_T2_1081_IOM_DIS_XX__AUDIO_1081_IOM_FEA_XX_wav2lip.mp4,FAKE_T2_1081_IOM_DIS_XX__AUDIO_1081_IOM_FEA_XX_wav2lip.mp4,fav_spk
+fav_id01544_00044_id00761_wavtolip,1,wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/African/men/id01544/00044_id00761_wavtolip.mp4,00044_id00761_wavtolip.mp4,id01544
+fav_id00594_00005,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (European)/men/id00594/00005.mp4,00005.mp4,id00594
+fav_id06752_00221,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (South)/women/id06752/00221.mp4,00221.mp4,id06752
+fav_id00707_00052,0,real,RealVideo-RealAudio,RealVideo-RealAudio/African/women/id00707/00052.mp4,00052.mp4,id00707
+fav_fav_spk_dia623_utt14,1,faceswap,FakeVideo-RealAudio,MELD/MELD-RAW/MELD.Raw/train/train_splits/dia623_utt14.mp4,dia623_utt14.mp4,fav_spk
+fav_id00732_00118_id07195_wavtolip,1,wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Asian (South)/men/id00732/00118_id07195_wavtolip.mp4,00118_id07195_wavtolip.mp4,id00732
+fav_id06268_00159,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (South)/women/id06268/00159.mp4,00159.mp4,id06268
+fav_id03559_00023,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (South)/women/id03559/00023.mp4,00023.mp4,id03559
+fav_id00171_00092_id00292_wavtolip,1,wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (European)/men/id00171/00092_id00292_wavtolip.mp4,00092_id00292_wavtolip.mp4,id00171
+fav_id02721_00424,0,real,RealVideo-RealAudio,RealVideo-RealAudio/African/women/id02721/00424.mp4,00424.mp4,id02721
+fav_id00078_00114_id08313_wavtolip,1,wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Asian (South)/men/id00078/00114_id08313_wavtolip.mp4,00114_id08313_wavtolip.mp4,id00078
+fav_fav_spk_FAKE_T2_1081_TAI_HAP_XX__AUDIO_1081_TAI_NEU_XX_wav2lip,1,wav2lip,FakeVideo-RealAudio,synthetic/track2_fakes/videos/FAKE_T2_1081_TAI_HAP_XX__AUDIO_1081_TAI_NEU_XX_wav2lip.mp4,FAKE_T2_1081_TAI_HAP_XX__AUDIO_1081_TAI_NEU_XX_wav2lip.mp4,fav_spk
+fav_id00430_00209,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (East)/women/id00430/00209.mp4,00209.mp4,id00430
+fav_id02316_00094,0,real,RealVideo-RealAudio,RealVideo-RealAudio/African/men/id02316/00094.mp4,00094.mp4,id02316
+fav_id07078_00405,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (South)/women/id07078/00405.mp4,00405.mp4,id07078
+fav_id00417_00069,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (South)/women/id00417/00069.mp4,00069.mp4,id00417
+fav_id00944_00135,0,real,RealVideo-RealAudio,RealVideo-RealAudio/African/men/id00944/00135.mp4,00135.mp4,id00944
+fav_id00330_00118_id00365_XV-imLNJvfk_faceswap_id00328_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (European)/women/id00330/00118_id00365_XV-imLNJvfk_faceswap_id00328_wavtolip.mp4,00118_id00365_XV-imLNJvfk_faceswap_id00328_wavtolip.mp4,id00330
+fav_id00740_00015,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (East)/men/id00740/00015.mp4,00015.mp4,id00740
+fav_id00616_00305,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (American)/women/id00616/00305.mp4,00305.mp4,id00616
+fav_id02464_00002,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (American)/women/id02464/00002.mp4,00002.mp4,id02464
+fav_id00732_00118,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (South)/men/id00732/00118.mp4,00118.mp4,id00732
+fav_id00379_00043,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (European)/women/id00379/00043.mp4,00043.mp4,id00379
+fav_id00266_00470_id00594_2WHHoksbeVw_faceswap_id00909_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (European)/men/id00266/00470_id00594_2WHHoksbeVw_faceswap_id00909_wavtolip.mp4,00470_id00594_2WHHoksbeVw_faceswap_id00909_wavtolip.mp4,id00266
+fav_id02466_00136,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (American)/women/id02466/00136.mp4,00136.mp4,id02466
+fav_fav_spk_dia541_utt4,1,faceswap,FakeVideo-RealAudio,MELD/MELD-RAW/MELD.Raw/train/train_splits/dia541_utt4.mp4,dia541_utt4.mp4,fav_spk
+fav_id01048_00160_id00264_wavtolip,1,wav2lip,FakeVideo-RealAudio,FakeVideo-RealAudio/Caucasian (American)/men/id01048/00160_id00264_wavtolip.mp4,00160_id00264_wavtolip.mp4,id01048
+fav_fav_spk_FAKE_T2_1063_TAI_FEA_XX__AUDIO_1063_TAI_HAP_XX_wav2lip,1,wav2lip,FakeVideo-RealAudio,synthetic/track2_fakes/videos/FAKE_T2_1063_TAI_FEA_XX__AUDIO_1063_TAI_HAP_XX_wav2lip.mp4,FAKE_T2_1063_TAI_FEA_XX__AUDIO_1063_TAI_HAP_XX_wav2lip.mp4,fav_spk
+fav_id00270_00088,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (European)/women/id00270/00088.mp4,00088.mp4,id00270
+fav_id00418_00052_id00458_wavtolip,1,wav2lip,FakeVideo-RealAudio,FakeVideo-RealAudio/Caucasian (American)/women/id00418/00052_id00458_wavtolip.mp4,00052_id00458_wavtolip.mp4,id00418
+fav_id05332_00065,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (East)/men/id05332/00065.mp4,00065.mp4,id05332
+fav_id00491_00122_id00633_UXrTMta1EDM_faceswap_id00569_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (European)/women/id00491/00122_id00633_UXrTMta1EDM_faceswap_id00569_wavtolip.mp4,00122_id00633_UXrTMta1EDM_faceswap_id00569_wavtolip.mp4,id00491
+fav_id01597_00005,0,real,RealVideo-RealAudio,RealVideo-RealAudio/African/men/id01597/00005.mp4,00005.mp4,id01597
+fav_id00379_00043_id00633_UXrTMta1EDM_faceswap_id00270_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (European)/women/id00379/00043_id00633_UXrTMta1EDM_faceswap_id00270_wavtolip.mp4,00043_id00633_UXrTMta1EDM_faceswap_id00270_wavtolip.mp4,id00379
+fav_id02617_00028,0,real,RealVideo-RealAudio,RealVideo-RealAudio/African/women/id02617/00028.mp4,00028.mp4,id02617
+fav_id09125_00098,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (East)/women/id09125/00098.mp4,00098.mp4,id09125
+fav_fav_spk_FAKE_T3_1060_IWW_DIS_XX__AUDIO_1060_IWW_FEA_XX_sadtalker,1,faceswap,FakeVideo-RealAudio,synthetic/track3_fakes/videos/FAKE_T3_1060_IWW_DIS_XX__AUDIO_1060_IWW_FEA_XX_sadtalker.mp4,FAKE_T3_1060_IWW_DIS_XX__AUDIO_1060_IWW_FEA_XX_sadtalker.mp4,fav_spk
+fav_id01204_00092_id00560_wavtolip,1,wav2lip,FakeVideo-RealAudio,FakeVideo-RealAudio/Asian (East)/men/id01204/00092_id00560_wavtolip.mp4,00092_id00560_wavtolip.mp4,id01204
+fav_id00306_00015_id01058_2DKbOjf3Wyo_faceswap_id00919_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (European)/men/id00306/00015_id01058_2DKbOjf3Wyo_faceswap_id00919_wavtolip.mp4,00015_id01058_2DKbOjf3Wyo_faceswap_id00919_wavtolip.mp4,id00306
+fav_id01052_00076,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (European)/men/id01052/00076.mp4,00076.mp4,id01052
+fav_id00306_00015,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (European)/men/id00306/00015.mp4,00015.mp4,id00306
+fav_fav_spk_gJdSxPhf85M,1,faceswap,FakeVideo-RealAudio,CMU-MOSEI/videos/gJdSxPhf85M.mp4,gJdSxPhf85M.mp4,fav_spk
+fav_id00987_00160_id01637_wavtolip,1,wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/African/men/id00987/00160_id01637_wavtolip.mp4,00160_id01637_wavtolip.mp4,id00987
+fav_id05931_00013,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (South)/women/id05931/00013.mp4,00013.mp4,id05931
+fav_id00071_00014,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (European)/women/id00071/00014.mp4,00014.mp4,id00071
+fav_id00186_00120_id00358_vsVwGKy79kM_faceswap_id00709_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (European)/men/id00186/00120_id00358_vsVwGKy79kM_faceswap_id00709_wavtolip.mp4,00120_id00358_vsVwGKy79kM_faceswap_id00709_wavtolip.mp4,id00186
+fav_id01201_00028,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (American)/men/id01201/00028.mp4,00028.mp4,id01201
+fav_id01156_00078,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (European)/men/id01156/00078.mp4,00078.mp4,id01156
+fav_id00554_00028,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (European)/men/id00554/00028.mp4,00028.mp4,id00554
+fav_fav_spk_FAKE_T2_1026_IEO_FEA_MD__AUDIO_1026_IEO_HAP_MD_wav2lip,1,wav2lip,FakeVideo-RealAudio,synthetic/track2_fakes/videos/FAKE_T2_1026_IEO_FEA_MD__AUDIO_1026_IEO_HAP_MD_wav2lip.mp4,FAKE_T2_1026_IEO_FEA_MD__AUDIO_1026_IEO_HAP_MD_wav2lip.mp4,fav_spk
+fav_id00062_00278,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (American)/men/id00062/00278.mp4,00278.mp4,id00062
+fav_id04582_00180_id06445_NWtdqOxEbDY_faceswap_id00461_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Asian (South)/women/id04582/00180_id06445_NWtdqOxEbDY_faceswap_id00461_wavtolip.mp4,00180_id06445_NWtdqOxEbDY_faceswap_id00461_wavtolip.mp4,id04582
+fav_id00832_00078_id00371_t20i0HtPwW0_faceswap_id00371_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/African/women/id00832/00078_id00371_t20i0HtPwW0_faceswap_id00371_wavtolip.mp4,00078_id00371_t20i0HtPwW0_faceswap_id00371_wavtolip.mp4,id00832
+fav_id08139_00067,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (East)/women/id08139/00067.mp4,00067.mp4,id08139
+fav_id03525_00048_id04221_5XfsCrxGvj4_id00708_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (American)/men/id03525/00048_id04221_5XfsCrxGvj4_id00708_wavtolip.mp4,00048_id04221_5XfsCrxGvj4_id00708_wavtolip.mp4,id03525
+fav_id06060_00219,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (East)/women/id06060/00219.mp4,00219.mp4,id06060
+fav_id00775_00092_id00049_S_EHTUF-mQY_faceswap_id00529_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (American)/men/id00775/00092_id00049_S_EHTUF-mQY_faceswap_id00529_wavtolip.mp4,00092_id00049_S_EHTUF-mQY_faceswap_id00529_wavtolip.mp4,id00775
+fav_id00241_00015_2_id00063_wavtolip,1,wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (European)/men/id00241/00015_2_id00063_wavtolip.mp4,00015_2_id00063_wavtolip.mp4,id00241
+fav_id00909_00037_id00368_KohcGDsg29U_faceswap_id00981_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (European)/men/id00909/00037_id00368_KohcGDsg29U_faceswap_id00981_wavtolip.mp4,00037_id00368_KohcGDsg29U_faceswap_id00981_wavtolip.mp4,id00909
+fav_id00225_00078,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (European)/men/id00225/00078.mp4,00078.mp4,id00225
+fav_id00696_00005,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (American)/men/id00696/00005.mp4,00005.mp4,id00696
+fav_id00265_00130,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (European)/men/id00265/00130.mp4,00130.mp4,id00265
+fav_id01838_00126_id05235_ASy8lP3SRtw_faceswap_id01838_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/African/women/id01838/00126_id05235_ASy8lP3SRtw_faceswap_id01838_wavtolip.mp4,00126_id05235_ASy8lP3SRtw_faceswap_id01838_wavtolip.mp4,id01838
+fav_id07233_00010_id07200_quCElxMhW6g_faceswap_id06753_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Asian (South)/men/id07233/00010_id07200_quCElxMhW6g_faceswap_id06753_wavtolip.mp4,00010_id07200_quCElxMhW6g_faceswap_id06753_wavtolip.mp4,id07233
+fav_id01210_00283,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (American)/men/id01210/00283.mp4,00283.mp4,id01210
+fav_id00187_00360_id01051_jPxk6s6FM6Y_faceswap_id01157_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (European)/men/id00187/00360_id01051_jPxk6s6FM6Y_faceswap_id01157_wavtolip.mp4,00360_id01051_jPxk6s6FM6Y_faceswap_id01157_wavtolip.mp4,id00187
+fav_id00179_00143_id00169__V1xAwwG29U_faceswap_id01210_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (American)/men/id00179/00143_id00169__V1xAwwG29U_faceswap_id01210_wavtolip.mp4,00143_id00169__V1xAwwG29U_faceswap_id01210_wavtolip.mp4,id00179
+fav_id07058_00010,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (South)/men/id07058/00010.mp4,00010.mp4,id07058
+fav_id01192_00217_id00943_wavtolip,1,wav2lip,FakeVideo-RealAudio,FakeVideo-RealAudio/Caucasian (American)/men/id01192/00217_id00943_wavtolip.mp4,00217_id00943_wavtolip.mp4,id01192
+fav_id03658_00077,0,real,RealVideo-RealAudio,RealVideo-RealAudio/African/women/id03658/00077.mp4,00077.mp4,id03658
+fav_id00495_00027,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (European)/women/id00495/00027.mp4,00027.mp4,id00495
+fav_id03605_00048_id00272_wavtolip,1,wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (American)/women/id03605/00048_id00272_wavtolip.mp4,00048_id00272_wavtolip.mp4,id03605
+fav_id00282_00268_id01051_wavtolip,1,wav2lip,FakeVideo-RealAudio,FakeVideo-RealAudio/Caucasian (European)/men/id00282/00268_id01051_wavtolip.mp4,00268_id01051_wavtolip.mp4,id00282
+fav_id00476_00109_id00476_UgdYVJ6xPYg_faceswap_id00830_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/African/men/id00476/00109_id00476_UgdYVJ6xPYg_faceswap_id00830_wavtolip.mp4,00109_id00476_UgdYVJ6xPYg_faceswap_id00830_wavtolip.mp4,id00476
+fav_id01239_00280,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (American)/men/id01239/00280.mp4,00280.mp4,id01239
+fav_id07233_00010,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (South)/men/id07233/00010.mp4,00010.mp4,id07233
+fav_id04529_00186_id01026_rM4ZERt7oM0_faceswap_id06268_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Asian (South)/women/id04529/00186_id01026_rM4ZERt7oM0_faceswap_id06268_wavtolip.mp4,00186_id01026_rM4ZERt7oM0_faceswap_id06268_wavtolip.mp4,id04529
+fav_id00171_00092,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (European)/men/id00171/00092.mp4,00092.mp4,id00171
+fav_id01783_00015,0,real,RealVideo-RealAudio,RealVideo-RealAudio/African/women/id01783/00015.mp4,00015.mp4,id01783
+fav_fav_spk_FAKE_T2_1040_IWW_HAP_XX__AUDIO_1040_IWW_NEU_XX_wav2lip,1,wav2lip,FakeVideo-RealAudio,synthetic/track2_fakes/videos/FAKE_T2_1040_IWW_HAP_XX__AUDIO_1040_IWW_NEU_XX_wav2lip.mp4,FAKE_T2_1040_IWW_HAP_XX__AUDIO_1040_IWW_NEU_XX_wav2lip.mp4,fav_spk
+fav_id05845_00027,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (South)/women/id05845/00027.mp4,00027.mp4,id05845
+fav_id00909_00037_id00368_KohcGDsg29U_faceswap_id01156_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (European)/men/id00909/00037_id00368_KohcGDsg29U_faceswap_id01156_wavtolip.mp4,00037_id00368_KohcGDsg29U_faceswap_id01156_wavtolip.mp4,id00909
+fav_id01717_00005,0,real,RealVideo-RealAudio,RealVideo-RealAudio/African/men/id01717/00005.mp4,00005.mp4,id01717
+fav_id00589_00130,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (European)/women/id00589/00130.mp4,00130.mp4,id00589
+fav_id00184_00241,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (American)/men/id00184/00241.mp4,00241.mp4,id00184
+fav_id02587_00020,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (East)/women/id02587/00020.mp4,00020.mp4,id02587
+fav_id09181_00048,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (East)/women/id09181/00048.mp4,00048.mp4,id09181
+fav_id01972_00078_2_id01717_wavtolip,1,wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/African/men/id01972/00078_2_id01717_wavtolip.mp4,00078_2_id01717_wavtolip.mp4,id01972
+fav_id00166_00010_id01179_wavtolip,1,wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/African/men/id00166/00010_id01179_wavtolip.mp4,00010_id01179_wavtolip.mp4,id00166
+fav_id01124_00063_id00696_7PrURACjhqU_faceswap_id01239_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (American)/men/id01124/00063_id00696_7PrURACjhqU_faceswap_id01239_wavtolip.mp4,00063_id00696_7PrURACjhqU_faceswap_id01239_wavtolip.mp4,id01124
+fav_id01035_00012_id00052_NK_leX996Yk_faceswap_id01105_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (American)/men/id01035/00012_id00052_NK_leX996Yk_faceswap_id01105_wavtolip.mp4,00012_id00052_NK_leX996Yk_faceswap_id01105_wavtolip.mp4,id01035
+fav_fav_spk_dia93_utt1,1,faceswap,FakeVideo-RealAudio,MELD/MELD-RAW/MELD.Raw/train/train_splits/dia93_utt1.mp4,dia93_utt1.mp4,fav_spk
+fav_id09125_00098_id06225_wavtolip,1,wav2lip,FakeVideo-RealAudio,FakeVideo-RealAudio/Asian (East)/women/id09125/00098_id06225_wavtolip.mp4,00098_id06225_wavtolip.mp4,id09125
+fav_id04526_00317_id04562_wavtolip,1,wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Asian (South)/men/id04526/00317_id04562_wavtolip.mp4,00317_id04562_wavtolip.mp4,id04526
+fav_id00063_00021,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (European)/men/id00063/00021.mp4,00021.mp4,id00063
+fav_id00391_00052_id00476_UgdYVJ6xPYg_faceswap_id02005_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/African/men/id00391/00052_id00476_UgdYVJ6xPYg_faceswap_id02005_wavtolip.mp4,00052_id00476_UgdYVJ6xPYg_faceswap_id02005_wavtolip.mp4,id00391
+fav_id00076_00109_12_id00987_wavtolip,1,wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/African/men/id00076/00109_12_id00987_wavtolip.mp4,00109_12_id00987_wavtolip.mp4,id00076
+fav_id01589_00017_id08613_wavtolip,1,wav2lip,FakeVideo-RealAudio,FakeVideo-RealAudio/Asian (East)/men/id01589/00017_id08613_wavtolip.mp4,00017_id08613_wavtolip.mp4,id01589
+fav_id00264_00257,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (American)/men/id00264/00257.mp4,00257.mp4,id00264
+fav_id01192_00217,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (American)/men/id01192/00217.mp4,00217.mp4,id01192
+fav_id03747_00273,0,real,RealVideo-RealAudio,RealVideo-RealAudio/African/women/id03747/00273.mp4,00273.mp4,id03747
+fav_id04727_00007,0,real,RealVideo-RealAudio,RealVideo-RealAudio/African/men/id04727/00007.mp4,00007.mp4,id04727
+fav_fav_spk_dia446_utt17,1,faceswap,FakeVideo-RealAudio,MELD/MELD-RAW/MELD.Raw/train/train_splits/dia446_utt17.mp4,dia446_utt17.mp4,fav_spk
+fav_id04530_00231,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (South)/women/id04530/00231.mp4,00231.mp4,id04530
+fav_id06470_00052,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (East)/men/id06470/00052.mp4,00052.mp4,id06470
+fav_id04245_00072,0,real,RealVideo-RealAudio,RealVideo-RealAudio/African/women/id04245/00072.mp4,00072.mp4,id04245
+fav_id00581_00010,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (European)/women/id00581/00010.mp4,00010.mp4,id00581
+fav_id00192_00078_id00292_qELK8N_DykA_faceswap_id03205_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (European)/men/id00192/00078_id00292_qELK8N_DykA_faceswap_id03205_wavtolip.mp4,00078_id00292_qELK8N_DykA_faceswap_id03205_wavtolip.mp4,id00192
+fav_id07739_00019,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (East)/women/id07739/00019.mp4,00019.mp4,id07739
+fav_id02553_00043_id02332_hlo8q3-L9vI_faceswap_id09053_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Asian (East)/men/id02553/00043_id02332_hlo8q3-L9vI_faceswap_id09053_wavtolip.mp4,00043_id02332_hlo8q3-L9vI_faceswap_id09053_wavtolip.mp4,id02553
+fav_id00946_00126,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (European)/men/id00946/00126.mp4,00126.mp4,id00946
+fav_id02553_00043,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (East)/men/id02553/00043.mp4,00043.mp4,id02553
+fav_id01281_00040,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (East)/women/id01281/00040.mp4,00040.mp4,id01281
+fav_id06268_00159_id07051_d1c0Pl2aP_4_faceswap_id00747_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Asian (South)/women/id06268/00159_id07051_d1c0Pl2aP_4_faceswap_id00747_wavtolip.mp4,00159_id07051_d1c0Pl2aP_4_faceswap_id00747_wavtolip.mp4,id06268
+fav_id07165_00368_id04537_G1e1UFopjfI_faceswap_id00745_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Asian (South)/men/id07165/00368_id04537_G1e1UFopjfI_faceswap_id00745_wavtolip.mp4,00368_id04537_G1e1UFopjfI_faceswap_id00745_wavtolip.mp4,id07165
+fav_id01211_00023_id04219_9llHvP-jYDg_faceswap_id00775_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (American)/men/id01211/00023_id04219_9llHvP-jYDg_faceswap_id00775_wavtolip.mp4,00023_id04219_9llHvP-jYDg_faceswap_id00775_wavtolip.mp4,id01211
+fav_id01212_00183_id02553_wavtolip,1,wav2lip,FakeVideo-RealAudio,FakeVideo-RealAudio/Asian (East)/men/id01212/00183_id02553_wavtolip.mp4,00183_id02553_wavtolip.mp4,id01212
+fav_id00179_00143,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (American)/men/id00179/00143.mp4,00143.mp4,id00179
+fav_id02005_00052_id02342_RJPBPhJB8TA_faceswap_id01544_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/African/men/id02005/00052_id02342_RJPBPhJB8TA_faceswap_id01544_wavtolip.mp4,00052_id02342_RJPBPhJB8TA_faceswap_id01544_wavtolip.mp4,id02005
+fav_id07689_00028,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (South)/women/id07689/00028.mp4,00028.mp4,id07689
+fav_id07236_00143,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (South)/women/id07236/00143.mp4,00143.mp4,id07236
+fav_id01532_00065_id00568_gakhcJXnJZ8_id03747_wavtolip,1,wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/African/women/id01532/00065_id00568_gakhcJXnJZ8_id03747_wavtolip.mp4,00065_id00568_gakhcJXnJZ8_id03747_wavtolip.mp4,id01532
+fav_id00863_00069,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (East)/men/id00863/00069.mp4,00069.mp4,id00863
+fav_id00379_00043_id00633_UXrTMta1EDM_faceswap_id00395_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (European)/women/id00379/00043_id00633_UXrTMta1EDM_faceswap_id00395_wavtolip.mp4,00043_id00633_UXrTMta1EDM_faceswap_id00395_wavtolip.mp4,id00379
+fav_id07463_00028,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (South)/men/id07463/00028.mp4,00028.mp4,id07463
+fav_id04927_00013,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (South)/women/id04927/00013.mp4,00013.mp4,id04927
+fav_id01392_00167,0,real,RealVideo-RealAudio,RealVideo-RealAudio/African/men/id01392/00167.mp4,00167.mp4,id01392
+fav_id00559_00078_id00305_LdcY3ILdQrE_faceswap_id00192_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (European)/men/id00559/00078_id00305_LdcY3ILdQrE_faceswap_id00192_wavtolip.mp4,00078_id00305_LdcY3ILdQrE_faceswap_id00192_wavtolip.mp4,id00559
+fav_id00488_00028,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (South)/women/id00488/00028.mp4,00028.mp4,id00488
+fav_id00680_00110,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (American)/women/id00680/00110.mp4,00110.mp4,id00680
+fav_id00385_00439_id01005_wavtolip,1,wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (American)/women/id00385/00439_id01005_wavtolip.mp4,00439_id01005_wavtolip.mp4,id00385
+fav_id05845_00027_id05478_VJkjRzPt-Jw_faceswap_id06437_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Asian (South)/women/id05845/00027_id05478_VJkjRzPt-Jw_faceswap_id06437_wavtolip.mp4,00027_id05478_VJkjRzPt-Jw_faceswap_id06437_wavtolip.mp4,id05845
+fav_fav_spk_1_10004_c,1,faceswap,FakeVideo-RealAudio,MUStARD/raw_data/context_final/1_10004_c.mp4,1_10004_c.mp4,fav_spk
+fav_id06254_00043,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (South)/women/id06254/00043.mp4,00043.mp4,id06254
+fav_id05844_00072,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (East)/women/id05844/00072.mp4,00072.mp4,id05844
+fav_id02721_00424_id03658_8Wtu9VXKqjY_faceswap_id04820_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/African/women/id02721/00424_id03658_8Wtu9VXKqjY_faceswap_id04820_wavtolip.mp4,00424_id03658_8Wtu9VXKqjY_faceswap_id04820_wavtolip.mp4,id02721
+fav_fav_spk_dia36_utt10,1,faceswap,FakeVideo-RealAudio,MELD/MELD-RAW/MELD.Raw/dev/dev_splits_complete/dia36_utt10.mp4,dia36_utt10.mp4,fav_spk
+fav_id03965_00051,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (East)/men/id03965/00051.mp4,00051.mp4,id03965
+fav_id00769_00015,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (South)/men/id00769/00015.mp4,00015.mp4,id00769
+fav_id06054_00010,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (East)/women/id06054/00010.mp4,00010.mp4,id06054
+fav_id04219_00130,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (American)/men/id04219/00130.mp4,00130.mp4,id04219
+fav_id00597_00019_id05743_Fjri4MXHXWY_faceswap_id00126_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Asian (East)/men/id00597/00019_id05743_Fjri4MXHXWY_faceswap_id00126_wavtolip.mp4,00019_id05743_Fjri4MXHXWY_faceswap_id00126_wavtolip.mp4,id00597
+fav_id07236_00143_id05435_OvX-Jv_whcU_faceswap_id04529_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Asian (South)/women/id07236/00143_id05435_OvX-Jv_whcU_faceswap_id04529_wavtolip.mp4,00143_id05435_OvX-Jv_whcU_faceswap_id04529_wavtolip.mp4,id07236
+fav_id07179_00206,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (South)/men/id07179/00206.mp4,00206.mp4,id07179
+fav_id07039_00105,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (East)/women/id07039/00105.mp4,00105.mp4,id07039
+fav_id00830_00143,0,real,RealVideo-RealAudio,RealVideo-RealAudio/African/men/id00830/00143.mp4,00143.mp4,id00830
+fav_id02296_00019_2_id01610_wavtolip,1,wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/African/men/id02296/00019_2_id01610_wavtolip.mp4,00019_2_id01610_wavtolip.mp4,id02296
+fav_id01005_00028,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (American)/women/id01005/00028.mp4,00028.mp4,id01005
+fav_id03781_00113_id00025_wavtolip,1,wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (American)/women/id03781/00113_id00025_wavtolip.mp4,00113_id00025_wavtolip.mp4,id03781
+fav_id01835_00130,0,real,RealVideo-RealAudio,RealVideo-RealAudio/African/men/id01835/00130.mp4,00130.mp4,id01835
+fav_fav_spk_dia798_utt3,1,faceswap,FakeVideo-RealAudio,MELD/MELD-RAW/MELD.Raw/train/train_splits/dia798_utt3.mp4,dia798_utt3.mp4,fav_spk
+fav_fav_spk_FAKE_T2_1049_IWL_ANG_XX__AUDIO_1049_IWL_DIS_XX_wav2lip,1,wav2lip,FakeVideo-RealAudio,synthetic/track2_fakes/videos/FAKE_T2_1049_IWL_ANG_XX__AUDIO_1049_IWL_DIS_XX_wav2lip.mp4,FAKE_T2_1049_IWL_ANG_XX__AUDIO_1049_IWL_DIS_XX_wav2lip.mp4,fav_spk
+fav_id01076_00005,0,real,RealVideo-RealAudio,RealVideo-RealAudio/African/men/id01076/00005.mp4,00005.mp4,id01076
+fav_id00816_00118,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (South)/men/id00816/00118.mp4,00118.mp4,id00816
+fav_id01042_00154_id00052_wavtolip,1,wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (American)/men/id01042/00154_id00052_wavtolip.mp4,00154_id00052_wavtolip.mp4,id01042
+fav_id00773_00038,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Asian (South)/men/id00773/00038.mp4,00038.mp4,id00773
+fav_id00701_00092_id01036_AohKaMtIHxA_faceswap_id00391_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/African/men/id00701/00092_id01036_AohKaMtIHxA_faceswap_id00391_wavtolip.mp4,00092_id01036_AohKaMtIHxA_faceswap_id00391_wavtolip.mp4,id00701
+fav_id00366_00118_id01856_wavtolip,1,wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/African/men/id00366/00118_id01856_wavtolip.mp4,00118_id01856_wavtolip.mp4,id00366
+fav_id00519_00028_id01154_tvmOcaG4A4w_faceswap_id00306_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (European)/men/id00519/00028_id01154_tvmOcaG4A4w_faceswap_id00306_wavtolip.mp4,00028_id01154_tvmOcaG4A4w_faceswap_id00306_wavtolip.mp4,id00519
+fav_id02824_00130,0,real,RealVideo-RealAudio,RealVideo-RealAudio/African/women/id02824/00130.mp4,00130.mp4,id02824
+fav_id00935_00005_id04414_0sJN-9GIO-M_faceswap_id06225_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Asian (East)/women/id00935/00005_id04414_0sJN-9GIO-M_faceswap_id06225_wavtolip.mp4,00005_id04414_0sJN-9GIO-M_faceswap_id06225_wavtolip.mp4,id00935
+fav_fav_spk_FAKE_T2_1059_TSI_DIS_XX__AUDIO_1059_TSI_FEA_XX_wav2lip,1,wav2lip,FakeVideo-RealAudio,synthetic/track2_fakes/videos/FAKE_T2_1059_TSI_DIS_XX__AUDIO_1059_TSI_FEA_XX_wav2lip.mp4,FAKE_T2_1059_TSI_DIS_XX__AUDIO_1059_TSI_FEA_XX_wav2lip.mp4,fav_spk
+fav_id01002_00043,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (European)/women/id01002/00043.mp4,00043.mp4,id01002
+fav_id00391_00052_id00476_UgdYVJ6xPYg_faceswap_id01610_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/African/men/id00391/00052_id00476_UgdYVJ6xPYg_faceswap_id01610_wavtolip.mp4,00052_id00476_UgdYVJ6xPYg_faceswap_id01610_wavtolip.mp4,id00391
+fav_id00365_00078_0_id00569_wavtolip,1,wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (European)/women/id00365/00078_0_id00569_wavtolip.mp4,00078_0_id00569_wavtolip.mp4,id00365
+fav_id03716_00040,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (European)/women/id03716/00040.mp4,00040.mp4,id03716
+fav_fav_spk_FAKE_T2_1037_IEO_HAP_LO__AUDIO_1037_IEO_NEU_XX_wav2lip,1,wav2lip,FakeVideo-RealAudio,synthetic/track2_fakes/videos/FAKE_T2_1037_IEO_HAP_LO__AUDIO_1037_IEO_NEU_XX_wav2lip.mp4,FAKE_T2_1037_IEO_HAP_LO__AUDIO_1037_IEO_NEU_XX_wav2lip.mp4,fav_spk
+fav_id00358_00217_id00063_cVZBXC2rjPM_faceswap_id01099_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (European)/men/id00358/00217_id00063_cVZBXC2rjPM_faceswap_id01099_wavtolip.mp4,00217_id00063_cVZBXC2rjPM_faceswap_id01099_wavtolip.mp4,id00358
+fav_id00379_00043_id00633_UXrTMta1EDM_faceswap_id01018_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (European)/women/id00379/00043_id00633_UXrTMta1EDM_faceswap_id01018_wavtolip.mp4,00043_id00633_UXrTMta1EDM_faceswap_id01018_wavtolip.mp4,id00379
+fav_id03344_00114_id00857_wavtolip,1,wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Asian (South)/men/id03344/00114_id00857_wavtolip.mp4,00114_id00857_wavtolip.mp4,id03344
+fav_id00126_00173_id01212_ZuKSE0WIlpM,1,fsgan,FakeVideo-RealAudio,FakeVideo-RealAudio/Asian (East)/men/id00126/00173_id01212_ZuKSE0WIlpM.mp4,00173_id01212_ZuKSE0WIlpM.mp4,id00126
+fav_id00829_00271_id04055_wavtolip,1,wav2lip,FakeVideo-RealAudio,FakeVideo-RealAudio/African/women/id00829/00271_id04055_wavtolip.mp4,00271_id04055_wavtolip.mp4,id00829
+fav_id00025_00025,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (American)/women/id00025/00025.mp4,00025.mp4,id00025
+fav_id01528_00017_id01452_4MqeoSxSy3w_faceswap_id02005_wavtolip,1,faceswap-wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/African/men/id01528/00017_id01452_4MqeoSxSy3w_faceswap_id02005_wavtolip.mp4,00017_id01452_4MqeoSxSy3w_faceswap_id02005_wavtolip.mp4,id01528
+fav_id04687_00066_id06269_wavtolip,1,wav2lip,FakeVideo-RealAudio,FakeVideo-RealAudio/Asian (East)/men/id04687/00066_id06269_wavtolip.mp4,00066_id06269_wavtolip.mp4,id04687
+fav_id01217_00005,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (American)/women/id01217/00005.mp4,00005.mp4,id01217
+fav_fav_spk_7rMLN0KKE5k_022,1,faceswap,FakeVideo-RealAudio,CMU-MOSEI/segments/7rMLN0KKE5k_022.mp4,7rMLN0KKE5k_022.mp4,fav_spk
+fav_id00981_00092_id00265_dZq57FoxXR4_id00520_wavtolip,1,wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (European)/men/id00981/00092_id00265_dZq57FoxXR4_id00520_wavtolip.mp4,00092_id00265_dZq57FoxXR4_id00520_wavtolip.mp4,id00981
+fav_id00374_00311,0,real,RealVideo-RealAudio,RealVideo-RealAudio/Caucasian (European)/women/id00374/00311.mp4,00311.mp4,id00374
+fav_id01995_00071,0,real,RealVideo-RealAudio,RealVideo-RealAudio/African/men/id01995/00071.mp4,00071.mp4,id01995
+fav_id00842_00043_id00272_wavtolip,1,wav2lip,FakeVideo-RealAudio,FakeVideo-RealAudio/Caucasian (American)/women/id00842/00043_id00272_wavtolip.mp4,00043_id00272_wavtolip.mp4,id00842
+fav_fav_spk_dia596_utt8,1,faceswap,FakeVideo-RealAudio,MELD/MELD-RAW/MELD.Raw/train/train_splits/dia596_utt8.mp4,dia596_utt8.mp4,fav_spk
+fav_fav_spk_final_videos_testdia72_utt10,1,faceswap,FakeVideo-RealAudio,MELD/MELD-RAW/MELD.Raw/test/output_repeated_splits_test/final_videos_testdia72_utt10.mp4,final_videos_testdia72_utt10.mp4,fav_spk
+fav_id00529_00409_id04073_wavtolip,1,wav2lip,FakeVideo-RealAudio,FakeVideo-RealAudio/Caucasian (American)/men/id00529/00409_id04073_wavtolip.mp4,00409_id04073_wavtolip.mp4,id00529
+fav_id01156_00078_id00919_XDUn0Pskyrk_id00909_wavtolip,1,wav2lip,FakeVideo-FakeAudio,FakeVideo-FakeAudio/Caucasian (European)/men/id01156/00078_id00919_XDUn0Pskyrk_id00909_wavtolip.mp4,00078_id00919_XDUn0Pskyrk_id00909_wavtolip.mp4,id01156
