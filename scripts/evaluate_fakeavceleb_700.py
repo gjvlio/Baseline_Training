@@ -288,6 +288,11 @@ def main():
     except Exception:
         auc = float("nan")
     prec, rec, f1, _ = precision_recall_fscore_support(y_true, binary_preds, average="binary", zero_division=0)
+    tn, fp, fn, tp = confusion_matrix(y_true, binary_preds).ravel()
+    tpr = tp / (tp + fn) if (tp + fn) > 0 else 0.0
+    tnr = tn / (tn + fp) if (tn + fp) > 0 else 0.0
+    fpr = fp / (tn + fp) if (tn + fp) > 0 else 0.0
+    fnr = fn / (tp + fn) if (tp + fn) > 0 else 0.0
 
     fieldnames = ["clip_id", "fake_label", "method", "type", "deepsentinel_score", "acenet_score", "acenet_pred"]
     with open(out_csv_p, "w", newline="", encoding="utf-8") as f:
@@ -303,19 +308,37 @@ def main():
     print(f"  Accuracy         : {acc * 100:.2f}%")
     print(f"  Balanced Accuracy: {bal_acc * 100:.2f}%")
     print(f"  Precision        : {prec:.4f}")
-    print(f"  Recall           : {rec:.4f}")
+    print(f"  Recall (TPR)     : {rec:.4f} ({tpr * 100:.1f}%)")
+    print(f"  Specificity (TNR): {tnr:.4f} ({tnr * 100:.1f}%)")
     print(f"  F1-Score         : {f1:.4f}")
     print(f"  Inference Time   : {elapsed:.1f}s ({elapsed/len(y_true):.3f}s / clip)")
     print("-" * 80)
+    print("📋 CONFUSION MATRIX BREAKDOWN (ACE-Net Baseline):")
+    print(f"  True Positives  (TP - Fakes Detected)  : {tp:3d} / 350 ({tp/350*100:5.1f}%)")
+    print(f"  True Negatives  (TN - Reals Passed)    : {tn:3d} / 350 ({tn/350*100:5.1f}%)")
+    print(f"  False Positives (FP - False Alarms)    : {fp:3d} / 350 ({fp/350*100:5.1f}% | FPR: {fpr:.4f})")
+    print(f"  False Negatives (FN - Missed Fakes)    : {fn:3d} / 350 ({fn/350*100:5.1f}% | FNR: {fnr:.4f})")
+    print("-" * 80)
 
     if len(y_pred_deepsentinel) == len(y_true):
-        ds_auc = roc_auc_score(y_true, np.array(y_pred_deepsentinel))
-        p_val = delong_roc_test(y_true, np.array(y_pred_deepsentinel), y_pred)
-        print("📊 STATISTICAL SIGNIFICANCE (DeepSentinel vs. ACE-Net Baseline):")
-        print(f"  DeepSentinel AUC : {ds_auc:.4f}")
-        print(f"  ACE-Net Baseline : {auc:.4f}")
-        print(f"  AUC Margin       : {ds_auc - auc:+.4f} ({(ds_auc - auc)*100:+.2f}%)")
-        print(f"  DeLong Test p-val: p = {p_val:.5f} {'(Statistically Significant, p < 0.05! ⭐)' if p_val < 0.05 else ''}")
+        ds_pred_arr = np.array(y_pred_deepsentinel)
+        ds_binary = (ds_pred_arr >= 0.5).astype(int)
+        ds_tn, ds_fp, ds_fn, ds_tp = confusion_matrix(y_true, ds_binary).ravel()
+        ds_auc = roc_auc_score(y_true, ds_pred_arr)
+        ds_acc = accuracy_score(y_true, ds_binary)
+        p_val = delong_roc_test(y_true, ds_pred_arr, y_pred)
+
+        print("📊 HEAD-TO-HEAD COMPARISON (DeepSentinel vs. ACE-Net Baseline):")
+        print(f"{'Metric':<22} | {'DeepSentinel':<16} | {'ACE-Net Baseline':<16} | {'Margin':<10}")
+        print("-" * 72)
+        print(f"{'AUC-ROC':<22} | {ds_auc:<16.4f} | {auc:<16.4f} | {ds_auc - auc:+10.4f}")
+        print(f"{'Accuracy':<22} | {ds_acc*100:<15.2f}% | {acc*100:<15.2f}% | {(ds_acc-acc)*100:+9.2f}%")
+        print(f"{'TP (Fake Detected)':<22} | {ds_tp:<16d} | {tp:<16d} | {ds_tp - tp:+10d}")
+        print(f"{'TN (Real Passed)':<22} | {ds_tn:<16d} | {tn:<16d} | {ds_tn - tn:+10d}")
+        print(f"{'FP (False Alarms)':<22} | {ds_fp:<16d} | {fp:<16d} | {ds_fp - fp:+10d}")
+        print(f"{'FN (Missed Fakes)':<22} | {ds_fn:<16d} | {fn:<16d} | {ds_fn - fn:+10d}")
+        print("-" * 72)
+        print(f"  DeLong Test p-value: p = {p_val:.5f} {'(Statistically Significant, p < 0.05! ⭐)' if p_val < 0.05 else ''}")
         print("-" * 80)
 
     print(f"💾 Paired predictions saved to: {out_csv_p}")
