@@ -232,8 +232,7 @@ def main():
 
     adapt_loader = DataLoader(adapt_ds, batch_size=args.batch_size, shuffle=True, num_workers=0)
 
-    print("
-[2/3] Initializing Model & Freezing Feature Extractors...")
+    print("\n[2/3] Initializing Model & Freezing Feature Extractors...")
     model = ACENet().to(device)
     ckpt_data = torch.load(args.init_ckpt, map_location=device)
     if isinstance(ckpt_data, dict) and "model_state" in ckpt_data:
@@ -242,12 +241,9 @@ def main():
         state_dict = ckpt_data
     model.load_state_dict(state_dict, strict=False)
 
+    model.eval()
     model.freeze_extractors()
-    
-    for m in model.modules():
-        if isinstance(m, (nn.BatchNorm1d, nn.BatchNorm2d)):
-            m.eval()
-            m.track_running_stats = False
+    model.discriminator.train()
 
     trainable_params = [p for p in model.discriminator.parameters() if p.requires_grad]
     print(f"  -> Trainable Parameters for Adaptation: {sum(p.numel() for p in trainable_params):,}")
@@ -255,20 +251,16 @@ def main():
     criterion = nn.BCEWithLogitsLoss()
     optimizer = torch.optim.AdamW(trainable_params, lr=args.lr, weight_decay=1e-3)
 
-    print("
-[3/3] Starting Few-Shot Fine-Tuning...")
+    print("\n[3/3] Starting Few-Shot Fine-Tuning...")
     print("-" * 80)
     print(f"{'Epoch':<8} | {'Adapt Loss':<12} | {'Train Acc':<10} | {'LR':<10} | {'Time'}")
     print("-" * 80)
 
     t0 = time.time()
     for epoch in range(1, args.epochs + 1):
-        model.train()
+        model.eval()
         model.freeze_extractors()
-        for m in model.modules():
-            if isinstance(m, (nn.BatchNorm1d, nn.BatchNorm2d)):
-                m.eval()
-                m.track_running_stats = False
+        model.discriminator.train()
 
         total_loss = 0.0
         correct_preds = 0

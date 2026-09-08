@@ -1,5 +1,5 @@
 """
-scripts/evaluate_fakeavceleb_700.py — End-to-End FakeAVCeleb 700-Clip Benchmark Evaluator.
+scripts/evaluate_fakeavceleb_700.py - End-to-End FakeAVCeleb 700-Clip Benchmark Evaluator.
 
 Evaluates the trained ACE-Net baseline model on the exact 700 FakeAVCeleb clips (350 Real / 350 Fake),
 generates paired prediction CSVs, and computes statistical significance against DeepSentinel.
@@ -16,7 +16,6 @@ import numpy as np
 import torch
 import cv2
 import librosa
-from PIL import Image
 from sklearn.metrics import (
     roc_auc_score, accuracy_score, balanced_accuracy_score,
     precision_recall_fscore_support, confusion_matrix
@@ -35,13 +34,11 @@ N_KEYFRAMES = 8
 IMG_SIZE = 224
 
 def get_face_detector(device="cpu"):
-    # 1. Try MTCNN
     try:
         from facenet_pytorch import MTCNN
         return MTCNN(keep_all=False, device=device, post_process=False)
     except Exception:
         pass
-    # 2. Try OpenCV Haar Cascade
     try:
         if hasattr(cv2, "CascadeClassifier") and hasattr(cv2, "data") and hasattr(cv2.data, "haarcascades"):
             cascade_path = cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
@@ -56,7 +53,6 @@ def extract_face_crop(frame, detector=None):
     h, w, _ = frame.shape
     if detector is not None:
         try:
-            # If MTCNN
             if hasattr(detector, "detect"):
                 boxes, _ = detector.detect(frame)
                 if boxes is not None and len(boxes) > 0:
@@ -65,7 +61,6 @@ def extract_face_crop(frame, detector=None):
                     x2, y2 = min(w, box[2]), min(h, box[3])
                     if x2 > x1 and y2 > y1:
                         return frame[y1:y2, x1:x2]
-            # If CascadeClassifier
             elif hasattr(detector, "detectMultiScale"):
                 gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                 faces = detector.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=4, minSize=(60, 60))
@@ -79,7 +74,6 @@ def extract_face_crop(frame, detector=None):
         except Exception:
             pass
 
-    # High-quality talking head center-upper crop fallback
     sz = min(h, w)
     y1 = max(0, int(0.05 * h))
     y2 = min(h, y1 + int(sz * 0.9))
@@ -87,23 +81,21 @@ def extract_face_crop(frame, detector=None):
     x2 = min(w, x1 + sz)
     return frame[y1:y2, x1:x2]
 
-def extract_visual_frames(video_path, face_detector):
+def extract_visual_frames(video_path, face_detector=None):
     cap = cv2.VideoCapture(str(video_path))
     total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     if total_frames <= 0:
         cap.release()
         return torch.zeros((N_KEYFRAMES, 3, IMG_SIZE, IMG_SIZE), dtype=torch.float32), torch.zeros(N_KEYFRAMES, dtype=torch.float32)
 
-    # Sample up to 32 evenly spaced frames
     n_samples = min(total_frames, 32)
     sample_indices = np.linspace(0, total_frames - 1, n_samples, dtype=int)
-    
     crops = []
     current_idx = 0
     success = True
     while success and current_idx < total_frames:
         success, frame = cap.read()
-        if not success:
+        if not success or frame is None:
             break
         if current_idx in sample_indices:
             face_crop = extract_face_crop(frame, face_detector)
@@ -143,15 +135,44 @@ def extract_audio_mel(video_path):
     except Exception:
         return torch.zeros((N_MELS, FIXED_MEL_LEN), dtype=torch.float32)
 
-def delong_roc_test(ground_truth, predictions_one, predictions_two):
-    try:
-        from scipy import stats
-        diff = predictions_one - predictions_two
-        z = np.mean(diff) / (np.std(diff) / np.sqrt(len(diff)) + 1e-8)
-        p = 2 * (1 - stats.norm.cdf(abs(z)))
-        return float(p)
-    except Exception:
-        return float('nan')
+def norm_cdf(z):
+    import math
+    return 0.5 * (1.0 + math.erf(z / math.sqrt(2.0)))
+
+def delong_roc_test(y_true, p_a, p_b):
+    import math
+    pos_idx = [i for i, y in enumerate(y_true) if y == 1]
+    neg_idx = [i for i, y in enumerate(y_true) if y == 0]
+    m, n = len(pos_idx), len(neg_idx)
+    if m == 0 or n == 0:
+        return 1.0
+
+    v10_a = [sum(1.0 if p_a[i] > p_a[j] else (0.5 if p_a[i] == p_a[j] else 0.0) for j in neg_idx) / n for i in pos_idx]
+    v01_a = [sum(1.0 if p_a[i] > p_a[j] else (0.5 if p_a[i] == p_a[j] else 0.0) for i in pos_idx) / m for j in neg_idx]
+
+    v10_b = [sum(1.0 if p_b[i] > p_b[j] else (0.5 if p_b[i] == p_b[j] else 0.0) for j in neg_idx) / n for i in pos_idx]
+    v01_b = [sum(1.0 if p_b[i] > p_b[j] else (0.5 if p_b[i] == p_b[j] else 0.0) for i in pos_idx) / m for j in neg_idx]
+
+    auc_a = sum(v10_a) / m
+    auc_b = sum(v10_b) / m
+
+    s10_a = sum((x - auc_a)**2 for x in v10_a) / max(1, m - 1)
+    s01_a = sum((x - auc_a)**2 for x in v01_a) / max(1, n - 1)
+
+    s10_b = sum((x - auc_b)**2 for x in v10_b) / max(1, m - 1)
+    s01_b = sum((x - auc_b)**2 for x in v01_b) / max(1, n - 1)
+
+    s10_ab = sum((v10_a[i] - auc_a) * (v10_b[i] - auc_b) for i in range(m)) / max(1, m - 1)
+    s01_ab = sum((v01_a[j] - auc_a) * (v01_b[j] - auc_b) for j in range(n)) / max(1, n - 1)
+
+    var_a = s10_a / m + s01_a / n
+    var_b = s10_b / m + s01_b / n
+    cov_ab = s10_ab / m + s01_ab / n
+
+    var_diff = max(1e-12, var_a + var_b - 2 * cov_ab)
+    z = (auc_a - auc_b) / math.sqrt(var_diff)
+    p_val = 2.0 * (1.0 - norm_cdf(abs(z)))
+    return p_val
 
 def main():
     parser = argparse.ArgumentParser(description="ACE-Net FakeAVCeleb 700 End-to-End Evaluator")
@@ -172,7 +193,7 @@ def main():
     out_csv_p.parent.mkdir(parents=True, exist_ok=True)
 
     print("=" * 80)
-    print("      🚀 ACE-NET END-TO-END FAKEAVCELEB (N=700) BENCHMARK EVALUATOR 🚀")
+    print("      ACE-NET END-TO-END FAKEAVCELEB (N=700) BENCHMARK EVALUATOR")
     print(f"  Checkpoint   : {args.ckpt}")
     print(f"  Manifest     : {manifest_p}")
     print(f"  Raw Videos   : {raw_dir}")
@@ -181,7 +202,14 @@ def main():
     print(f"  Device       : {device}")
     print("=" * 80)
 
-    # 1. Load ACE-Net Model
+    video_index = {}
+    if raw_dir.exists():
+        for p in raw_dir.rglob("*.mp4"):
+            video_index[p.name] = p
+            parts = p.parts
+            if len(parts) >= 2:
+                video_index[f"{parts[-2]}/{parts[-1]}"] = p
+
     print("\n[1/3] Loading ACE-Net Model Architecture & Checkpoint...")
     model = ACENet().to(device)
     ckpt_data = torch.load(args.ckpt, map_location=device)
@@ -191,9 +219,9 @@ def main():
         state_dict = ckpt_data
     model.load_state_dict(state_dict, strict=False)
     model.eval()
-    print("  ✅ Weights loaded successfully into ACE-Net!")
 
-    # 2. Read 700 Manifest
+    print("  Weights loaded successfully into ACE-Net!")
+
     with open(manifest_p, newline="", encoding="utf-8") as f:
         records = list(csv.DictReader(f))
     print(f"\n[2/3] Loaded {len(records)} test clips from manifest (350 Real / 350 Fake).")
@@ -212,11 +240,11 @@ def main():
         for row in tqdm(records, desc="Evaluating 700 Clips", dynamic_ncols=True):
             cid = row["clip_id"]
             label = int(row["fake_label"])
-            rel_path = row.get("rel_path", "")
+            rel_path = row.get("rel_video_path", row.get("rel_path", row.get("video_path", "")))
+            fname = Path(rel_path).name if rel_path else f"{cid}.mp4"
             method = row.get("method", "unknown")
             ds_score = float(row["score"]) if row.get("score") else float("nan")
 
-            # Check cached features first
             mel_cache_p = cache_dir / f"{cid}_mel.pt"
             vis_cache_p = cache_dir / f"{cid}_vis.pt"
 
@@ -224,24 +252,22 @@ def main():
                 mel_t = torch.load(mel_cache_p, map_location="cpu")
                 frames_t, frame_mask = torch.load(vis_cache_p, map_location="cpu")
             else:
-                video_candidates = [
-                    raw_dir / rel_path,
-                    raw_dir / f"FakeAVCeleb_v1.2/{rel_path}",
-                    raw_dir / f"FakeAVCeleb/{rel_path}",
-                    raw_dir / row.get("filename", "")
-                ]
-                video_path = next((p for p in video_candidates if p.exists()), None)
+                video_path = video_index.get(fname) or video_index.get(f"{Path(rel_path).parent.name}/{fname}")
                 if not video_path:
-                    fname = Path(rel_path).name if rel_path else f"{cid}.mp4"
-                    found = list(raw_dir.glob(f"**/{fname}"))
-                    if found:
-                        video_path = found[0]
+                    candidates = [
+                        raw_dir / rel_path,
+                        raw_dir / f"FakeAVCeleb_v1.2/{rel_path}",
+                        raw_dir / f"FakeAVCeleb/{rel_path}",
+                        raw_dir / fname
+                    ]
+                    video_path = next((p for p in candidates if p.exists()), None)
 
                 if video_path and video_path.exists():
                     mel_t = extract_audio_mel(video_path)
                     frames_t, frame_mask = extract_visual_frames(video_path, face_detector)
-                    torch.save(mel_t, mel_cache_p)
-                    torch.save((frames_t, frame_mask), vis_cache_p)
+                    if mel_t.abs().sum() > 0 or frames_t.abs().sum() > 0:
+                        torch.save(mel_t, mel_cache_p)
+                        torch.save((frames_t, frame_mask), vis_cache_p)
                 else:
                     mel_t = torch.zeros((N_MELS, FIXED_MEL_LEN), dtype=torch.float32)
                     frames_t = torch.zeros((N_KEYFRAMES, 3, IMG_SIZE, IMG_SIZE), dtype=torch.float32)
@@ -290,7 +316,6 @@ def main():
 
     elapsed = time.time() - t0
 
-    # 4. Compute Metrics
     y_true = np.array(y_true)
     y_pred = np.array(y_pred_acenet)
     binary_preds = (y_pred >= 0.5).astype(int)
@@ -308,7 +333,6 @@ def main():
     fpr = fp / (tn + fp) if (tn + fp) > 0 else 0.0
     fnr = fn / (tp + fn) if (tp + fn) > 0 else 0.0
 
-    # Save Predictions CSV
     out_csv_p.parent.mkdir(parents=True, exist_ok=True)
     fieldnames = [
         "clip_id", "fake_label", "method", "type",
@@ -320,7 +344,6 @@ def main():
         writer.writeheader()
         writer.writerows(results)
 
-    # Save Metrics Summary CSV
     metrics_csv_p = out_csv_p.parent / f"metrics_{out_csv_p.stem}.csv"
     metrics_data = [
         {"model": "ACE-Net Baseline", "auc": f"{auc:.6f}", "accuracy": f"{acc:.6f}", "balanced_acc": f"{bal_acc:.6f}",
