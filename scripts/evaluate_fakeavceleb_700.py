@@ -205,10 +205,11 @@ def main():
     video_index = {}
     if raw_dir.exists():
         for p in raw_dir.rglob("*.mp4"):
-            video_index[p.name] = p
+            video_index[p.name.lower()] = p
             parts = p.parts
             if len(parts) >= 2:
-                video_index[f"{parts[-2]}/{parts[-1]}"] = p
+                video_index[f"{parts[-2]}/{parts[-1]}".lower()] = p
+    print(f"  Indexed {len(video_index)} MP4 videos found in {raw_dir}")
 
     print("\n[1/3] Loading ACE-Net Model Architecture & Checkpoint...")
     model = ACENet().to(device)
@@ -232,6 +233,7 @@ def main():
     y_pred_acenet = []
     y_pred_deepsentinel = []
     methods = []
+    missing_count = 0
 
     print("\n[3/3] Running End-to-End Feature Extraction & Model Inference...")
     t0 = time.time()
@@ -240,8 +242,9 @@ def main():
         for row in tqdm(records, desc="Evaluating 700 Clips", dynamic_ncols=True):
             cid = row["clip_id"]
             label = int(row["fake_label"])
-            rel_path = row.get("rel_video_path", row.get("rel_path", row.get("video_path", "")))
-            fname = Path(rel_path).name if rel_path else f"{cid}.mp4"
+            rel_path = row.get("rel_video_path", row.get("rel_path", row.get("video_path", ""))).replace("\\", "/")
+            p_rel = Path(rel_path)
+            fname = p_rel.name.lower() if rel_path else f"{cid}.mp4".lower()
             method = row.get("method", "unknown")
             ds_score = float(row["score"]) if row.get("score") else float("nan")
 
@@ -252,7 +255,8 @@ def main():
                 mel_t = torch.load(mel_cache_p, map_location="cpu")
                 frames_t, frame_mask = torch.load(vis_cache_p, map_location="cpu")
             else:
-                video_path = video_index.get(fname) or video_index.get(f"{Path(rel_path).parent.name}/{fname}")
+                key_parent = f"{p_rel.parent.name}/{p_rel.name}".lower() if len(p_rel.parts) >= 2 else fname
+                video_path = video_index.get(fname) or video_index.get(key_parent)
                 if not video_path:
                     candidates = [
                         raw_dir / rel_path,
@@ -269,6 +273,7 @@ def main():
                         torch.save(mel_t, mel_cache_p)
                         torch.save((frames_t, frame_mask), vis_cache_p)
                 else:
+                    missing_count += 1
                     mel_t = torch.zeros((N_MELS, FIXED_MEL_LEN), dtype=torch.float32)
                     frames_t = torch.zeros((N_KEYFRAMES, 3, IMG_SIZE, IMG_SIZE), dtype=torch.float32)
                     frame_mask = torch.zeros(N_KEYFRAMES, dtype=torch.float32)
@@ -315,6 +320,10 @@ def main():
             })
 
     elapsed = time.time() - t0
+    if missing_count > 0:
+        print(f"\n⚠️ WARNING: {missing_count} / {len(records)} videos were not found and used dummy zeros!")
+    else:
+        print(f"\n✅ All {len(records)} videos were found and evaluated!")
 
     y_true = np.array(y_true)
     y_pred = np.array(y_pred_acenet)
