@@ -263,7 +263,7 @@ def main():
     parser.add_argument("--manifest", type=str, default="Manifests/fakeavceleb_eval_700.csv", help="Path to 700 manifest CSV")
     parser.add_argument("--raw-dir", type=str, default="/content/fakeav_raw", help="Path to unzipped FakeAVCeleb raw videos directory")
     parser.add_argument("--ckpt", type=str, required=True, help="Path to trained ACE-Net checkpoint (.pth or .pt)")
-    parser.add_argument("--output-csv", type=str, default="data/eval_results/preds_acenet_700.csv", help="Output CSV path")
+    parser.add_argument("--output-csv", type=str, default="data/eval_results/preds_acenet_700_with_bert.csv", help="Output CSV path")
     parser.add_argument("--cache-dir", type=str, default="/content/fakeav_preprocessed_700", help="Directory to cache extracted features")
     parser.add_argument("--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu")
     parser.add_argument("--whisper-model", type=str, default="base", choices=["tiny", "base", "small", "medium", "none"], help="Whisper ASR model for speech transcription")
