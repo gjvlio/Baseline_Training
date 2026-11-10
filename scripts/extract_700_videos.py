@@ -26,15 +26,29 @@ def main():
     out_dir = Path(args.output_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
+    if zip_path.is_dir():
+        # Look for video zip in the directory, skipping feature zips
+        candidates = list(zip_path.glob("*.zip"))
+        video_zips = [z for z in candidates if "feature" not in z.name.lower()]
+        if video_zips:
+            zip_path = video_zips[0]
+
     if not zip_path.exists():
         # Try candidate paths
         candidates = [
+            Path("/content/drive/MyDrive/Baseline_training"),
+            Path("/content/drive/MyDrive/Baseline_training/fakeavceleb.zip"),
             Path("/content/drive/MyDrive/THESIS_MOTHERFILE/datasets/fakeavceleb.zip"),
             Path("/content/drive/Shared with me/THESIS_MOTHERFILE/datasets/fakeavceleb.zip"),
             Path("/content/drive/Shareddrives/THESIS_MOTHERFILE/datasets/fakeavceleb.zip")
         ]
         for c in candidates:
-            if c.exists():
+            if c.is_dir():
+                zips = [z for z in c.glob("*.zip") if "feature" not in z.name.lower()]
+                if zips:
+                    zip_path = zips[0]
+                    break
+            elif c.exists():
                 zip_path = c
                 break
 
@@ -50,6 +64,11 @@ def main():
             with open(mf, newline="", encoding="utf-8") as f:
                 for r in csv.DictReader(f):
                     rel = r.get("rel_path", "").replace("\\", "/").strip().lower()
+                    if not rel and r.get("video_path"):
+                        rel = r.get("video_path", "").replace("\\", "/").strip().lower()
+                        for pfx in ["data/raw/fakeavceleb_v1.2/", "fakeavceleb_v1.2/"]:
+                            if rel.startswith(pfx):
+                                rel = rel[len(pfx):]
                     if rel:
                         target_rel_paths.add(rel)
 
