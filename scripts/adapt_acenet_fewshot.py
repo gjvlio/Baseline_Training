@@ -27,9 +27,93 @@ from src.models.acenet import ACENet
 _IMAGENET_MEAN = np.array([0.485, 0.456, 0.406], dtype=np.float32)
 _IMAGENET_STD = np.array([0.229, 0.224, 0.225], dtype=np.float32)
 FIXED_MEL_LEN = 128
+TEXT_MAX_LEN = 128
 N_MELS = 80
 N_KEYFRAMES = 8
 IMG_SIZE = 224
+
+def get_whisper_and_tokenizer(model_name="base", device="cpu"):
+    """
+    Initializes Whisper ASR model and BERT Tokenizer for ACE-Net SpeechTextModule.
+    Traced to Section 3.2 (Speech-Text Emotion Feature Extraction Module).
+    """
+    whisper_model = None
+    tokenizer = None
+    try:
+        import whisper
+        print(f"  [ASR] Loading OpenAI-Whisper model ('{model_name}') onto {device}...")
+        whisper_model = whisper.load_model(model_name, device=device)
+        print("  [ASR] Whisper model loaded successfully!")
+    except Exception as e:
+        print(f"  [ASR Warning] Could not load Whisper ('{model_name}'): {e}")
+        print("  [ASR Warning] Ensure 'openai-whisper' is installed (pip install openai-whisper).")
+
+    try:
+        from transformers import BertTokenizer
+        print("  [NLP] Loading BERT Tokenizer ('bert-base-uncased')...")
+        tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
+        print("  [NLP] BERT Tokenizer loaded successfully!")
+    except Exception as e:
+        print(f"  [NLP Warning] Could not load BertTokenizer: {e}")
+
+    return whisper_model, tokenizer
+
+def process_text_tokens(video_path, txt_cache_p, whisper_model=None, tokenizer=None):
+    """
+    Transcribes audio from the video clip using Whisper and tokenizes into BERT input_ids.
+    Caches the results to prevent re-transcription.
+    """
+    if txt_cache_p.exists():
+        try:
+            cached = torch.load(txt_cache_p, map_location="cpu")
+            if isinstance(cached, tuple) and len(cached) == 3:
+                return cached[0], cached[1], cached[2]
+            elif isinstance(cached, tuple) and len(cached) == 2:
+                return cached[0], cached[1], ""
+        except Exception:
+            pass
+
+    text = ""
+    if whisper_model is not None and video_path is not None and Path(video_path).exists():
+        try:
+            device_is_cuda = next(whisper_model.parameters()).is_cuda if hasattr(whisper_model, "parameters") else False
+            res = whisper_model.transcribe(str(video_path), fp16=device_is_cuda)
+            text = res.get("text", "").strip()
+        except Exception as e:
+            text = ""
+
+    if tokenizer is not None and text:
+        try:
+            encoded = tokenizer(
+                text,
+                max_length=TEXT_MAX_LEN,
+                padding="max_length",
+                truncation=True,
+                return_tensors="pt"
+            )
+            input_ids = encoded["input_ids"].squeeze(0)
+            attention_mask = encoded["attention_mask"].squeeze(0)
+        except Exception:
+            input_ids = torch.zeros(TEXT_MAX_LEN, dtype=torch.int64)
+            input_ids[0] = 101
+            input_ids[1] = 102
+            attention_mask = torch.zeros(TEXT_MAX_LEN, dtype=torch.int64)
+            attention_mask[0] = 1
+            attention_mask[1] = 1
+    else:
+        input_ids = torch.zeros(TEXT_MAX_LEN, dtype=torch.int64)
+        input_ids[0] = 101
+        input_ids[1] = 102
+        attention_mask = torch.zeros(TEXT_MAX_LEN, dtype=torch.int64)
+        attention_mask[0] = 1
+        attention_mask[1] = 1
+
+    try:
+        torch.save((input_ids, attention_mask, text), txt_cache_p)
+    except Exception:
+        pass
+
+    return input_ids, attention_mask, text
 
 def extract_face_crop(frame, detector=None):
     h, w, _ = frame.shape
@@ -117,10 +201,12 @@ def extract_audio_mel(video_path):
         return torch.zeros((N_MELS, FIXED_MEL_LEN), dtype=torch.float32)
 
 class FakeAVAdaptationDataset(Dataset):
-    def __init__(self, manifest_path=None, raw_dir="/content/fakeav_raw", cache_dir="/content/fakeav_preprocessed_700"):
+    def __init__(self, manifest_path=None, raw_dir="/content/fakeav_raw", cache_dir="/content/fakeav_preprocessed_700", whisper_model=None, tokenizer=None):
         self.raw_dir = Path(raw_dir)
         self.cache_dir = Path(cache_dir)
         self.cache_dir.mkdir(parents=True, exist_ok=True)
+        self.whisper_model = whisper_model
+        self.tokenizer = tokenizer
         self.samples = []
 
         self.video_index = {}
@@ -152,6 +238,16 @@ class FakeAVAdaptationDataset(Dataset):
         rel_path = item["rel_path"]
         fname = item["filename"]
 
+        video_p = self.video_index.get(fname) or self.video_index.get(f"{Path(rel_path).parent.name}/{fname}")
+        if not video_p:
+            candidates = [
+                self.raw_dir / rel_path,
+                self.raw_dir / f"FakeAVCeleb_v1.2/{rel_path}",
+                self.raw_dir / f"FakeAVCeleb/{rel_path}",
+                self.raw_dir / fname
+            ]
+            video_p = next((p for p in candidates if p.exists()), None)
+
         mel_p = self.cache_dir / f"{cid}_mel.pt"
         vis_p = self.cache_dir / f"{cid}_vis.pt"
 
@@ -159,16 +255,6 @@ class FakeAVAdaptationDataset(Dataset):
             mel_t = torch.load(mel_p, map_location="cpu")
             frames_t, frame_mask = torch.load(vis_p, map_location="cpu")
         else:
-            video_p = self.video_index.get(fname) or self.video_index.get(f"{Path(rel_path).parent.name}/{fname}")
-            if not video_p:
-                candidates = [
-                    self.raw_dir / rel_path,
-                    self.raw_dir / f"FakeAVCeleb_v1.2/{rel_path}",
-                    self.raw_dir / f"FakeAVCeleb/{rel_path}",
-                    self.raw_dir / fname
-                ]
-                video_p = next((p for p in candidates if p.exists()), None)
-
             if video_p and video_p.exists():
                 mel_t = extract_audio_mel(video_p)
                 frames_t, frame_mask = extract_visual_frames(video_p, None)
@@ -180,12 +266,13 @@ class FakeAVAdaptationDataset(Dataset):
                 frames_t = torch.zeros((N_KEYFRAMES, 3, IMG_SIZE, IMG_SIZE), dtype=torch.float32)
                 frame_mask = torch.zeros(N_KEYFRAMES, dtype=torch.float32)
 
-        input_ids = torch.zeros(128, dtype=torch.int64)
-        input_ids[0] = 101
-        input_ids[1] = 102
-        attention_mask = torch.zeros(128, dtype=torch.int64)
-        attention_mask[0] = 1
-        attention_mask[1] = 1
+        txt_cache_p = self.cache_dir / f"{cid}_txt.pt"
+        input_ids, attention_mask, _ = process_text_tokens(
+            video_path=video_p,
+            txt_cache_p=txt_cache_p,
+            whisper_model=self.whisper_model,
+            tokenizer=self.tokenizer
+        )
 
         return {
             "melspec": mel_t,
@@ -203,12 +290,14 @@ def main():
     parser.add_argument("--manifest", type=str, default="Manifests/fakeavceleb_adapt_300.csv", help="Path to 300 adaptation manifest")
     parser.add_argument("--raw-dir", type=str, default="/content/fakeav_raw", help="Path to raw videos")
     parser.add_argument("--cache-dir", type=str, default="/content/fakeav_preprocessed_700", help="Feature cache directory")
-    parser.add_argument("--init-ckpt", type=str, required=True, help="Path to pre-trained baseline model checkpoint (.pth or .pt)")
-    parser.add_argument("--output-ckpt", type=str, default="checkpoints/acenet_adapted.pth", help="Path to save adapted model")
+    parser.add_argument("--init-ckpt", type=str, default="/content/drive/MyDrive/Baseline_training/checkpoints/acenet_adapted.pth", help="Path to pre-trained baseline model checkpoint (.pth or .pt)")
+    parser.add_argument("--output-ckpt", type=str, default="/content/drive/MyDrive/Baseline_training/checkpoints/acenet_adapted_whisper.pth", help="Path to save adapted model")
     parser.add_argument("--epochs", type=int, default=5, help="Number of adaptation epochs")
     parser.add_argument("--lr", type=float, default=5e-6, help="Adaptation learning rate")
     parser.add_argument("--batch-size", type=int, default=16, help="Batch size")
     parser.add_argument("--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu")
+    parser.add_argument("--whisper-model", type=str, default="base", choices=["tiny", "base", "small", "medium", "none"], help="Whisper ASR model for speech transcription")
+    parser.add_argument("--skip-whisper", action="store_true", help="Skip Whisper ASR transcription and use fallback text padding")
     args = parser.parse_args()
 
     device = torch.device(args.device)
@@ -216,7 +305,7 @@ def main():
     out_ckpt.parent.mkdir(parents=True, exist_ok=True)
 
     print("=" * 80)
-    print("      ACE-NET FEW-SHOT DOMAIN ADAPTATION ENGINE (STABILIZED)")
+    print("      ACE-NET FEW-SHOT DOMAIN ADAPTATION ENGINE (WHISPER-ENABLED)")
     print(f"  Init Checkpoint : {args.init_ckpt}")
     print(f"  Manifest        : {args.manifest}")
     print(f"  Raw Videos Dir  : {args.raw_dir}")
@@ -224,17 +313,50 @@ def main():
     print(f"  Learning Rate   : {args.lr}")
     print(f"  Batch Size      : {args.batch_size}")
     print(f"  Output Checkpoint: {out_ckpt}")
+    print(f"  Whisper Model   : {args.whisper_model}")
     print(f"  Device          : {device}")
     print("=" * 80)
 
-    adapt_ds = FakeAVAdaptationDataset(manifest_path=args.manifest, raw_dir=args.raw_dir, cache_dir=args.cache_dir)
+    whisper_model = None
+    tokenizer = None
+    if args.whisper_model != "none" and not args.skip_whisper:
+        print(f"\n[1/3] Initializing Whisper ASR ('{args.whisper_model}') & BERT Tokenizer for Adaptation...")
+        whisper_model, tokenizer = get_whisper_and_tokenizer(model_name=args.whisper_model, device=device)
+    else:
+        print("\n[1/3] Whisper transcription disabled for adaptation. Using fallback padding.")
+
+    adapt_ds = FakeAVAdaptationDataset(
+        manifest_path=args.manifest,
+        raw_dir=args.raw_dir,
+        cache_dir=args.cache_dir,
+        whisper_model=whisper_model,
+        tokenizer=tokenizer
+    )
     print(f"  -> Loaded {len(adapt_ds)} adaptation clips (150 Real / 150 Fake from Speaker Set A).")
 
     adapt_loader = DataLoader(adapt_ds, batch_size=args.batch_size, shuffle=True, num_workers=0)
 
     print("\n[2/3] Initializing Model & Freezing Feature Extractors...")
     model = ACENet().to(device)
-    ckpt_data = torch.load(args.init_ckpt, map_location=device)
+
+    init_path = Path(args.init_ckpt)
+    if not init_path.exists():
+        fallback_candidates = [
+            Path("/content/drive/MyDrive/Baseline_training/checkpoints/best_baseline_model.pth"),
+            Path("/content/drive/MyDrive/Baseline_training/checkpoints/acenet_adapted.pth"),
+            Path("/content/drive/MyDrive/THESIS_MOTHERFILE/Baseline_training/checkpoints/best_baseline_model.pth"),
+            Path("/content/drive/MyDrive/THESIS_MOTHERFILE/Baseline_training/checkpoints/acenet_adapted.pth"),
+            Path("checkpoints/best_baseline_model.pth"),
+            Path("checkpoints/acenet_adapted.pth"),
+        ]
+        found = next((p for p in fallback_candidates if p.exists()), None)
+        if found:
+            print(f"  [Init Ckpt Fallback] '{init_path}' not found. Using: {found}")
+            init_path = found
+        else:
+            raise FileNotFoundError(f"Cannot find init checkpoint at {init_path}")
+
+    ckpt_data = torch.load(init_path, map_location=device)
     if isinstance(ckpt_data, dict) and "model_state" in ckpt_data:
         state_dict = ckpt_data["model_state"]
     else:

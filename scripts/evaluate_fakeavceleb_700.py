@@ -299,7 +299,23 @@ def main():
 
     print("\n[1/3] Loading ACE-Net Model Architecture & Checkpoint...")
     model = ACENet().to(device)
-    ckpt_data = torch.load(args.ckpt, map_location=device)
+    ckpt_path = Path(args.ckpt)
+    if not ckpt_path.exists():
+        fallback_candidates = [
+            Path("/content/drive/MyDrive/Baseline_training/checkpoints/acenet_adapted_whisper.pth"),
+            Path("/content/drive/MyDrive/Baseline_training/checkpoints/acenet_adapted.pth"),
+            Path("/content/drive/MyDrive/THESIS_MOTHERFILE/Baseline_training/checkpoints/acenet_adapted.pth"),
+            Path("checkpoints/acenet_adapted_whisper.pth"),
+            Path("checkpoints/acenet_adapted.pth")
+        ]
+        found = next((p for p in fallback_candidates if p.exists()), None)
+        if found:
+            print(f"  [Checkpoint Fallback] '{ckpt_path}' not found. Using fallback: {found}")
+            ckpt_path = found
+        else:
+            raise FileNotFoundError(f"Checkpoint not found at '{ckpt_path}' or any fallback location.")
+
+    ckpt_data = torch.load(ckpt_path, map_location=device)
     if isinstance(ckpt_data, dict) and "model_state" in ckpt_data:
         state_dict = ckpt_data["model_state"]
     else:
