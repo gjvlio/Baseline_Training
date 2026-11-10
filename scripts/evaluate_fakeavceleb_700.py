@@ -21,6 +21,89 @@ from sklearn.metrics import (
     precision_recall_fscore_support, confusion_matrix
 )
 
+def get_whisper_and_tokenizer(model_name="base", device="cpu"):
+    """
+    Initializes Whisper ASR model and BERT Tokenizer for ACE-Net SpeechTextModule.
+    Traced to Section 3.2 (Speech-Text Emotion Feature Extraction Module).
+    """
+    whisper_model = None
+    tokenizer = None
+    try:
+        import whisper
+        print(f"  [ASR] Loading OpenAI-Whisper model ('{model_name}') onto {device}...")
+        whisper_model = whisper.load_model(model_name, device=device)
+        print("  [ASR] Whisper model loaded successfully!")
+    except Exception as e:
+        print(f"  [ASR Warning] Could not load Whisper ('{model_name}'): {e}")
+        print("  [ASR Warning] Ensure 'openai-whisper' is installed (pip install openai-whisper).")
+
+    try:
+        from transformers import BertTokenizer
+        print("  [NLP] Loading BERT Tokenizer ('bert-base-uncased')...")
+        tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
+        print("  [NLP] BERT Tokenizer loaded successfully!")
+    except Exception as e:
+        print(f"  [NLP Warning] Could not load BertTokenizer: {e}")
+
+    return whisper_model, tokenizer
+
+def process_text_tokens(video_path, txt_cache_p, whisper_model=None, tokenizer=None):
+    """
+    Transcribes audio from the video clip using Whisper and tokenizes into BERT input_ids.
+    Caches the results to prevent re-transcription.
+    """
+    if txt_cache_p.exists():
+        try:
+            cached = torch.load(txt_cache_p, map_location="cpu")
+            if isinstance(cached, tuple) and len(cached) == 3:
+                return cached[0], cached[1], cached[2]
+            elif isinstance(cached, tuple) and len(cached) == 2:
+                return cached[0], cached[1], ""
+        except Exception:
+            pass
+
+    text = ""
+    if whisper_model is not None and video_path is not None and Path(video_path).exists():
+        try:
+            device_is_cuda = next(whisper_model.parameters()).is_cuda if hasattr(whisper_model, "parameters") else False
+            res = whisper_model.transcribe(str(video_path), fp16=device_is_cuda)
+            text = res.get("text", "").strip()
+        except Exception as e:
+            text = ""
+
+    if tokenizer is not None and text:
+        try:
+            encoded = tokenizer(
+                text,
+                max_length=TEXT_MAX_LEN,
+                padding="max_length",
+                truncation=True,
+                return_tensors="pt"
+            )
+            input_ids = encoded["input_ids"].squeeze(0)
+            attention_mask = encoded["attention_mask"].squeeze(0)
+        except Exception:
+            input_ids = torch.zeros(TEXT_MAX_LEN, dtype=torch.int64)
+            input_ids[0] = 101
+            input_ids[1] = 102
+            attention_mask = torch.zeros(TEXT_MAX_LEN, dtype=torch.int64)
+            attention_mask[0] = 1
+            attention_mask[1] = 1
+    else:
+        input_ids = torch.zeros(TEXT_MAX_LEN, dtype=torch.int64)
+        input_ids[0] = 101
+        input_ids[1] = 102
+        attention_mask = torch.zeros(TEXT_MAX_LEN, dtype=torch.int64)
+        attention_mask[0] = 1
+        attention_mask[1] = 1
+
+    try:
+        torch.save((input_ids, attention_mask, text), txt_cache_p)
+    except Exception:
+        pass
+
+    return input_ids, attention_mask, text
+
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
 
@@ -29,6 +112,7 @@ from src.models.acenet import ACENet
 _IMAGENET_MEAN = np.array([0.485, 0.456, 0.406], dtype=np.float32)
 _IMAGENET_STD = np.array([0.229, 0.224, 0.225], dtype=np.float32)
 FIXED_MEL_LEN = 128
+TEXT_MAX_LEN = 128
 N_MELS = 80
 N_KEYFRAMES = 8
 IMG_SIZE = 224
@@ -182,6 +266,8 @@ def main():
     parser.add_argument("--output-csv", type=str, default="data/eval_results/preds_acenet_700.csv", help="Output CSV path")
     parser.add_argument("--cache-dir", type=str, default="/content/fakeav_preprocessed_700", help="Directory to cache extracted features")
     parser.add_argument("--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu")
+    parser.add_argument("--whisper-model", type=str, default="base", choices=["tiny", "base", "small", "medium", "none"], help="Whisper ASR model for speech transcription")
+    parser.add_argument("--skip-whisper", action="store_true", help="Skip Whisper ASR transcription and use fallback text padding")
     args = parser.parse_args()
 
     device = torch.device(args.device)
@@ -222,6 +308,14 @@ def main():
     model.eval()
 
     print("  Weights loaded successfully into ACE-Net!")
+
+    whisper_model = None
+    tokenizer = None
+    if args.whisper_model != "none" and not args.skip_whisper:
+        print(f"\n[1.5/3] Initializing Whisper ASR ('{args.whisper_model}') & BERT Tokenizer for SpeechTextModule...")
+        whisper_model, tokenizer = get_whisper_and_tokenizer(model_name=args.whisper_model, device=device)
+    else:
+        print("\n[1.5/3] Whisper transcription disabled. Using fallback padding.")
 
     with open(manifest_p, newline="", encoding="utf-8") as f:
         records = list(csv.DictReader(f))
@@ -278,18 +372,19 @@ def main():
                     frames_t = torch.zeros((N_KEYFRAMES, 3, IMG_SIZE, IMG_SIZE), dtype=torch.float32)
                     frame_mask = torch.zeros(N_KEYFRAMES, dtype=torch.float32)
 
-            input_ids = torch.zeros((1, 128), dtype=torch.int64, device=device)
-            input_ids[0, 0] = 101
-            input_ids[0, 1] = 102
-            attention_mask = torch.zeros((1, 128), dtype=torch.int64, device=device)
-            attention_mask[0, 0] = 1
-            attention_mask[0, 1] = 1
+            txt_cache_p = cache_dir / f"{cid}_txt.pt"
+            input_ids_t, attn_mask_t, transcript_text = process_text_tokens(
+                video_path=video_path,
+                txt_cache_p=txt_cache_p,
+                whisper_model=whisper_model,
+                tokenizer=tokenizer
+            )
 
             batch_dev = {
                 "melspec": mel_t.unsqueeze(0).to(device),
                 "mel_lengths": torch.tensor([FIXED_MEL_LEN], device=device),
-                "input_ids": input_ids,
-                "attention_mask": attention_mask,
+                "input_ids": input_ids_t.unsqueeze(0).to(device),
+                "attention_mask": attn_mask_t.unsqueeze(0).to(device),
                 "frames": frames_t.unsqueeze(0).to(device),
                 "alpha": (torch.ones((1, N_KEYFRAMES), dtype=torch.float32) / N_KEYFRAMES).to(device),
                 "frame_mask": frame_mask.unsqueeze(0).to(device)
@@ -312,6 +407,7 @@ def main():
                 "fake_label": label,
                 "method": method,
                 "type": row.get("type", ""),
+                "transcript": transcript_text,
                 "deepsentinel_score": f"{ds_score:.6f}" if not np.isnan(ds_score) else "",
                 "deepsentinel_pred": pred_ds,
                 "acenet_score": f"{score_acenet:.6f}",
@@ -344,7 +440,7 @@ def main():
 
     out_csv_p.parent.mkdir(parents=True, exist_ok=True)
     fieldnames = [
-        "clip_id", "fake_label", "method", "type",
+        "clip_id", "fake_label", "method", "type", "transcript",
         "deepsentinel_score", "deepsentinel_pred",
         "acenet_score", "acenet_pred", "acenet_correct"
     ]
