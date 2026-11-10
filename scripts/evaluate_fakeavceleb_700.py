@@ -361,20 +361,22 @@ def main():
             mel_cache_p = cache_dir / f"{cid}_mel.pt"
             vis_cache_p = cache_dir / f"{cid}_vis.pt"
 
+            # Resolve video_path early so it's always available for Whisper text extraction
+            key_parent = f"{p_rel.parent.name}/{p_rel.name}".lower() if len(p_rel.parts) >= 2 else fname
+            video_path = video_index.get(fname) or video_index.get(key_parent)
+            if not video_path:
+                candidates = [
+                    raw_dir / rel_path,
+                    raw_dir / f"FakeAVCeleb_v1.2/{rel_path}",
+                    raw_dir / f"FakeAVCeleb/{rel_path}",
+                    raw_dir / fname
+                ]
+                video_path = next((p for p in candidates if p.exists()), None)
+
             if mel_cache_p.exists() and vis_cache_p.exists():
                 mel_t = torch.load(mel_cache_p, map_location="cpu")
                 frames_t, frame_mask = torch.load(vis_cache_p, map_location="cpu")
             else:
-                key_parent = f"{p_rel.parent.name}/{p_rel.name}".lower() if len(p_rel.parts) >= 2 else fname
-                video_path = video_index.get(fname) or video_index.get(key_parent)
-                if not video_path:
-                    candidates = [
-                        raw_dir / rel_path,
-                        raw_dir / f"FakeAVCeleb_v1.2/{rel_path}",
-                        raw_dir / f"FakeAVCeleb/{rel_path}",
-                        raw_dir / fname
-                    ]
-                    video_path = next((p for p in candidates if p.exists()), None)
 
                 if video_path and video_path.exists():
                     mel_t = extract_audio_mel(video_path)
